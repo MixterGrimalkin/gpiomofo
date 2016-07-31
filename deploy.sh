@@ -11,9 +11,17 @@ then
     echo "Compiling Java..."
     mvn clean package
 fi
-echo "Uploading Application..."
-sshpass -p raspberry scp -r target/gpiomofo pi@${ip}:
-sshpass -p raspberry ssh pi@${ip} "cd /home/pi/gpiomofo; sudo chmod +x *.sh"
+if [ "$1" = "-quick" ]
+then
+    echo "Uploading Application (quick mode)..."
+    sshpass -p raspberry scp target/gpiomofo/*.sh pi@${ip}:gpiomofo
+    sshpass -p raspberry scp target/gpiomofo/*.jar pi@${ip}:gpiomofo
+    sshpass -p raspberry ssh pi@${ip} "cd /home/pi/gpiomofo; sudo chmod +x *.sh"
+else
+    echo "Uploading Application..."
+    sshpass -p raspberry scp -r target/gpiomofo pi@${ip}:
+    sshpass -p raspberry ssh pi@${ip} "cd /home/pi/gpiomofo; sudo chmod +x *.sh"
+fi
 echo
 echo "Done"
 echo

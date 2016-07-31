@@ -79,6 +79,11 @@ public abstract class GpioProvider {
         digitalWrite(pinNumber, state);
     }
 
+    public void toggle(int pinNumber) {
+        failIfNotDigitalOutput(pinNumber);
+        digitalWrite(pinNumber, !digitalRead(pinNumber));
+    }
+
     protected abstract void digitalWrite(int pinNumber, boolean high);
 
     public void setupDigitalOutput(int pinNumber) {
@@ -170,6 +175,12 @@ public abstract class GpioProvider {
         if ( monitorTimer!=null ) {
             monitorTimer.cancel();
             monitorTimer = null;
+        }
+    }
+
+    public void shutdown() {
+        for ( Integer pinNumber : digitalOutputs ) {
+            write(pinNumber, false);
         }
     }
 

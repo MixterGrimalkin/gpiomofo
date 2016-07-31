@@ -1,0 +1,97 @@
+
+*** GPIO MoFo ***
+
+Brief:
+System which responds to configurable GPIO events (Triggers) by firing GPIO, MIDI, AUDIO and/or HTTP events (Targets).
+Config is edited via a webapp.
+HTTP endpoints accept/produce JSON
+Must have a picture of Samuel L Jackson and Bruce Willis
+
+
+>>> TRIGGERS
+
+	Name = "Button 1"
+	GPIO Pin = 17
+	Trigger On = HIGH / LOW / BOTH
+	Reset Time = 1500ms (further triggers ignored for this amount of time)
+	
+Webapp displays whether trigger is active or not. Allows create/edit/delete.
+
+GET  /gpiomofo/triggerstate/{id}
+GET  /gpiomofo/trigger
+GET  /gpiomofo/trigger/{id}
+POST /gpiomofo/trigger/add
+POST /gpiomofo/trigger/update
+POST /gpiomofo/trigger/remove/{id}
+
+	
+>>> TARGETS
+
+	Name = "Target 1"
+	Type = GPIO / MIDI / HTTP / AUDIO
+
+For GPIO:
+
+	GPIO Pin = 20
+	Trigger To = HIGH / LOW / TOGGLE
+	Reset To = HIGH / LOW / LAST / NONE
+	Reset Time = 1000ms
+	
+For MIDI:
+
+	Command = NOTE_ON / NOTE_OFF / etc.
+	Channel = 1
+	Data1 = 67
+	Data2 = 127
+	
+For HTTP:
+
+	Host = 192.168.1.10
+	Port = 8001
+	Method = GET / POST
+	Path = /lightboard/scene/whatever/load?start=true
+	Payload = Chavhattedtwat
+	
+For AUDIO:
+
+	Action = PLAY / STOP_ALL
+	Filename = forfucksake.mp3
+	
+Webapp allows manual firing of targets. Allows create/edit/delete
+
+GET  /gpiomofo/target
+GET  /gpiomofo/target?id=123
+POST /gpiomofo/target/add
+POST /gpiomofo/target/update
+POST /gpiomofo/target/remove?id=123
+POST /gpiomofo/target/fire?id=123
+
+
+>>> LINKS
+
+	Triggers = "Button 1" , ... , ...
+	Target = "Target 1"
+
+When multiple Triggers are specified, the Target is fired when ALL the Triggers are active
+Same Triggers and Targets can be used in multiple Links
+	
+GET  /gpiomofo/link
+GET  /gpiomofo/link?id=123
+POST /gpiomofo/link/add
+POST /gpiomofo/link/update
+POST /gpiomofo/link/remove?id=123
+	
+	
+
+
+	
+	
+	
+
+
+
+
+
+
+
+
