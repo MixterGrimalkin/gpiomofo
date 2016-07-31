@@ -2,6 +2,7 @@ package net.amarantha.gpiomofo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.gpio.GpioProvider;
 
 import java.util.Scanner;
@@ -15,7 +16,10 @@ public class GpioMoFo {
 
         System.out.println("Starting GpioMoFo...");
 
-        gpio.onInputChange(1, (s)->gpio.digitalOutput(0, s));
+        gpio.setupDigitalInput(1, PinPullResistance.PULL_DOWN);
+        gpio.setupDigitalOutput(0, false);
+
+        gpio.onInputChange(1, (s)-> gpio.write(0, s));
         gpio.whileInputHigh(1, ()-> System.out.println("HIGH AS A BIRD!"));
         gpio.whileInputLow(1, ()-> System.out.println("^W^"));
 

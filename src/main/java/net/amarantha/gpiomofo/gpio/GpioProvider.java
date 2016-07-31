@@ -1,60 +1,149 @@
 package net.amarantha.gpiomofo.gpio;
 
-import com.pi4j.io.gpio.*;
+import com.pi4j.io.gpio.PinPullResistance;
+import com.pi4j.io.gpio.PinState;
 
 import java.util.*;
 
-import static com.pi4j.io.gpio.RaspiPin.*;
 import static java.lang.System.currentTimeMillis;
 
 public abstract class GpioProvider {
 
-    protected Map<Integer, Pin> availablePins = new HashMap<>();
-    protected Map<Integer, GpioPinDigitalOutput>  digitalOutputPins = new HashMap<>();
-    protected Map<Integer, GpioPinDigitalInput>   digitalInputPins = new HashMap<>();
+    protected List<Integer> digitalInputs = new ArrayList<>();
+    protected List<Integer> digitalOutputs = new ArrayList<>();
 
-    private Map<Integer, List<OnHigh>>    onHighCallbacks = new HashMap<>();
-    private Map<Integer, List<OnLow>>     onLowCallbacks = new HashMap<>();
-    private Map<Integer, List<OnChange>>  onChangeCallbacks = new HashMap<>();
+    protected Map<Integer, Boolean>   inputLastState = new HashMap<>();
+    protected Map<Integer, Long>      inputLastChange = new HashMap<>();
+    protected Map<Integer, Long>      inputTimeouts = new HashMap<>();
 
-    private Map<Integer, List<OnHigh>>    whenHighCallbacks = new HashMap<>();
-    private Map<Integer, List<OnLow>>     whenLowCallbacks = new HashMap<>();
+    protected Map<Integer, List<OnHigh>>    onHighCallbacks = new HashMap<>();
+    protected Map<Integer, List<OnLow>>     onLowCallbacks = new HashMap<>();
+    protected Map<Integer, List<OnChange>>  onChangeCallbacks = new HashMap<>();
 
-    protected Map<Integer, Boolean>   lastInputState = new HashMap<>();
-    protected Map<Integer, Long>      lastInputStateChange = new HashMap<>();
-    protected Map<Integer, Long>      pinTimeouts = new HashMap<>();
+    protected Map<Integer, List<OnHigh>>    whenHighCallbacks = new HashMap<>();
+    protected Map<Integer, List<OnLow>>     whenLowCallbacks = new HashMap<>();
 
-    public GpioProvider() {
-        availablePins.put( 0, GPIO_00);
-        availablePins.put( 1, GPIO_01);
-        availablePins.put( 2, GPIO_02);
-        availablePins.put( 3, GPIO_03);
-        availablePins.put( 4, GPIO_04);
-        availablePins.put( 5, GPIO_05);
-        availablePins.put( 6, GPIO_06);
-        availablePins.put( 7, GPIO_07);
-        availablePins.put( 8, GPIO_08);
-        availablePins.put( 9, GPIO_09);
-        availablePins.put(10, GPIO_10);
-        availablePins.put(11, GPIO_11);
-        availablePins.put(12, GPIO_12);
-        availablePins.put(13, GPIO_13);
-        availablePins.put(14, GPIO_14);
-        availablePins.put(15, GPIO_15);
-        availablePins.put(16, GPIO_16);
-        availablePins.put(17, GPIO_17);
-        availablePins.put(18, GPIO_18);
-        availablePins.put(19, GPIO_19);
-        availablePins.put(20, GPIO_20);
-        availablePins.put(21, GPIO_21);
-        availablePins.put(22, GPIO_22);
-        availablePins.put(23, GPIO_23);
-        availablePins.put(24, GPIO_24);
-        availablePins.put(25, GPIO_25);
-        availablePins.put(26, GPIO_26);
-        availablePins.put(27, GPIO_27);
-        availablePins.put(28, GPIO_28);
-        availablePins.put(29, GPIO_29);
+    public abstract boolean isValidPin(int pinNumber);
+
+    public boolean isProvisioned(int pinNumber) {
+        return isDigitalInput(pinNumber) || isDigitalOutput(pinNumber);
+    }
+
+    ///////////////////
+    // Digital Input //
+    ///////////////////
+
+    public boolean read(int pinNumber) {
+        failIfNotDigitalInput(pinNumber);
+        return digitalRead(pinNumber);
+    }
+
+    protected abstract boolean digitalRead(int pinNumber);
+
+    public void setupDigitalInput(int pinNumber) {
+        setupDigitalInput(pinNumber, DEFAULT_PULL_RESISTANCE);
+    }
+
+    public void setupDigitalInput(int pinNumber, PinPullResistance resistance) {
+        if ( !isValidPin(pinNumber) ) {
+            throw new IllegalStateException("Pin " + pinNumber + " is not valid");
+        }
+        if ( isProvisioned(pinNumber) ) {
+            throw new IllegalStateException("Pin " + pinNumber + " is already in use");
+        }
+        provisionDigitalInput(pinNumber, resistance);
+        digitalInputs.add(pinNumber);
+        inputLastState.put(pinNumber, digitalRead(pinNumber));
+        inputLastChange.put(pinNumber, currentTimeMillis());
+        inputTimeouts.put(pinNumber, 0L);
+    }
+
+    protected abstract void provisionDigitalInput(int pinNumber, PinPullResistance resistance);
+
+    public boolean isDigitalInput(int pinNumber) {
+        return digitalInputs.contains(pinNumber);
+    }
+
+    private void failIfNotDigitalInput(int pinNumber) {
+        if ( !isDigitalInput(pinNumber) ) {
+            throw new IllegalStateException("Pin " + pinNumber + " is not an input");
+        }
+    }
+
+    ////////////////////
+    // Digital Output //
+    ////////////////////
+
+    public void write(int pinNumber, boolean state) {
+        failIfNotDigitalOutput(pinNumber);
+        digitalWrite(pinNumber, state);
+    }
+
+    protected abstract void digitalWrite(int pinNumber, boolean high);
+
+    public void setupDigitalOutput(int pinNumber) {
+        setupDigitalOutput(pinNumber, DEFAULT_OUTPUT_STATE);
+    }
+
+    public void setupDigitalOutput(int pinNumber, boolean initialState) {
+        if ( !isValidPin(pinNumber) ) {
+            throw new IllegalStateException("Pin " + pinNumber + " is not valid");
+        }
+        if ( isProvisioned(pinNumber) ) {
+            throw new IllegalStateException("Pin " + pinNumber + " is already in use");
+        }
+        provisionDigitalOutput(pinNumber, initialState ? PinState.HIGH : PinState.LOW);
+        digitalOutputs.add(pinNumber);
+    }
+
+    protected abstract void provisionDigitalOutput(int pinNumber, PinState initialState);
+
+    public boolean isDigitalOutput(int pinNumber) {
+        return digitalOutputs.contains(pinNumber);
+    }
+
+    private void failIfNotDigitalOutput(int pinNumber) {
+        if ( !isDigitalOutput(pinNumber) ) {
+            throw new IllegalStateException("Pin " + pinNumber + " is not an output");
+        }
+    }
+
+    ///////////////
+    // Listeners //
+    ///////////////
+
+    public void onInputHigh(int pinNumber, OnHigh callback) {
+        failIfNotDigitalInput(pinNumber);
+        addCallback(onHighCallbacks, pinNumber, callback);
+    }
+
+    public void onInputLow(int pinNumber, OnLow callback) {
+        failIfNotDigitalInput(pinNumber);
+        addCallback(onLowCallbacks, pinNumber, callback);
+    }
+
+    public void onInputChange(int pinNumber, OnChange callback) {
+        failIfNotDigitalInput(pinNumber);
+        addCallback(onChangeCallbacks, pinNumber, callback);
+    }
+
+    public void whileInputHigh(int pinNumber, OnHigh callback) {
+        failIfNotDigitalInput(pinNumber);
+        addCallback(whenHighCallbacks, pinNumber, callback);
+    }
+
+    public void whileInputLow(int pinNumber, OnLow callback) {
+        failIfNotDigitalInput(pinNumber);
+        addCallback(whenLowCallbacks, pinNumber, callback);
+    }
+
+    private <C> void addCallback(Map<Integer, List<C>> map, int pinNumber, C callback) {
+        List<C> callbacks = map.get(pinNumber);
+        if ( callbacks==null ) {
+            callbacks = new ArrayList<>();
+            map.put(pinNumber, callbacks);
+        }
+        callbacks.add(callback);
     }
 
     ///////////////////
@@ -71,8 +160,7 @@ public abstract class GpioProvider {
         stopInputMonitor();
         monitorTimer = new Timer();
         monitorTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 scanPins();
             }
         }, 0, period);
@@ -85,17 +173,30 @@ public abstract class GpioProvider {
         }
     }
 
-    private void scanPins() {
+    protected void scanPins() {
 
-        for ( Integer pinNumber : digitalInputPins.keySet() ) {
+        for ( Integer pinNumber : digitalInputs ) {
 
-            boolean lastState = lastInputState.get(pinNumber);
-            boolean currentState = read(pinNumber);
+            boolean currentState = digitalRead(pinNumber);
+            boolean lastState = inputLastState.get(pinNumber);
+
+            // Continuous State Callbacks
+            if ( currentState ) {
+                if (whenHighCallbacks.containsKey(pinNumber)) {
+                    whenHighCallbacks.get(pinNumber).forEach(OnHigh::onHigh);
+                }
+            } else {
+                if (whenLowCallbacks.containsKey(pinNumber)) {
+                    whenLowCallbacks.get(pinNumber).forEach(OnLow::onLow);
+                }
+            }
 
             // State Changed Callbacks
-            if ( lastState!=currentState && currentTimeMillis()-lastInputStateChange.get(pinNumber) > pinTimeouts.get(pinNumber) ) {
-                lastInputState.put(pinNumber, currentState);
-                lastInputStateChange.put(pinNumber, currentTimeMillis());
+            if ( currentState != lastState && isReady(pinNumber) ) {
+
+                inputLastState.put(pinNumber, currentState);
+                inputLastChange.put(pinNumber, currentTimeMillis());
+
                 if ( onChangeCallbacks.containsKey(pinNumber) ) {
                     for ( OnChange callback : onChangeCallbacks.get(pinNumber) ) {
                         callback.onChange(currentState);
@@ -111,138 +212,12 @@ public abstract class GpioProvider {
                     }
                 }
             }
-
-            // Continuous State Callbacks
-            if ( currentState ) {
-                if (whenHighCallbacks.containsKey(pinNumber)) {
-                    whenHighCallbacks.get(pinNumber).forEach(OnHigh::onHigh);
-                }
-            } else {
-                if (whenLowCallbacks.containsKey(pinNumber)) {
-                    whenLowCallbacks.get(pinNumber).forEach(OnLow::onLow);
-                }
-            }
-
-        }
-
-    }
-
-    ////////////
-    // Output //
-    ////////////
-
-    public void digitalOutput(int pinNumber) {
-        getOrCreateDigitalOutputPin(pinNumber, null);
-    }
-
-    public void digitalOutput(int pinNumber, boolean state) {
-        getOrCreateDigitalOutputPin(pinNumber, state ? PinState.HIGH : PinState.LOW );
-    }
-
-    ///////////
-    // Input //
-    ///////////
-
-    public void digitalInput(int pinNumber) {
-        getOrCreateDigitalInputPin(pinNumber, null);
-    }
-
-    public void digitalInput(int pinNumber, PinPullResistance resistance) {
-        getOrCreateDigitalInputPin(pinNumber, resistance);
-    }
-
-    public void setPinTimeout(int pinNumber, long timeout) {
-        pinTimeouts.put(pinNumber, timeout);
-    }
-
-    ///////////////
-    // Listeners //
-    ///////////////
-
-    public void onInputHigh(int pinNumber, OnHigh callback) {
-        getOrCreateDigitalInputPin(pinNumber, null);
-        addCallback(onHighCallbacks, pinNumber, callback);
-    }
-
-    public void onInputLow(int pinNumber, OnLow callback) {
-        getOrCreateDigitalInputPin(pinNumber, null);
-        addCallback(onLowCallbacks, pinNumber, callback);
-    }
-
-    public void onInputChange(int pinNumber, OnChange callback) {
-        getOrCreateDigitalInputPin(pinNumber, null);
-        addCallback(onChangeCallbacks, pinNumber, callback);
-    }
-
-    public void whileInputHigh(int pinNumber, OnHigh callback) {
-        getOrCreateDigitalInputPin(pinNumber, null);
-        addCallback(whenHighCallbacks, pinNumber, callback);
-    }
-
-    public void whileInputLow(int pinNumber, OnLow callback) {
-        getOrCreateDigitalInputPin(pinNumber, null);
-        addCallback(whenLowCallbacks, pinNumber, callback);
-    }
-
-    private <C> void addCallback(Map<Integer, List<C>> map, int pinNumber, C callback) {
-        List<C> callbacks = map.get(pinNumber);
-        if ( callbacks==null ) {
-            callbacks = new ArrayList<>();
-            map.put(pinNumber, callbacks);
-        }
-        callbacks.add(callback);
-    }
-
-    //////////////////
-    // Pin Creation //
-    //////////////////
-
-    protected void getOrCreateDigitalOutputPin(int pinNumber, PinState state) {
-        GpioPinDigitalOutput pin = digitalOutputPins.get(pinNumber);
-        if ( pin==null ) {
-            if ( isValidPin(pinNumber) ) {
-                if ( digitalInputPins.containsKey(pinNumber) ) {
-                    throw new IllegalStateException("Pin " + pinNumber + " is configured as an input");
-                }
-                pin = createDigitalOutputPin(pinNumber, state);
-                digitalOutputPins.put(pinNumber, pin);
-                System.out.println("Provisioned Digital Output Pin " + pinNumber);
-            } else {
-                throw new IllegalStateException("Pin " + pinNumber + " is not valid");
-            }
-        } else {
-            if (state != null) {
-                write(pinNumber, state.isHigh());
-            }
         }
     }
 
-    protected void getOrCreateDigitalInputPin(int pinNumber, PinPullResistance resistance) {
-        GpioPinDigitalInput pin = digitalInputPins.get(pinNumber);
-        if ( pin==null ) {
-            if ( isValidPin(pinNumber) ) {
-                if ( digitalOutputPins.containsKey(pinNumber) ) {
-                    throw new IllegalStateException("Pin " + pinNumber + " is configured as an output");
-                }
-                pin = createDigitalInputPin(pinNumber, resistance);
-                digitalInputPins.put(pinNumber, pin);
-                lastInputStateChange.put(pinNumber, currentTimeMillis());
-                lastInputState.put(pinNumber, read(pinNumber));
-                pinTimeouts.put(pinNumber, 0L);
-                System.out.println("Provisioned Digital Input Pin " + pinNumber);
-            } else {
-                throw new IllegalStateException("Pin " + pinNumber + " is not valid");
-            }
-        }
+    private boolean isReady(int pinNumber) {
+        return currentTimeMillis()- inputLastChange.get(pinNumber) > inputTimeouts.get(pinNumber);
     }
-
-    protected abstract GpioPinDigitalOutput createDigitalOutputPin(int pinNumber, PinState state);
-
-    protected abstract GpioPinDigitalInput createDigitalInputPin(int pinNumber, PinPullResistance resistance);
-
-    public abstract void write(int pinNumber, boolean high);
-
-    public abstract boolean read(int pinNumber);
 
     //////////////
     // Callback //
@@ -260,14 +235,12 @@ public abstract class GpioProvider {
         void onChange(boolean state);
     }
 
-    /////////////
-    // Utility //
-    /////////////
+    ///////////////
+    // Constants //
+    ///////////////
 
-    public boolean isValidPin(int pinNumber) {
-        return availablePins.containsKey(pinNumber);
-    }
-
-    public static final int DEFAULT_SCAN_PERIOD = 10;
+    private static final int                DEFAULT_SCAN_PERIOD = 10;
+    private static final boolean            DEFAULT_OUTPUT_STATE = false;
+    private static final PinPullResistance  DEFAULT_PULL_RESISTANCE = PinPullResistance.PULL_DOWN;
 
 }

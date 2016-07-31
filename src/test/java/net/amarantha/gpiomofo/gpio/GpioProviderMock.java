@@ -1,29 +1,77 @@
 package net.amarantha.gpiomofo.gpio;
 
-import com.pi4j.io.gpio.GpioPinDigitalInput;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.PinState;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class GpioProviderMock extends GpioProvider {
 
+    private Map<Integer, Boolean> inputStates = new HashMap<>();
+    private Map<Integer, Boolean> outputStates = new HashMap<>();
+
     @Override
-    protected GpioPinDigitalOutput createDigitalOutputPin(int pinNumber, PinState state) {
-        return null;
+    public boolean isValidPin(int pinNumber) {
+        return pinNumber>=0 && pinNumber<=29;
     }
 
     @Override
-    protected GpioPinDigitalInput createDigitalInputPin(int pinNumber, PinPullResistance resistance) {
-        return null;
+    protected boolean digitalRead(int pinNumber) {
+        return inputStates.get(pinNumber);
     }
 
     @Override
-    public void write(int pinNumber, boolean high) {
-
+    protected void provisionDigitalInput(int pinNumber, PinPullResistance resistance) {
+        inputStates.put(pinNumber, false);
     }
 
     @Override
-    public boolean read(int pinNumber) {
-        return false;
+    protected void digitalWrite(int pinNumber, boolean state) {
+        outputStates.put(pinNumber, state);
     }
+
+    @Override
+    protected void provisionDigitalOutput(int pinNumber, PinState initialState) {
+        outputStates.put(pinNumber, initialState==PinState.HIGH);
+    }
+
+    /////////////
+    // Testing //
+    /////////////
+
+    @Override
+    public void scanPins() {
+        super.scanPins();
+    }
+
+    public void setInput(int pinNumber, boolean state) {
+        if ( !inputStates.containsKey(pinNumber) ) {
+            throw new IllegalStateException("TESTING ERROR: Pin " + pinNumber + " is not an input");
+        }
+        inputStates.put(pinNumber, state);
+    }
+
+    public boolean getOutput(int pinNumber) {
+        if ( !outputStates.containsKey(pinNumber) ) {
+            throw new IllegalStateException("TESTING ERROR: Pin " + pinNumber + " is not an output");
+        }
+        return outputStates.get(pinNumber);
+    }
+
+    public void reset() {
+        inputStates.clear();
+        outputStates.clear();
+        digitalInputs.clear();
+        digitalOutputs.clear();
+        inputLastChange.clear();
+        inputLastChange.clear();
+        inputTimeouts.clear();
+        onHighCallbacks.clear();
+        onLowCallbacks.clear();
+        onChangeCallbacks.clear();
+        whenHighCallbacks.clear();
+        whenLowCallbacks.clear();
+    }
+
 }
