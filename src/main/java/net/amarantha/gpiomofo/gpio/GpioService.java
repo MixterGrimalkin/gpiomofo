@@ -178,6 +178,7 @@ public abstract class GpioService {
     }
 
     public void shutdown() {
+        stopInputMonitor();
         for ( Integer pinNumber : digitalOutputs ) {
             write(pinNumber, false);
         }

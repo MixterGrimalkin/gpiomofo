@@ -26,6 +26,20 @@ public class TargetFactory {
         return target;
     }
 
+    public HttpTarget http(String name, String method, String host, String path, String payload) {
+        HttpTarget target =
+            injector.getInstance(HttpTarget.class)
+                .onCommand(method, host, path, payload);
+
+        // Assume HTTP command is just an ON - can be overridden later
+        target.oneShot(true);
+
+        target.setName(name);
+        registerTarget(target);
+
+        return target;
+    }
+
     public MidiTarget midi(String name, MidiCommand onCommand, MidiCommand offCommand) {
 
         MidiTarget target =
@@ -49,6 +63,19 @@ public class TargetFactory {
         registerTarget(target);
 
         return target;
+    }
+
+    public PythonTarget python(String name, String script) {
+
+        PythonTarget target =
+            injector.getInstance(PythonTarget.class)
+                .scriptFile(script);
+
+        target.setName(name);
+        registerTarget(target);
+
+        return target;
+
     }
 
     ///////////////////

@@ -9,4 +9,5 @@ public interface HttpService {
     String post(String host, String path, String payload, Param... params);
 
     void postAsync(HttpCallback callback, String host, String path, String payload, Param... params);
+
 }

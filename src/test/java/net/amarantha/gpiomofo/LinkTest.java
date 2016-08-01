@@ -8,16 +8,22 @@ import com.googlecode.guicebehave.StoryRunner;
 import net.amarantha.gpiomofo.gpio.GpioService;
 import net.amarantha.gpiomofo.gpio.GpioServiceMock;
 import net.amarantha.gpiomofo.link.LinkFactory;
+import net.amarantha.gpiomofo.midi.MidiCommand;
+import net.amarantha.gpiomofo.midi.MidiService;
+import net.amarantha.gpiomofo.midi.MidiServiceMock;
 import net.amarantha.gpiomofo.target.GpioTarget;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.target.TargetFactory;
 import net.amarantha.gpiomofo.trigger.GpioTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.trigger.TriggerFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
 import static com.pi4j.io.gpio.PinPullResistance.OFF;
+import static javax.sound.midi.ShortMessage.NOTE_OFF;
+import static javax.sound.midi.ShortMessage.NOTE_ON;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.testng.Assert.assertEquals;
@@ -26,6 +32,8 @@ import static org.testng.Assert.assertEquals;
 public class LinkTest {
 
     @Inject private GpioService gpio;
+    @Inject private MidiService midi;
+
     @Inject private TriggerFactory triggers;
     @Inject private TargetFactory targets;
     @Inject private LinkFactory links;
@@ -33,8 +41,16 @@ public class LinkTest {
     @Before
     public void given_system() {
         ((GpioServiceMock)gpio).reset();
+        ((MidiServiceMock)midi).clearLastCommand();
         triggers.clearAll();
         targets.clearAll();
+        midi.openDevice();
+    }
+
+    @After
+    public void shutdown() {
+        midi.closeDevice();
+        gpio.shutdown();
     }
 
     @Story
@@ -213,6 +229,41 @@ public class LinkTest {
     }
 
     @Story
+    public void test_composite_trigger() {
+
+        Trigger trigger1 = given_trigger_on_pin_$1(0);
+        Trigger trigger2 = given_trigger_on_pin_$1(1);
+        Trigger trigger3 = given_trigger_on_pin_$1(2);
+        Trigger composite = given_composed_trigger(trigger1, trigger2, trigger3);
+
+        Target singleTarget = given_target_on_pin_$1(3);
+        Target mainTarget = given_target_on_pin_$1(4);
+
+        given_link_between_$1_and_$2(trigger2, singleTarget);
+        given_link_between_$1_and_$2(composite, mainTarget);
+
+        then_pin_$1_is_$2(3, false);
+        then_pin_$1_is_$2(4, false);
+
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(3, false);
+        then_pin_$1_is_$2(4, false);
+
+        when_set_pin_$1_to_$2(1, true);
+        then_pin_$1_is_$2(3, true);
+        then_pin_$1_is_$2(4, false);
+
+        when_set_pin_$1_to_$2(2, true);
+        then_pin_$1_is_$2(3, true);
+        then_pin_$1_is_$2(4, true);
+
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(3, true);
+        then_pin_$1_is_$2(4, false);
+
+    }
+
+    @Story
     public void test_gpio_toggle() {
 
         Trigger trigger = given_trigger_on_pin_$1(0);
@@ -236,7 +287,25 @@ public class LinkTest {
 
     }
 
+    @Story
+    public void test_midi_target() {
 
+        MidiCommand on = new MidiCommand(NOTE_ON, 1, 64, 127);
+        MidiCommand off = new MidiCommand(NOTE_OFF, 1, 64, 127);
+
+        Trigger trigger = given_trigger_on_pin_$1(0);
+        Target target = given_midi_target(on, off);
+        given_link_between_$1_and_$2(trigger, target);
+
+        then_last_midi_command_was_$1(null);
+
+        when_set_pin_$1_to_$2(0, true);
+        then_last_midi_command_was_$1(on);
+
+        when_set_pin_$1_to_$2(0, false);
+        then_last_midi_command_was_$1(off);
+
+    }
 
     ///////////
     // Given //
@@ -252,6 +321,10 @@ public class LinkTest {
         GpioTrigger trigger = triggers.gpio("InvertedTrigger"+pin, pin, OFF, false);
         assertEquals(false, trigger.getTriggerState());
         return trigger;
+    }
+
+    Trigger given_composed_trigger(Trigger... ts) {
+        return triggers.composite(ts);
     }
 
     Target given_target_on_pin_$1(int pin) {
@@ -286,6 +359,10 @@ public class LinkTest {
         GpioTarget target = targets.gpio("InvertedTarget"+pin, pin, null);
         assertNull(target.getOutputState());
         return target;
+    }
+
+    Target given_midi_target(MidiCommand on, MidiCommand off) {
+        return targets.midi("MidiTarget", on, off);
     }
 
     void given_link_between_$1_and_$2(Trigger trigger, Target target) {
@@ -344,6 +421,11 @@ public class LinkTest {
 
     void then_target_$1_is_registered(String name) {
         assertNotNull(targets.getTarget(name));
+    }
+
+    void then_last_midi_command_was_$1(MidiCommand command) {
+        assertEquals(command, ((MidiServiceMock)midi).getLastMidiCommand());
+
     }
 
 }

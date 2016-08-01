@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.config.Config;
 import net.amarantha.gpiomofo.gpio.GpioService;
 import net.amarantha.gpiomofo.midi.MidiService;
+import net.amarantha.gpiomofo.webservice.WebService;
 
 import java.util.Scanner;
 
@@ -15,6 +16,7 @@ public class GpioMoFo {
 
     @Inject private Config config;
 
+    @Inject private WebService webService;
     @Inject private GpioService gpio;
     @Inject private MidiService midi;
 
@@ -24,15 +26,16 @@ public class GpioMoFo {
 
         config.setup();
 
+        webService.start();
         gpio.startInputMonitor();
         midi.openDevice();
 
-        System.out.println(" System Active (Press ENTER to quit)\n"+BAR+"\n");
+        System.out.println(BAR+"\n System Active (Press ENTER to quit)\n"+BAR+"\n");
 
         Scanner scanner = new Scanner(System.in);
         while (!scanner.hasNextLine()) {}
 
-        gpio.stopInputMonitor();
+        webService.stop();
         gpio.shutdown();
         midi.closeDevice();
 

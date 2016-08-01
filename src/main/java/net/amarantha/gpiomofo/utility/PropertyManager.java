@@ -86,4 +86,28 @@ public class PropertyManager {
         }
     }
 
+    private String ip;
+
+    public String getIp() {
+        if ( ip==null ) {
+            StringBuilder output = new StringBuilder();
+
+            Process p;
+            try {
+                p = Runtime.getRuntime().exec("sh getip.sh");
+                p.waitFor();
+                BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String line = "";
+                while ((line = reader.readLine())!= null) {
+                    output.append(line).append("\n");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ip = output.toString().trim();
+        }
+        return ip;
+    }
+
 }

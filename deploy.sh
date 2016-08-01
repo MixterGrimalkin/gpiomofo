@@ -21,6 +21,7 @@ then
     sshpass -p raspberry scp -r audio pi@${ip}:gpiomofo
 else
     echo "Uploading Application..."
+    sshpass -p raspberry scp target/gpiomofo/python/*.py pi@${ip}:gpiomofo/python
     sshpass -p raspberry scp target/gpiomofo/*.sh pi@${ip}:gpiomofo
     sshpass -p raspberry scp target/gpiomofo/*.jar pi@${ip}:gpiomofo
 fi

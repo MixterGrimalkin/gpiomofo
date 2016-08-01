@@ -8,8 +8,6 @@ import net.amarantha.gpiomofo.target.TargetFactory;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.trigger.TriggerFactory;
 
-import javax.sound.midi.ShortMessage;
-
 import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
 import static javax.sound.midi.ShortMessage.NOTE_OFF;
 import static javax.sound.midi.ShortMessage.NOTE_ON;
@@ -22,55 +20,64 @@ public class TestConfig extends Config {
 
     private Trigger button;
     private Trigger wire;
-    private Target redLedOn;
-    private Target redLed2s;
-    private Target blueLedOn;
-    private Target lowNoteMax3s;
-    private Target highNoteHold;
-    private Target seaPower;
+    private Trigger all;
+    private Trigger network;
+
+    private Target redLed;
+    private Target blueLed;
+    private Target lowNote;
+    private Target playSong;
+    private Target greenpeaceLogo;
+    private Target python;
 
     @Override
     public void setupTriggers() {
 
-        button = triggers.gpio("Button", 0, PULL_DOWN, true);
-        wire = triggers.gpio("Wire", 3, PULL_DOWN, false);
+        button =
+                triggers.gpio("Button", 0, PULL_DOWN, true);
+
+        wire =
+                triggers.gpio("Wire", 3, PULL_DOWN, false);
+
+        network =
+                triggers.http("Play Song");
+
+        all =
+                triggers.composite(button, wire, network);
 
     }
 
     @Override
     public void setupTargets() {
 
-        redLedOn = targets.gpio("Red LED", 1, true);
+        redLed =
+                targets.gpio("Red LED", 1, true);
 
-        redLed2s = targets.gpio("Red LED for 2 seconds", 1, true)
-                .followTrigger(false)
-                .clearDelay(2000L);
+        blueLed =
+                targets.gpio("Blue LED", 2, true);
 
-        blueLedOn = targets.gpio("Blue LED", 2, true);
+        lowNote =
+                targets.midi("Low Note", new MidiCommand(NOTE_ON, 1, 64, 127), new MidiCommand(NOTE_OFF, 1, 64, 0)).clearDelay(3000L);
 
-        lowNoteMax3s = targets.midi("Low Note for max 3 seconds",
-                new MidiCommand(NOTE_ON, 1, 64, 127), new MidiCommand(NOTE_OFF, 1, 64, 0)
-        ).clearDelay(3000L);
+        greenpeaceLogo =
+                targets.http("Greenpeace", "POST", "192.168.1.60:8001", "lightboard/scene/greenpeace-logo/load", "");
 
-        highNoteHold = targets.midi("High Note hold",
-                new MidiCommand(NOTE_ON, 1, 71, 127), new MidiCommand(NOTE_OFF, 1, 71, 0)
-        );
+        python =
+                targets.python("Python", "python/test.py");
 
-        seaPower = targets.audio("British Sea Power", "audio/bsp.mp3");
+        playSong =
+                targets.audio("Play Song", "audio/bsp.mp3");
 
     }
 
     @Override
     public void setupLinks() {
 
-        links.link(button, redLedOn);
-        links.link(button, lowNoteMax3s);
-        links.link(button, highNoteHold);
-
-        links.link(wire, redLed2s);
-        links.link(wire, blueLedOn);
-        links.link(wire, seaPower);
+        links.link(button,      redLed, lowNote, python);
+        links.link(wire,        blueLed, greenpeaceLogo);
+        links.link(all,         playSong);
 
     }
 
 }
+

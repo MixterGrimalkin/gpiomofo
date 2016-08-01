@@ -140,11 +140,11 @@
 
         <plugins>
 
-            <!-- Include BASH Scripts -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.6</version>
                 <executions>
+                    <!-- Include BASH Scripts -->
                     <execution>
                         <id>copy-scripts</id>
                         <phase>validate</phase>
@@ -156,6 +156,23 @@
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/main/bash</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <!-- Include Python Scripts -->
+                    <execution>
+                        <id>copy-python</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/gpiomofo/python</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/python</directory>
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>

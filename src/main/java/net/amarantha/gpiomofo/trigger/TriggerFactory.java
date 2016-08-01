@@ -27,6 +27,34 @@ public class TriggerFactory {
         return trigger;
     }
 
+    public HttpTrigger http(String name) {
+
+        HttpTrigger trigger =
+                injector.getInstance(HttpTrigger.class);
+
+        trigger.setName(name);
+        registerTrigger(trigger);
+
+        return trigger;
+    }
+
+    public CompositeTrigger composite(Trigger... triggers) {
+
+        StringBuilder name = new StringBuilder();
+        for ( Trigger trigger : triggers ) {
+            name.append(trigger.getName());
+        }
+
+        CompositeTrigger trigger =
+            injector.getInstance(CompositeTrigger.class)
+                .addTriggers(triggers);
+
+        trigger.setName(name.toString());
+        registerTrigger(trigger);
+
+        return trigger;
+    }
+
     ///////////////////
     // Registrations //
     ///////////////////
