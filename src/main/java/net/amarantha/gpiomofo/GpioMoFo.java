@@ -2,50 +2,43 @@ package net.amarantha.gpiomofo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.gpio.GpioProvider;
-import net.amarantha.gpiomofo.midi.MidiCommand;
+import net.amarantha.gpiomofo.config.Config;
+import net.amarantha.gpiomofo.gpio.GpioService;
 import net.amarantha.gpiomofo.midi.MidiService;
-import net.amarantha.gpiomofo.target.TargetFactory;
-import net.amarantha.gpiomofo.target.TriggerConfig;
 
-import javax.sound.midi.ShortMessage;
 import java.util.Scanner;
 
-import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
+import static net.amarantha.gpiomofo.config.Config.BAR;
 
 @Singleton
 public class GpioMoFo {
 
-    @Inject private GpioProvider gpio;
-    @Inject private TargetFactory targets;
+    @Inject private Config config;
+
+    @Inject private GpioService gpio;
     @Inject private MidiService midi;
 
-    private void setup() {
-
-        TriggerConfig button = new TriggerConfig(0, PULL_DOWN, true);
-
-        targets.gpio(button, 1, true)
-                .clearAfter(3000L);
-
-        targets.gpio(button, 2, false)
-                .clearAfter(3000L);
-
-        targets.midi(button, new MidiCommand(ShortMessage.NOTE_ON, 1, 64, 127), new MidiCommand(ShortMessage.NOTE_OFF, 1, 64, 0))
-                .clearAfter(3000L);
-
-    }
-
     public void start() {
-        System.out.println("Starting GpioMoFo...");
-        setup();
-        midi.openDevice();
+
+        System.out.println(BAR+"\n Starting GpioMoFo...");
+
+        config.setup();
+
         gpio.startInputMonitor();
+        midi.openDevice();
+
+        System.out.println(" System Active (Press ENTER to quit)\n"+BAR+"\n");
+
         Scanner scanner = new Scanner(System.in);
         while (!scanner.hasNextLine()) {}
+
         gpio.stopInputMonitor();
         gpio.shutdown();
-        System.out.println("Goodbye");
+        midi.closeDevice();
+
+        System.out.println("\n"+BAR+"\n Bye for now! \n"+BAR);
         System.exit(0);
+
     }
 
 }

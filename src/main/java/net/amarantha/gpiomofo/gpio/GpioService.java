@@ -7,7 +7,7 @@ import java.util.*;
 
 import static java.lang.System.currentTimeMillis;
 
-public abstract class GpioProvider {
+public abstract class GpioService {
 
     protected List<Integer> digitalInputs = new ArrayList<>();
     protected List<Integer> digitalOutputs = new ArrayList<>();
@@ -34,7 +34,6 @@ public abstract class GpioProvider {
     ///////////////////
 
     public boolean read(int pinNumber) {
-        failIfNotDigitalInput(pinNumber);
         return digitalRead(pinNumber);
     }
 

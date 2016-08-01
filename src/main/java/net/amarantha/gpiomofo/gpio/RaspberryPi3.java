@@ -8,7 +8,7 @@ import java.util.Map;
 
 import static com.pi4j.io.gpio.RaspiPin.*;
 
-public class RaspberryPi3 extends GpioProvider {
+public class RaspberryPi3 extends GpioService {
 
     private GpioController gpioController = GpioFactory.getInstance();
 

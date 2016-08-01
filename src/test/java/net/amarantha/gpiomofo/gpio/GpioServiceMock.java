@@ -6,7 +6,7 @@ import com.pi4j.io.gpio.PinState;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GpioProviderMock extends GpioProvider {
+public class GpioServiceMock extends GpioService {
 
     private Map<Integer, Boolean> inputStates = new HashMap<>();
     private Map<Integer, Boolean> outputStates = new HashMap<>();
@@ -18,7 +18,7 @@ public class GpioProviderMock extends GpioProvider {
 
     @Override
     protected boolean digitalRead(int pinNumber) {
-        return inputStates.get(pinNumber);
+        return inputStates.get(pinNumber)==null ? outputStates.get(pinNumber) : inputStates.get(pinNumber);
     }
 
     @Override
@@ -50,6 +50,7 @@ public class GpioProviderMock extends GpioProvider {
             throw new IllegalStateException("TESTING ERROR: Pin " + pinNumber + " is not an input");
         }
         inputStates.put(pinNumber, state);
+        scanPins();
     }
 
     public boolean getOutput(int pinNumber) {
@@ -57,6 +58,10 @@ public class GpioProviderMock extends GpioProvider {
             throw new IllegalStateException("TESTING ERROR: Pin " + pinNumber + " is not an output");
         }
         return outputStates.get(pinNumber);
+    }
+
+    public Map<Integer, Boolean> getOutputStates() {
+        return outputStates;
     }
 
     public void reset() {

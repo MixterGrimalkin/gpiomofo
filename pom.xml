@@ -112,6 +112,13 @@
             <version>1.0</version>
         </dependency>
 
+        <!-- Audio System -->
+        <dependency>
+            <groupId>com.googlecode.soundlibs</groupId>
+            <artifactId>jlayer</artifactId>
+            <version>1.0.1-1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -10,7 +10,6 @@ import java.net.NoRouteToHostException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static org.glassfish.jersey.client.ClientProperties.*;
 import static org.glassfish.jersey.client.ClientProperties.CONNECT_TIMEOUT;
 
 @Singleton

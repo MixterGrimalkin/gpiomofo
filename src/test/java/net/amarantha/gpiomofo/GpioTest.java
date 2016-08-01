@@ -5,22 +5,40 @@ import com.googlecode.guicebehave.Expected;
 import com.googlecode.guicebehave.Modules;
 import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
-import net.amarantha.gpiomofo.gpio.GpioProvider;
-import net.amarantha.gpiomofo.gpio.GpioProviderMock;
+import net.amarantha.gpiomofo.gpio.GpioService;
+import net.amarantha.gpiomofo.gpio.GpioServiceMock;
 import org.junit.Before;
 import org.junit.runner.RunWith;
+
+import java.util.Map.Entry;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(StoryRunner.class) @Modules(TestModule.class)
 public class GpioTest {
 
-    @Inject private GpioProvider gpio;
+    @Inject private GpioService gpio;
 
     @Before
     public void given_gpio_system() {
-        ((GpioProviderMock)gpio).reset();
+        ((GpioServiceMock)gpio).reset();
         listenerMessage = null;
+    }
+
+    @Story
+    public void test_shutdown() {
+        given_digital_output_pin_$1(0);
+        given_digital_output_pin_$1(1);
+        given_digital_output_pin_$1(2);
+        given_digital_output_pin_$1(3);
+        when_set_output_$1_to_$2(0, true);
+        when_set_output_$1_to_$2(1, true);
+        when_set_output_$1_to_$2(2, true);
+        when_set_output_$1_to_$2(3, true);
+        then_all_outputs_are_$1(true);
+        when_shutdown();
+        then_all_outputs_are_$1(false);
+
     }
 
     @Story
@@ -33,12 +51,12 @@ public class GpioTest {
         given_digital_output_pin_$1(1);
         then_cannot_create_input_$1(1);
         then_cannot_create_output_$1(1);
+        then_cannot_listen_on_$1(1);
     }
 
     @Story
     public void basic_Io_test() {
         given_digital_output_pin_$1(0);
-        then_cannot_read_pin_$1(0);
         then_output_$1_is_$2(0, false);
         when_set_output_$1_to_$2(0, true);
         then_output_$1_is_$2(0, true);
@@ -133,12 +151,16 @@ public class GpioTest {
     //////////
 
     void when_input_$1_is_set_to_$2(int pin, boolean state) {
-        ((GpioProviderMock)gpio).setInput(pin, state);
-        ((GpioProviderMock)gpio).scanPins();
+        ((GpioServiceMock)gpio).setInput(pin, state);
+        ((GpioServiceMock)gpio).scanPins();
     }
 
     void when_set_output_$1_to_$2(int pin, boolean state) {
         gpio.write(pin, state);
+    }
+
+    void when_shutdown() {
+        gpio.shutdown();
     }
 
     //////////
@@ -156,8 +178,8 @@ public class GpioTest {
     }
 
     @Expected(IllegalStateException.class)
-    void then_cannot_read_pin_$1(int pin) {
-        gpio.read(pin);
+    void then_cannot_listen_on_$1(int pin) {
+        gpio.onInputHigh(pin, null);
     }
 
     @Expected(IllegalStateException.class)
@@ -170,11 +192,17 @@ public class GpioTest {
     }
 
     void then_output_$1_is_$2(int pin, boolean state) {
-        assertEquals(state, ((GpioProviderMock)gpio).getOutput(pin));
+        assertEquals(state, ((GpioServiceMock)gpio).getOutput(pin));
     }
 
     void then_listener_message_is_correct(String message) {
         assertEquals(message, listenerMessage);
+    }
+
+    void then_all_outputs_are_$1(boolean state) {
+        for ( Entry<Integer, Boolean> entry : ((GpioServiceMock)gpio).getOutputStates().entrySet() ) {
+            assertEquals(state, entry.getValue());
+        }
     }
 
 }

@@ -1,48 +1,48 @@
 package net.amarantha.gpiomofo.target;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.gpio.GpioProvider;
+import net.amarantha.gpiomofo.gpio.GpioService;
 
-public class GpioTarget extends AbstractTarget {
+public class GpioTarget extends Target {
 
-    @Inject private GpioProvider gpio;
-
-    private int pinNumber;
-    private Boolean outputState;
+    @Inject private GpioService gpio;
 
     @Override
     public void onActivate() {
-        if ( outputState !=null ) {
-            gpio.write(pinNumber, outputState);
+        if ( outputState!=null ) {
+            gpio.write(outputPin, outputState);
         } else {
-            gpio.toggle(pinNumber);
+            gpio.toggle(outputPin);
         }
     }
 
     @Override
     public void onDeactivate() {
-        if ( outputState !=null ) {
-            gpio.write(pinNumber, !outputState);
+        if ( outputState!=null ) {
+            gpio.write(outputPin, !outputState);
         } else {
-            gpio.toggle(pinNumber);
+            gpio.toggle(outputPin);
         }
     }
 
-    public int getPinNumber() {
-        return pinNumber;
+    private int outputPin;
+    private Boolean outputState;
+
+    public GpioTarget outputPin(int pinNumber, Boolean outputState) {
+        if ( !gpio.isDigitalOutput(pinNumber) ) {
+            gpio.setupDigitalOutput(pinNumber, outputState != null && !outputState);
+        }
+        this.outputPin = pinNumber;
+        this.outputState = outputState;
+        return this;
     }
 
-    public GpioTarget outputPin(int pinNumber) {
-        this.pinNumber = pinNumber;
-        return this;
+    public int getOutputPin() {
+        return outputPin;
     }
 
     public Boolean getOutputState() {
         return outputState;
     }
 
-    public GpioTarget outputState(Boolean outputState) {
-        this.outputState = outputState;
-        return this;
-    }
 }

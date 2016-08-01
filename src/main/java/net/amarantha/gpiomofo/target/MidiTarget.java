@@ -4,22 +4,9 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.midi.MidiCommand;
 import net.amarantha.gpiomofo.midi.MidiService;
 
-public class MidiTarget extends AbstractTarget {
+public class MidiTarget extends Target {
 
     @Inject private MidiService midi;
-
-    private MidiCommand onCommand;
-    private MidiCommand offCommand;
-
-    public MidiTarget onCommand(MidiCommand command) {
-        onCommand = command;
-        return this;
-    }
-
-    public MidiTarget offCommand(MidiCommand command) {
-        offCommand = command;
-        return this;
-    }
 
     @Override
     protected void onActivate() {
@@ -34,4 +21,18 @@ public class MidiTarget extends AbstractTarget {
             midi.send(offCommand);
         }
     }
+
+    private MidiCommand onCommand;
+    private MidiCommand offCommand;
+
+    public MidiTarget onCommand(MidiCommand command) {
+        onCommand = command;
+        return this;
+    }
+
+    public MidiTarget offCommand(MidiCommand command) {
+        offCommand = command;
+        return this;
+    }
+
 }
