@@ -48,10 +48,12 @@ public abstract class Target {
     ////////////////
 
     public final void deactivate() {
-        System.out.println(" ---- ["+getName()+"]");
-        stopTimer();
-        active = false;
-        onDeactivate();
+        if ( active ) {
+            System.out.println("  --  [" + getName() + "]");
+            stopTimer();
+            active = false;
+            onDeactivate();
+        }
     }
 
     protected abstract void onDeactivate();
@@ -143,4 +145,19 @@ public abstract class Target {
         return name;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Target target = (Target) o;
+
+        return name != null ? name.equals(target.name) : target.name == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
+    }
 }

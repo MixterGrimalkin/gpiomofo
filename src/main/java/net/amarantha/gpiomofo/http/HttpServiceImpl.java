@@ -23,7 +23,7 @@ public class HttpServiceImpl implements HttpService {
             response = getEndpoint(host, path, params).get();
             result = response.readEntity(String.class);
         } catch ( Exception e ) {
-            System.out.println(host + ": " + e.getMessage());
+//            System.out.println(host + ": " + e.getMessage());
         } finally {
             if ( response!=null ) response.close();
         }
@@ -58,7 +58,7 @@ public class HttpServiceImpl implements HttpService {
             response = getEndpoint(host, path, params).post(Entity.entity(payload, MediaType.TEXT_PLAIN));
             result = response.readEntity(String.class);
         } catch ( Exception e ) {
-            System.out.println(host + ": " + e.getMessage());
+//            System.out.println(host + ": " + e.getMessage());
         } finally {
             if ( response!=null ) response.close();
         }
@@ -74,7 +74,7 @@ public class HttpServiceImpl implements HttpService {
                 try {
                     response = getEndpoint(host, path, params).post(Entity.entity(payload, MediaType.TEXT_PLAIN));
                 } catch ( Exception e ) {
-                    System.out.println(host + ": " + e.getMessage());
+//                    System.out.println(host + ": " + e.getMessage());
                 } finally {
                     if ( response!=null ) response.close();
                 }

@@ -12,8 +12,7 @@ import java.util.Map;
 @Singleton
 public class TriggerFactory {
 
-    @Inject
-    private Injector injector;
+    @Inject private Injector injector;
 
     public GpioTrigger gpio(String name, int pinNumber, PinPullResistance resistance, boolean triggerState) {
 

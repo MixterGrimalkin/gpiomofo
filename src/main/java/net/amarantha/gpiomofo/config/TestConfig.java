@@ -29,6 +29,7 @@ public class TestConfig extends Config {
     private Target playSong;
     private Target greenpeaceLogo;
     private Target python;
+    private Target flashLeds;
 
     @Override
     public void setupTriggers() {
@@ -40,7 +41,7 @@ public class TestConfig extends Config {
                 triggers.gpio("Wire", 3, PULL_DOWN, false);
 
         network =
-                triggers.http("Play Song");
+                triggers.http("Net");
 
         all =
                 triggers.composite(button, wire, network);
@@ -51,31 +52,49 @@ public class TestConfig extends Config {
     public void setupTargets() {
 
         redLed =
-                targets.gpio("Red LED", 1, true);
+                targets.gpio(1, true);
 
         blueLed =
-                targets.gpio("Blue LED", 2, true);
+                targets.gpio(2, true);
+
+        Integer delay = 50;
+        flashLeds =
+            targets.chain()
+                .add(delay, targets.gpio(1, true))
+                .add(delay, targets.gpio(1, false))
+                .add(delay, targets.gpio(2, true))
+                .add(delay, targets.gpio(2, false))
+                .add(delay, targets.gpio(1, true))
+                .add(delay, targets.gpio(1, false))
+                .add(delay, targets.gpio(1, true))
+                .add(delay, targets.gpio(1, false))
+                .add(delay, targets.gpio(2, true))
+                .add(delay, targets.gpio(2, false))
+                .add(delay, targets.gpio(1, true))
+                .add(delay, targets.gpio(1, false))
+            .build().oneShot(true);
+
 
         lowNote =
-                targets.midi("Low Note", new MidiCommand(NOTE_ON, 1, 64, 127), new MidiCommand(NOTE_OFF, 1, 64, 0)).clearDelay(3000L);
+                targets.midi(new MidiCommand(NOTE_ON, 1, 64, 127), new MidiCommand(NOTE_OFF, 1, 64, 0)).clearDelay(3000L);
 
         greenpeaceLogo =
-                targets.http("Greenpeace", "POST", "192.168.1.60:8001", "lightboard/scene/greenpeace-logo/load", "");
+                targets.http("POST", "192.168.1.60:8001", "lightboard/scene/greenpeace-logo/load", "");
 
         python =
-                targets.python("Python", "python/test.py");
+                targets.python("python/test.py");
 
         playSong =
-                targets.audio("Play Song", "audio/bsp.mp3");
+                targets.audio("audio/bsp.mp3");
 
     }
 
     @Override
     public void setupLinks() {
 
-        links.link(button,      redLed, lowNote, python);
-        links.link(wire,        blueLed, greenpeaceLogo);
-        links.link(all,         playSong);
+        links.link(button,      flashLeds);
+        links.link(wire,        redLed, blueLed);
+//        links.link(all,         playSong);
 
     }
 

@@ -11,18 +11,26 @@ public class CompositeTrigger extends Trigger {
 
     private Map<String, Boolean> triggerStates = new HashMap<>();
 
+    private boolean lastState = false;
+
     public CompositeTrigger addTriggers(Trigger... triggers) {
         for ( Trigger trigger : triggers ) {
             componentTriggers.add(trigger);
             triggerStates.put(trigger.getName(), false);
-            trigger.onFire((state)->triggerFired(trigger, state));
+            trigger.onFireComposite((state)->triggerFired(trigger, state));
         }
         return this;
     }
 
     private void triggerFired(Trigger trigger, boolean state) {
         triggerStates.put(trigger.getName(), state);
-        fire(allActive());
+        if ( allActive() ) {
+            fire(lastState = true);
+        } else {
+            if ( lastState ) {
+                fire(lastState = false);
+            }
+        }
     }
 
     private boolean allActive() {

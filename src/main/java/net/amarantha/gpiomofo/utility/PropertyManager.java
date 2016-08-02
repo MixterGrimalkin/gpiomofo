@@ -94,7 +94,7 @@ public class PropertyManager {
 
             Process p;
             try {
-                p = Runtime.getRuntime().exec("sh getip.sh");
+                p = Runtime.getRuntime().exec("sh ip.sh");
                 p.waitFor();
                 BufferedReader reader =
                         new BufferedReader(new InputStreamReader(p.getInputStream()));
