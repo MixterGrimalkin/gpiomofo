@@ -40,6 +40,24 @@ public class MidiServiceImpl implements MidiService {
         }
     }
 
+    public void addListener() {
+        System.out.println("Adding Listening");
+        try {
+            Sequencer sequencer = MidiSystem.getSequencer();
+            System.out.println(sequencer.getReceiver());
+            System.out.println(sequencer.getTransmitter());
+            sequencer.addControllerEventListener(new ControllerEventListener() {
+                @Override
+                public void controlChange(ShortMessage event) {
+                    System.out.println("RECEIVED:");
+                    System.out.println(event);
+                }
+            }, new int[]{64});
+        } catch (MidiUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void send(int command, int channel, int data1, int data2) {
         if ( midiDevice!=null ) {
@@ -59,6 +77,7 @@ public class MidiServiceImpl implements MidiService {
     private MidiDevice getMidiDevice(String name) throws MidiUnavailableException {
         MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
         for (MidiDevice.Info info : infos) {
+            System.out.println(info.getName());
                 MidiDevice device = MidiSystem.getMidiDevice(info);
                 try {
                     if (device.getReceiver() != null && info.getDescription().contains(name)) {

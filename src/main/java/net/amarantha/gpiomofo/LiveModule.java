@@ -10,6 +10,7 @@ import net.amarantha.gpiomofo.http.HttpService;
 import net.amarantha.gpiomofo.http.HttpServiceImpl;
 import net.amarantha.gpiomofo.midi.MidiService;
 import net.amarantha.gpiomofo.midi.MidiServiceImpl;
+import net.amarantha.gpiomofo.scenario.TestScenario2;
 
 public class LiveModule extends AbstractModule {
 
@@ -18,7 +19,7 @@ public class LiveModule extends AbstractModule {
         bind(GpioService.class).to(RaspberryPi3.class).in(Scopes.SINGLETON);
         bind(MidiService.class).to(MidiServiceImpl.class).in(Scopes.SINGLETON);
         bind(HttpService.class).to(HttpServiceImpl.class).in(Scopes.SINGLETON);
-        bind(Scenario.class).to(TestScenario.class).in(Scopes.SINGLETON);
+        bind(Scenario.class).to(TestScenario2.class).in(Scopes.SINGLETON);
     }
 
 }

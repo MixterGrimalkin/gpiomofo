@@ -3,6 +3,7 @@ package net.amarantha.gpiomofo.factory;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import net.amarantha.gpiomofo.http.HttpCommand;
 import net.amarantha.gpiomofo.midi.MidiCommand;
 import net.amarantha.gpiomofo.target.*;
 
@@ -38,18 +39,28 @@ public class TargetFactory extends Factory<Target> {
     // HTTP //
     //////////
 
-    public HttpTarget http(String method, String host, String path, String payload) {
-        return http(getNextName("Http-"+method), method, host, path, payload);
+    public HttpTarget http(HttpCommand onCommand) {
+        return http(getNextName("Http"), onCommand, null);
     }
 
-    public HttpTarget http(String name, String method, String host, String path, String payload) {
+    public HttpTarget http(String name, HttpCommand onCommand) {
+        return http(name, onCommand, null);
+    }
+
+    public HttpTarget http(HttpCommand onCommand, HttpCommand offCommand) {
+        return http(getNextName("Http"), onCommand, offCommand);
+    }
+
+    public HttpTarget http(String name, HttpCommand onCommand, HttpCommand offCommand) {
 
         HttpTarget target =
             injector.getInstance(HttpTarget.class)
-                .onCommand(method, host, path, payload);
+                .onCommand(onCommand)
+                .offCommand(offCommand);
 
-        // Assume HTTP command is just an ON - can be overridden later
-        target.oneShot(true);
+        if ( offCommand==null ) {
+            target.oneShot(true);
+        }
 
         register(name, target);
 
@@ -59,6 +70,14 @@ public class TargetFactory extends Factory<Target> {
     //////////
     // MIDI //
     //////////
+
+    public MidiTarget midi(MidiCommand onCommand) {
+        return midi(getNextName("Midi"), onCommand, null);
+    }
+
+    public MidiTarget midi(String name, MidiCommand onCommand) {
+        return midi(name, onCommand, null);
+    }
 
     public MidiTarget midi(MidiCommand onCommand, MidiCommand offCommand) {
         return midi(getNextName("Midi"), onCommand, offCommand);
@@ -70,6 +89,10 @@ public class TargetFactory extends Factory<Target> {
             injector.getInstance(MidiTarget.class)
                 .onCommand(onCommand)
                 .offCommand(offCommand);
+
+        if ( offCommand==null ) {
+            target.oneShot(true);
+        }
 
         register(name, target);
 
@@ -148,6 +171,25 @@ public class TargetFactory extends Factory<Target> {
         public ChainedTarget build() {
             return chainedTarget;
         }
+    }
+
+    ////////////
+    // Queued //
+    ////////////
+
+    public QueuedTarget queue(Target... ts) {
+        return queue(getNextName("queue"), ts);
+    }
+
+    public QueuedTarget queue(String name, Target... ts) {
+
+        QueuedTarget target =
+            injector.getInstance(QueuedTarget.class)
+                .addTargets(ts);
+
+        register(name, target);
+
+        return target;
     }
 
 }

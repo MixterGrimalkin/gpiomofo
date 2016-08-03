@@ -33,6 +33,11 @@ public class MidiServiceMock implements MidiService {
         lastMidiCommand = new MidiCommand(command, channel, data1, data2);
     }
 
+    @Override
+    public void addListener() {
+
+    }
+
     public MidiCommand getLastMidiCommand() {
         return lastMidiCommand;
     }

@@ -1,5 +1,1 @@
-while True:
-    print "Test!"
-    print "One!"
-    print "Two!"
-    print ""
+print "Hello From Python!!!!"

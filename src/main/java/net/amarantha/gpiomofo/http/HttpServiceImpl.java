@@ -16,6 +16,29 @@ import static org.glassfish.jersey.client.ClientProperties.CONNECT_TIMEOUT;
 public class HttpServiceImpl implements HttpService {
 
     @Override
+    public String fire(HttpCommand command) {
+        switch ( command.getMethod().toUpperCase() ) {
+            case "GET":
+                return get(command.getFullHost(), command.getFullPath(), command.getParamsArray());
+            case "POST":
+                return post(command.getFullHost(), command.getFullPath(), command.getPayload(), command.getParamsArray());
+        }
+        return null;
+    }
+
+    @Override
+    public void fireAsync(HttpCallback callback, HttpCommand command) {
+        switch ( command.getMethod().toUpperCase() ) {
+            case "GET":
+                getAsync(callback, command.getFullHost(), command.getFullPath(), command.getParamsArray());
+                break;
+            case "POST":
+                postAsync(callback, command.getFullHost(), command.getFullPath(), command.getPayload(), command.getParamsArray());
+                break;
+        }
+    }
+
+    @Override
     public String get(String host, String path, Param... params) {
         String result = null;
         Response response = null;

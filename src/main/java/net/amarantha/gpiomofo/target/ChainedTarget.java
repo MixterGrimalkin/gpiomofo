@@ -63,4 +63,40 @@ public class ChainedTarget extends Target {
     private Map<Integer, Target> componentTargets = new HashMap<>();
     private Map<Integer, Integer> targetDelays = new HashMap<>();
 
+    @Override
+    public Target oneShot(boolean oneShot) {
+        super.oneShot(oneShot);
+        for ( Target target : componentTargets.values() ) {
+            target.oneShot(oneShot);
+        }
+        return this;
+    }
+
+    @Override
+    public Target triggerState(boolean triggerState) {
+        super.triggerState(triggerState);
+        for ( Target target : componentTargets.values() ) {
+            target.triggerState(triggerState);
+        }
+        return this;
+    }
+
+    @Override
+    public Target followTrigger(boolean followTrigger) {
+        super.followTrigger(followTrigger);
+        for ( Target target : componentTargets.values() ) {
+            target.followTrigger(followTrigger);
+        }
+        return this;
+    }
+
+    @Override
+    public Target clearDelay(Long clearDelay) {
+        super.clearDelay(clearDelay);
+        for ( Target target : componentTargets.values() ) {
+            target.clearDelay(clearDelay);
+        }
+        return this;
+    }
+
 }

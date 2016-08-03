@@ -36,7 +36,11 @@ public class Factory<T extends HasName> {
     }
 
     public T get(String name) {
-        return registrations.get(name);
+        T result = registrations.get(name);
+        if ( result==null ) {
+            throw new IllegalStateException(itemDescription + " '" + name + "' not registered");
+        }
+        return result;
     }
 
     public Collection<T> getAll() {

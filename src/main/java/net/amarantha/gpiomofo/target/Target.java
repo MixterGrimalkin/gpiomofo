@@ -32,7 +32,7 @@ public abstract class Target implements HasName {
     //////////////
 
     public final void activate() {
-        System.out.println(" ==>> ["+getName()+"]");
+        System.out.println(" " + (oneShot?"--":"==") + ">> ["+getName()+"]");
         stopTimer();
         if ( !oneShot ) {
             if (clearDelay != null) {

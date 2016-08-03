@@ -14,10 +14,12 @@ import net.amarantha.gpiomofo.midi.MidiCommand;
 import net.amarantha.gpiomofo.midi.MidiService;
 import net.amarantha.gpiomofo.midi.MidiServiceMock;
 import net.amarantha.gpiomofo.target.GpioTarget;
+import net.amarantha.gpiomofo.target.QueuedTarget;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.GpioTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
@@ -292,6 +294,59 @@ public class LinkTest {
     }
 
     @Story
+    public void test_queued_targets() {
+
+        Trigger trigger = given_trigger_on_pin_$1(0);
+        Target target1 = given_target_on_pin_$1(1);
+        Target target2 = given_target_on_pin_$1(2);
+        Target target3 = given_target_on_pin_$1(3);
+
+        Target queuedTarget = given_a_queued_target(target1, target2, target3);
+        given_link_between_$1_and_$2(trigger, queuedTarget);
+
+        then_pin_$1_is_$2(1, false);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(1, true);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(1, false);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(1, false);
+        then_pin_$1_is_$2(2, true);
+        then_pin_$1_is_$2(3, false);
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(1, false);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(1, false);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, true);
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(1, false);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(1, true);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(1, false);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+
+    }
+
+    @Story
     public void test_gpio_toggle() {
 
         Trigger trigger = given_trigger_on_pin_$1(0);
@@ -390,6 +445,12 @@ public class LinkTest {
     Target given_toggle_target_on_pin_$1(int pin) {
         GpioTarget target = targets.gpio(pin, null);
         assertNull(target.getOutputState());
+        return target;
+    }
+
+    Target given_a_queued_target(Target... ts) {
+        QueuedTarget target = targets.queue(ts);
+        assertEquals(ts.length, target.getComponentTargets().size());
         return target;
     }
 
