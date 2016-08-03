@@ -2,19 +2,19 @@ package net.amarantha.gpiomofo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.config.Config;
+import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.gpio.GpioService;
 import net.amarantha.gpiomofo.midi.MidiService;
 import net.amarantha.gpiomofo.webservice.WebService;
 
 import java.util.Scanner;
 
-import static net.amarantha.gpiomofo.config.Config.BAR;
+import static net.amarantha.gpiomofo.scenario.Scenario.BAR;
 
 @Singleton
 public class GpioMoFo {
 
-    @Inject private Config config;
+    @Inject private Scenario scenario;
 
     @Inject private WebService webService;
     @Inject private GpioService gpio;
@@ -24,7 +24,7 @@ public class GpioMoFo {
 
         System.out.println(BAR+"\n Starting GpioMoFo...");
 
-        config.setup();
+        scenario.setup();
 
         webService.start();
         gpio.startInputMonitor();

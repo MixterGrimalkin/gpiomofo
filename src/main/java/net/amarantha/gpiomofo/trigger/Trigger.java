@@ -1,10 +1,12 @@
 package net.amarantha.gpiomofo.trigger;
 
 
+import net.amarantha.gpiomofo.factory.HasName;
+
 import java.util.LinkedList;
 import java.util.List;
 
-public class Trigger {
+public class Trigger implements HasName {
 
     public void fire(boolean active) {
         System.out.println("["+getName()+"] " + (active?"==>>":" -- "));
@@ -41,33 +43,36 @@ public class Trigger {
 
     private String name;
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name.replaceAll(" ", "-");
+    }
+
+    ////////////
+    // Object //
+    ////////////
+
+    @Override
+    public String toString() {
+        return name;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Trigger trigger = (Trigger) o;
-
         return name != null ? name.equals(trigger.name) : trigger.name == null;
-
     }
 
     @Override
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return name;
     }
 
 }

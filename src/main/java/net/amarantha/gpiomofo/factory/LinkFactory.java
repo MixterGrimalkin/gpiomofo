@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.link;
+package net.amarantha.gpiomofo.factory;
 
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.target.Target;

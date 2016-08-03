@@ -22,4 +22,5 @@ public class GpioTrigger extends Trigger {
     public boolean getTriggerState() {
         return triggerState;
     }
+
 }

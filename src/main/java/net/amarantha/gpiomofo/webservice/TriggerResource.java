@@ -1,8 +1,8 @@
 package net.amarantha.gpiomofo.webservice;
 
 import com.google.inject.Inject;
+import net.amarantha.gpiomofo.factory.TriggerFactory;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.trigger.TriggerFactory;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -46,7 +46,7 @@ public class TriggerResource extends Resource {
     }
 
     private boolean fireTrigger(String triggerName, boolean state) {
-        Trigger trigger = triggers.getTrigger(triggerName);
+        Trigger trigger = triggers.get(triggerName);
         if ( trigger==null ) {
             return false;
         }

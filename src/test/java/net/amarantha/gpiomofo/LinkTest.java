@@ -5,19 +5,18 @@ import com.googlecode.guicebehave.Expected;
 import com.googlecode.guicebehave.Modules;
 import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
+import net.amarantha.gpiomofo.factory.LinkFactory;
+import net.amarantha.gpiomofo.factory.TargetFactory;
+import net.amarantha.gpiomofo.factory.TriggerFactory;
 import net.amarantha.gpiomofo.gpio.GpioService;
 import net.amarantha.gpiomofo.gpio.GpioServiceMock;
-import net.amarantha.gpiomofo.link.LinkFactory;
 import net.amarantha.gpiomofo.midi.MidiCommand;
 import net.amarantha.gpiomofo.midi.MidiService;
 import net.amarantha.gpiomofo.midi.MidiServiceMock;
-import net.amarantha.gpiomofo.target.ChainedTarget;
 import net.amarantha.gpiomofo.target.GpioTarget;
 import net.amarantha.gpiomofo.target.Target;
-import net.amarantha.gpiomofo.target.TargetFactory;
 import net.amarantha.gpiomofo.trigger.GpioTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.trigger.TriggerFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -341,13 +340,13 @@ public class LinkTest {
     ///////////
 
     Trigger given_trigger_on_pin_$1(int pin) {
-        GpioTrigger trigger = triggers.gpio("Trigger"+pin, pin, OFF, true);
+        GpioTrigger trigger = triggers.gpio(pin, OFF, true);
         assertEquals(true, trigger.getTriggerState());
         return trigger;
     }
 
     Trigger given_inverted_trigger_on_pin_$1(int pin) {
-        GpioTrigger trigger = triggers.gpio("InvertedTrigger"+pin, pin, OFF, false);
+        GpioTrigger trigger = triggers.gpio(pin, OFF, false);
         assertEquals(false, trigger.getTriggerState());
         return trigger;
     }
@@ -357,7 +356,7 @@ public class LinkTest {
     }
 
     Target given_target_on_pin_$1(int pin) {
-        GpioTarget target = targets.gpio("Target"+pin, pin, true);
+        GpioTarget target = targets.gpio(pin, true);
         assertEquals(true, target.isFollowTrigger());
         assertEquals(false, target.isOneShot());
         assertEquals(true, target.getTriggerState());
@@ -367,35 +366,35 @@ public class LinkTest {
     }
 
     Target given_chained_target(Target... ts) {
-        return targets.chain("ChainedTarget").add(ts).build();
+        return targets.chain().add(ts).build();
     }
 
     Target given_non_following_target_on_pin_$1(int pin) {
-        Target target = targets.gpio("NonFollowingTarget"+pin, pin, true).followTrigger(false);
+        Target target = targets.gpio(pin, true).followTrigger(false);
         assertEquals(false, target.isFollowTrigger());
         return target;
     }
 
     Target given_one_shot_target_on_pin_$1(int pin) {
-        Target target = targets.gpio("OneShotTarget"+pin, pin, true).oneShot(true);
+        Target target = targets.gpio(pin, true).oneShot(true);
         assertEquals(true, target.isOneShot());
         return target;
     }
 
     Target given_inverted_target_on_pin_$1(int pin) {
-        Target target = targets.gpio("InvertedTarget"+pin, pin, true).triggerState(false);
+        Target target = targets.gpio(pin, true).triggerState(false);
         assertEquals(false, target.getTriggerState());
         return target;
     }
 
     Target given_toggle_target_on_pin_$1(int pin) {
-        GpioTarget target = targets.gpio("ToggleTarget"+pin, pin, null);
+        GpioTarget target = targets.gpio(pin, null);
         assertNull(target.getOutputState());
         return target;
     }
 
     Target given_midi_target(MidiCommand on, MidiCommand off) {
-        return targets.midi("MidiTarget", on, off);
+        return targets.midi(on, off);
     }
 
     void given_link_between_$1_and_$2(Trigger trigger, Target target) {
@@ -431,11 +430,11 @@ public class LinkTest {
     }
 
     void then_there_are_$1_triggers(int count) {
-        assertEquals(count, triggers.getAllTriggers().size());
+        assertEquals(count, triggers.getAll().size());
     }
 
     void then_there_are_$1_targets(int count) {
-        assertEquals(count, targets.getAllTargets().size());
+        assertEquals(count, targets.getAll().size());
     }
 
     @Expected(IllegalStateException.class)
@@ -449,11 +448,11 @@ public class LinkTest {
     }
 
     void then_trigger_$1_is_registered(String name) {
-        assertNotNull(triggers.getTrigger(name));
+        assertNotNull(triggers.get(name));
     }
 
     void then_target_$1_is_registered(String name) {
-        assertNotNull(targets.getTarget(name));
+        assertNotNull(targets.get(name));
     }
 
     void then_last_midi_command_was_$1(MidiCommand command) {

@@ -1,6 +1,6 @@
-package net.amarantha.gpiomofo.config;
+package net.amarantha.gpiomofo.scenario;
 
-public abstract class Config {
+public abstract class Scenario {
 
     public void setup() {
         System.out.println(BAR+"\n TRIGGERS \n"+BAR);

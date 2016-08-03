@@ -1,9 +1,11 @@
 package net.amarantha.gpiomofo.target;
 
+import net.amarantha.gpiomofo.factory.HasName;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
-public abstract class Target {
+public abstract class Target implements HasName {
 
     private boolean active = false;
 
@@ -132,13 +134,19 @@ public abstract class Target {
 
     private String name;
 
+    @Override
     public void setName(String name) {
-        this.name = name;
+        this.name = name.replaceAll(" ", "-");
     }
 
+    @Override
     public String getName() {
         return name;
     }
+
+    ////////////
+    // Object //
+    ////////////
 
     @Override
     public String toString() {
@@ -149,15 +157,13 @@ public abstract class Target {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Target target = (Target) o;
-
         return name != null ? name.equals(target.name) : target.name == null;
-
     }
 
     @Override
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
     }
+
 }

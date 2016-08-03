@@ -1,6 +1,9 @@
 package net.amarantha.gpiomofo.target;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ChainedTarget extends Target {
 
@@ -20,7 +23,6 @@ public class ChainedTarget extends Target {
     private Timer activationTimer;
 
     private void activateTarget(final int i) {
-//        System.out.println("Firing Next " + i);
         if ( i < nextId ) {
             Target target = componentTargets.get(i);
             Integer delay = targetDelays.get(i);
