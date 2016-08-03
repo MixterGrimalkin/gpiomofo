@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.http.HttpCommand;
 import net.amarantha.gpiomofo.midi.MidiCommand;
+import net.amarantha.gpiomofo.osc.OscCommand;
 import net.amarantha.gpiomofo.target.*;
 
 @Singleton
@@ -99,6 +100,38 @@ public class TargetFactory extends Factory<Target> {
         return target;
     }
 
+    /////////
+    // OSC //
+    /////////
+
+    public OscTarget osc(OscCommand onCommand) {
+        return osc(getNextName("Osc"), onCommand, null);
+    }
+
+    public OscTarget osc(String name, OscCommand onCommand) {
+        return osc(name, onCommand, null);
+    }
+
+    public OscTarget osc(OscCommand onCommand, OscCommand offCommand) {
+        return osc(getNextName("Osc"), onCommand, offCommand);
+    }
+
+    public OscTarget osc(String name, OscCommand onCommand, OscCommand offCommand) {
+
+        OscTarget target =
+            injector.getInstance(OscTarget.class)
+                .onCommand(onCommand)
+                .offCommand(offCommand);
+
+        if ( offCommand==null ) {
+            target.oneShot(true);
+        }
+
+        register(name, target);
+
+        return target;
+    }
+
     ///////////
     // Audio //
     ///////////
@@ -178,7 +211,7 @@ public class TargetFactory extends Factory<Target> {
     ////////////
 
     public QueuedTarget queue(Target... ts) {
-        return queue(getNextName("queue"), ts);
+        return queue(getNextName("Queue"), ts);
     }
 
     public QueuedTarget queue(String name, Target... ts) {
