@@ -28,9 +28,9 @@ public class TriggerResource extends Resource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response fireTrigger(@PathParam("trigger") String triggerName) {
         if ( fireTrigger(triggerName, true) ) {
-            return ok("Fired trigger '" + triggerName + "'");
+            return ok("Fired trigger '" + triggerName + "'\n");
         } else {
-            return error("Trigger '" + triggerName + "' not found");
+            return error("Trigger '" + triggerName + "' not found\n");
         }
     }
 
@@ -39,9 +39,9 @@ public class TriggerResource extends Resource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response cancelTrigger(@PathParam("trigger") String triggerName) {
         if ( fireTrigger(triggerName, false) ) {
-            return ok("Cancelled trigger '" + triggerName + "'");
+            return ok("Cancelled trigger '" + triggerName + "'\n");
         } else {
-            return error("Trigger '" + triggerName + "' not found");
+            return error("Trigger '" + triggerName + "' not found\n");
         }
     }
 

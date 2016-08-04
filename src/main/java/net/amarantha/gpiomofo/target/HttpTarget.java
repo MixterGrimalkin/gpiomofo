@@ -11,14 +11,14 @@ public class HttpTarget extends Target {
     @Override
     protected void onActivate() {
         if ( onCommand!=null ) {
-            http.fireAsync(null, onCommand);
+            http.fire(onCommand);
         }
     }
 
     @Override
     protected void onDeactivate() {
         if ( offCommand!=null ) {
-            http.fireAsync(null, offCommand);
+            http.fire(offCommand);
         }
     }
 

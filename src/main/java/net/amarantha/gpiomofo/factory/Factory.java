@@ -6,6 +6,8 @@ import java.util.Map;
 
 public class Factory<T extends HasName> {
 
+    private boolean failQuietly;
+
     private final String itemDescription;
 
     public Factory(String itemDescription) {
@@ -18,17 +20,17 @@ public class Factory<T extends HasName> {
 
     private Map<String, T> registrations = new HashMap<>();
 
-    protected void register(String name, T t) {
+    public void register(String name, T t) {
         t.setName(name);
         register(t);
     }
 
-    protected void register(T t) {
+    public void register(T t) {
         String name = t.getName();
         if ( name==null ) {
             name = getNextName();
         }
-        if ( registrations.containsKey(name) ) {
+        if ( !failQuietly && registrations.containsKey(name) ) {
             throw new IllegalStateException(itemDescription + " '" + name + "' is already registered");
         }
         registrations.put(name, t);
@@ -37,7 +39,7 @@ public class Factory<T extends HasName> {
 
     public T get(String name) {
         T result = registrations.get(name);
-        if ( result==null ) {
+        if ( !failQuietly && result==null ) {
             throw new IllegalStateException(itemDescription + " '" + name + "' not registered");
         }
         return result;
@@ -49,6 +51,10 @@ public class Factory<T extends HasName> {
 
     public void clearAll() {
         registrations.clear();
+    }
+
+    public void setFailQuietly(boolean failQuietly) {
+        this.failQuietly = failQuietly;
     }
 
     /////////////////

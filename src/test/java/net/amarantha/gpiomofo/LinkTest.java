@@ -421,7 +421,7 @@ public class LinkTest {
     }
 
     Target given_chained_target(Target... ts) {
-        return targets.chain().add(ts).build();
+        return targets.chain().add(null, ts).build();
     }
 
     Target given_non_following_target_on_pin_$1(int pin) {

@@ -1,10 +1,10 @@
 package net.amarantha.gpiomofo.osc;
 
 import com.google.inject.Singleton;
-import com.illposed.osc.OSCMessage;
-import com.illposed.osc.OSCPortOut;
+import com.illposed.osc.*;
 
 import java.net.InetAddress;
+import java.net.SocketException;
 
 @Singleton
 public class OscService {
@@ -17,6 +17,16 @@ public class OscService {
             sender.send(msg);
 
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onReceive(int port, String address, OSCListener listener) {
+        try {
+            OSCPortIn receiver = new OSCPortIn(port);
+            receiver.addListener("/"+address, listener);
+            receiver.startListening();
+        } catch (SocketException e) {
             e.printStackTrace();
         }
     }

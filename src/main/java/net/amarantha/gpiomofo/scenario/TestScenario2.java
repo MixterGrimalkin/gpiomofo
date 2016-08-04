@@ -10,22 +10,24 @@ public class TestScenario2 extends Scenario {
     @Override
     public void setupTriggers() {
         triggers.gpio("Button", 0, PULL_DOWN, true);
+        triggers.osc("Osc", 55000, "gpiomofo");
     }
 
     @Override
     public void setupTargets() {
-        Target red = targets.gpio("Red", 1, true);
-        Target blue = targets.gpio("Blue", 2, true);
-//        Target both = targets.chain("Both").add(red, blue).build();
-//        targets.queue("Queue", red, blue, both);
+        Target red = targets.gpio("Red", 1, true).clearDelay(2000L);
+        Target blue = targets.gpio("Blue", 2, true).clearDelay(2000L);
+        Target both = targets.chain("Both").add(null, red, blue).build().clearDelay(2000L);
+        targets.queue("Queue", red, blue, both).clearDelay(2000L);
         targets.osc("Osc",
-                new OscCommand("192.168.1.60", 8000, "hello", "one", "two"),
-                new OscCommand("192.168.1.60", 8000, "goodbye", "three", "fout")
+                new OscCommand("192.168.1.70", 53000, "hello", "one", "two"),
+                new OscCommand("192.168.1.70", 53000, "goodbye", "three", "fout")
                 );
     }
 
     @Override
     public void setupLinks() {
-        links.link("Button", "Osc", "Red", "Blue");
+        links.link("Osc", "Queue").link("Button", "Osc");
+
     }
 }

@@ -7,7 +7,8 @@ import javax.sound.midi.*;
 @Singleton
 public class MidiServiceImpl implements MidiService {
 
-    private MidiDevice midiDevice;
+    private MidiDevice midiOutDevice;
+    private MidiDevice midiInDevice;
 
     @Override
     public void openDevice() {
@@ -19,8 +20,11 @@ public class MidiServiceImpl implements MidiService {
     @Override
     public void openDevice(String name) {
         try {
-            midiDevice = getMidiDevice(name);
-            midiDevice.open();
+            midiOutDevice = getMidiOutDevice(name);
+            midiOutDevice.open();
+//            midiInDevice = getMidiInDevice(name);
+//            midiInDevice.close();
+//            midiInDevice.open();
         } catch (MidiUnavailableException e) {
             System.err.println("Could not startup MIDI device '" + name + "': " + e.getMessage());
         }
@@ -28,8 +32,8 @@ public class MidiServiceImpl implements MidiService {
 
     @Override
     public void closeDevice() {
-        if ( midiDevice!=null ) {
-            midiDevice.close();
+        if ( midiOutDevice !=null ) {
+            midiOutDevice.close();
         }
     }
 
@@ -41,18 +45,39 @@ public class MidiServiceImpl implements MidiService {
     }
 
     public void addListener() {
-        System.out.println("Adding Listening");
+        System.out.println("ADD LISTENER");
         try {
+            midiInDevice.open();
             Sequencer sequencer = MidiSystem.getSequencer();
-            System.out.println(sequencer.getReceiver());
-            System.out.println(sequencer.getTransmitter());
+            sequencer.open();
+            Transmitter transmitter = midiInDevice.getTransmitter();
+            Receiver receiver = sequencer.getReceiver();
+            transmitter.setReceiver(receiver);
+            sequencer.addMetaEventListener(new MetaEventListener() {
+                @Override
+                public void meta(MetaMessage meta) {
+                    System.out.println("HellO!");
+                }
+            });
             sequencer.addControllerEventListener(new ControllerEventListener() {
                 @Override
                 public void controlChange(ShortMessage event) {
-                    System.out.println("RECEIVED:");
-                    System.out.println(event);
+                    System.out.println("Boom!");
                 }
             }, new int[]{64});
+//            Transmitter transmitter = midiInDevice.getTransmitter();
+//            transmitter.setReceiver(new Receiver() {
+//                @Override
+//                public void send(MidiMessage message, long timeStamp) {
+//                    System.out.println("MESSAGE: " + message.toString());
+//                }
+//
+//                @Override
+//                public void close() {
+//                    System.out.println("CLOSE");
+//
+//                }
+//            });
         } catch (MidiUnavailableException e) {
             e.printStackTrace();
         }
@@ -60,9 +85,9 @@ public class MidiServiceImpl implements MidiService {
 
     @Override
     public void send(int command, int channel, int data1, int data2) {
-        if ( midiDevice!=null ) {
+        if ( midiOutDevice !=null ) {
             try {
-                Receiver receiver = midiDevice.getReceiver();
+                Receiver receiver = midiOutDevice.getReceiver();
                 ShortMessage message = new ShortMessage();
                 message.setMessage(command, channel, data1, data2);
                 receiver.send(message, -1);
@@ -74,16 +99,32 @@ public class MidiServiceImpl implements MidiService {
         }
     }
 
-    private MidiDevice getMidiDevice(String name) throws MidiUnavailableException {
+    private MidiDevice getMidiOutDevice(String name) throws MidiUnavailableException {
         MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
         for (MidiDevice.Info info : infos) {
-            System.out.println(info.getName());
-                MidiDevice device = MidiSystem.getMidiDevice(info);
-                try {
-                    if (device.getReceiver() != null && info.getDescription().contains(name)) {
-                        return device;
-                    }
-                } catch ( MidiUnavailableException ignored ) {}
+            MidiDevice device = MidiSystem.getMidiDevice(info);
+            try {
+                if (device.getReceiver() != null && info.getDescription().contains(name)) {
+                    return device;
+                }
+            } catch ( MidiUnavailableException e ) {
+//                e.printStackTrace();
+            }
+        }
+        throw new MidiUnavailableException("MIDI Device '" + name + "' not found");
+    }
+
+    private MidiDevice getMidiInDevice(String name) throws MidiUnavailableException {
+        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
+        for (MidiDevice.Info info : infos) {
+            MidiDevice device = MidiSystem.getMidiDevice(info);
+            try {
+                if (device.getTransmitter() != null && info.getDescription().contains(name)) {
+                    return device;
+                }
+            } catch ( MidiUnavailableException e ) {
+//                e.printStackTrace();
+            }
         }
         throw new MidiUnavailableException("MIDI Device '" + name + "' not found");
     }

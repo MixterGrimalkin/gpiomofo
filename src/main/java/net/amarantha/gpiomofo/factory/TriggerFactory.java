@@ -4,10 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.pi4j.io.gpio.PinPullResistance;
-import net.amarantha.gpiomofo.trigger.CompositeTrigger;
-import net.amarantha.gpiomofo.trigger.GpioTrigger;
-import net.amarantha.gpiomofo.trigger.HttpTrigger;
-import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.trigger.*;
 
 @Singleton
 public class TriggerFactory extends Factory<Trigger> {
@@ -48,11 +45,31 @@ public class TriggerFactory extends Factory<Trigger> {
     public HttpTrigger http(String name) {
 
         HttpTrigger trigger =
-                injector.getInstance(HttpTrigger.class);
+            injector.getInstance(HttpTrigger.class);
 
         register(name, trigger);
 
         return trigger;
+    }
+
+    /////////
+    // OSC //
+    /////////
+
+    public OscTrigger osc(int port, String address) {
+        return osc(getNextName("Osc"), port, address);
+    }
+
+    public OscTrigger osc(String name, int port, String address) {
+
+        OscTrigger trigger =
+            injector.getInstance(OscTrigger.class)
+                .setReceiver(port, address);
+
+        register(name, trigger);
+
+        return trigger;
+
     }
 
     ///////////////
@@ -68,6 +85,25 @@ public class TriggerFactory extends Factory<Trigger> {
         CompositeTrigger trigger =
             injector.getInstance(CompositeTrigger.class)
                 .addTriggers(triggers);
+
+        register(name, trigger);
+
+        return trigger;
+    }
+
+    //////////////
+    // Inverted //
+    //////////////
+
+    public InvertedTrigger invert(Trigger t) {
+        return invert(getNextName("Invert"), t);
+    }
+
+    public InvertedTrigger invert(String name, Trigger t) {
+
+        InvertedTrigger trigger =
+            injector.getInstance(InvertedTrigger.class)
+                .trigger(t);
 
         register(name, trigger);
 

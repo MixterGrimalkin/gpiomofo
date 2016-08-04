@@ -8,6 +8,7 @@ import java.util.TimerTask;
 public abstract class Target implements HasName {
 
     private boolean active = false;
+    public Target offTarget;
 
     public final boolean isActive() {
         return active;
@@ -17,7 +18,7 @@ public abstract class Target implements HasName {
     // Trigger //
     /////////////
 
-    public final void processTrigger(boolean inputState) {
+    public void processTrigger(boolean inputState) {
         if ( inputState==triggerState) {
             if ( !active ) {
                 activate();
@@ -49,13 +50,17 @@ public abstract class Target implements HasName {
     // Deactivate //
     ////////////////
 
-    public final void deactivate() {
-        if ( active ) {
+    protected final void deactivate(boolean force) {
+        if ( active || force ) {
             System.out.println("  --  [" + getName() + "]");
             stopTimer();
             active = false;
             onDeactivate();
         }
+    }
+
+    public final void deactivate() {
+        deactivate(false);
     }
 
     protected abstract void onDeactivate();

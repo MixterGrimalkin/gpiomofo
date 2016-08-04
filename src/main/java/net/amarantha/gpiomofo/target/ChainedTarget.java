@@ -14,13 +14,18 @@ public class ChainedTarget extends Target {
 
     @Override
     protected void onDeactivate() {
+        System.out.println("Deactivate Chained Target");
         stopTimer();
+        if ( offTarget!=null ) {
+            offTarget.activate();
+        }
         for ( int i=0; i<nextId; i++ ) {
             componentTargets.get(i).deactivate();
         }
     }
 
     private Timer activationTimer;
+    private boolean repeat;
 
     private void activateTarget(final int i) {
         if ( i < nextId ) {
@@ -38,6 +43,10 @@ public class ChainedTarget extends Target {
                         activateTarget(i+1);
                     }
                 }, delay);
+            }
+        } else {
+            if ( repeat ) {
+                activateTarget(0);
             }
         }
     }
@@ -97,6 +106,20 @@ public class ChainedTarget extends Target {
             target.clearDelay(clearDelay);
         }
         return this;
+    }
+
+    public Target repeat(boolean repeat) {
+        return repeat(repeat, null);
+    }
+
+    public Target repeat(boolean repeat, Target offTarget) {
+        this.repeat = repeat;
+        this.offTarget = offTarget;
+        if ( offTarget!=null ) {
+            offTarget.oneShot(true);
+        }
+        return this;
+
     }
 
 }

@@ -8,6 +8,10 @@ import net.amarantha.gpiomofo.midi.MidiCommand;
 import net.amarantha.gpiomofo.osc.OscCommand;
 import net.amarantha.gpiomofo.target.*;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 @Singleton
 public class TargetFactory extends Factory<Target> {
 
@@ -194,8 +198,8 @@ public class TargetFactory extends Factory<Target> {
         private ChainBuilder(ChainedTarget chainedTarget) {
             this.chainedTarget = chainedTarget;
         }
-        public ChainBuilder add(Target... targets) {
-            return add(null, targets);
+        public ChainBuilder add(Target target) {
+            return add(null, target);
         }
         public ChainBuilder add(Integer delay, Target... targets) {
             chainedTarget.addTarget(delay, targets);
@@ -210,19 +214,46 @@ public class TargetFactory extends Factory<Target> {
     // Queued //
     ////////////
 
+    public QueuedTarget queue(String name) {
+        QueuedTarget target = injector.getInstance(QueuedTarget.class);
+        register(name, target);
+        return target;
+    }
+
     public QueuedTarget queue(Target... ts) {
         return queue(getNextName("Queue"), ts);
     }
 
+    public QueuedTarget queue(String name, String... names) {
+        List<Target> ts = new ArrayList<>(names.length);
+        for ( String n : names ) {
+            ts.add(get(n));
+        }
+        return queue(name, ts.toArray(new Target[names.length]));
+    }
+
     public QueuedTarget queue(String name, Target... ts) {
-
-        QueuedTarget target =
-            injector.getInstance(QueuedTarget.class)
-                .addTargets(ts);
-
-        register(name, target);
-
+        QueuedTarget target = queue(name).addTargets(ts);
         return target;
+    }
+
+    //////////////
+    // Inverted //
+    //////////////
+
+    public InvertedTarget invert(Target target) {
+        return invert(getNextName("Invert"), target);
+    }
+
+    public InvertedTarget invert(String name, Target target) {
+
+        InvertedTarget invertedTarget =
+            injector.getInstance(InvertedTarget.class)
+                .target(target);
+
+        register(name, invertedTarget);
+
+        return invertedTarget;
     }
 
 }

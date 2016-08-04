@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPort;
 import com.illposed.osc.OSCPortOut;
+import net.amarantha.gpiomofo.osc.OscCommand;
+import net.amarantha.gpiomofo.osc.OscService;
 import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.gpio.GpioService;
 import net.amarantha.gpiomofo.midi.MidiService;
@@ -17,6 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
+import static javax.sound.midi.ShortMessage.NOTE_OFF;
+import static javax.sound.midi.ShortMessage.NOTE_ON;
 import static net.amarantha.gpiomofo.scenario.Scenario.BAR;
 
 @Singleton
@@ -39,7 +43,6 @@ public class GpioMoFo {
         midi.openDevice();
 
         System.out.println(BAR+"\n System Active (Press ENTER to quit)\n"+BAR+"\n");
-
         Scanner scanner = new Scanner(System.in);
         while (!scanner.hasNextLine()) {}
 

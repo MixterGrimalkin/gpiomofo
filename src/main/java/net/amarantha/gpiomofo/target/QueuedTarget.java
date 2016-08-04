@@ -12,13 +12,16 @@ public class QueuedTarget extends Target {
             targetPointer = 0;
         }
         currentTarget = componentTargets.get(targetPointer++);
-        currentTarget.activate();
+        if ( currentTarget!=null ) {
+            currentTarget.activate();
+        }
     }
 
     @Override
     protected void onDeactivate() {
         if ( currentTarget!=null ) {
-            currentTarget.deactivate();
+            System.out.println("Deactivate " + currentTarget.getName());
+            currentTarget.deactivate(true);
         }
     }
 
