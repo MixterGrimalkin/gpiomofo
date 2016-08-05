@@ -3,13 +3,12 @@ package net.amarantha.gpiomofo.factory;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.http.HttpCommand;
-import net.amarantha.gpiomofo.midi.MidiCommand;
-import net.amarantha.gpiomofo.osc.OscCommand;
+import net.amarantha.gpiomofo.service.http.HttpCommand;
+import net.amarantha.gpiomofo.service.midi.MidiCommand;
+import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.*;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Singleton
@@ -45,7 +44,7 @@ public class TargetFactory extends Factory<Target> {
     //////////
 
     public HttpTarget http(HttpCommand onCommand) {
-        return http(getNextName("Http"), onCommand, null);
+        return http(getNextName("Http"), onCommand);
     }
 
     public HttpTarget http(String name, HttpCommand onCommand) {
@@ -77,7 +76,7 @@ public class TargetFactory extends Factory<Target> {
     //////////
 
     public MidiTarget midi(MidiCommand onCommand) {
-        return midi(getNextName("Midi"), onCommand, null);
+        return midi(getNextName("Midi"), onCommand);
     }
 
     public MidiTarget midi(String name, MidiCommand onCommand) {
@@ -109,7 +108,7 @@ public class TargetFactory extends Factory<Target> {
     /////////
 
     public OscTarget osc(OscCommand onCommand) {
-        return osc(getNextName("Osc"), onCommand, null);
+        return osc(getNextName("Osc"), onCommand);
     }
 
     public OscTarget osc(String name, OscCommand onCommand) {

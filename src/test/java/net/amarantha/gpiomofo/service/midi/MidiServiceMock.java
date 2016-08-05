@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.midi;
+package net.amarantha.gpiomofo.service.midi;
 
 import com.google.inject.Singleton;
 
@@ -38,7 +38,7 @@ public class MidiServiceMock implements MidiService {
 
     }
 
-    public MidiCommand getLastMidiCommand() {
+    public MidiCommand getLastCommand() {
         return lastMidiCommand;
     }
 

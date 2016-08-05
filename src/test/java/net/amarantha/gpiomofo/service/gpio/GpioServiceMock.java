@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.gpio;
+package net.amarantha.gpiomofo.service.gpio;
 
 import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.PinState;

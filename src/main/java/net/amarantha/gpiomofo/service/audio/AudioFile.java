@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.audio;
+package net.amarantha.gpiomofo.service.audio;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.FactoryRegistry;

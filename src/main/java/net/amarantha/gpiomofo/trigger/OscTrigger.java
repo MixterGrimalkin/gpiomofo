@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.trigger;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.osc.OscService;
+import net.amarantha.gpiomofo.service.osc.OscService;
 
 public class OscTrigger extends Trigger {
 

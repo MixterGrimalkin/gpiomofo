@@ -1,9 +1,12 @@
-package net.amarantha.gpiomofo.http;
+package net.amarantha.gpiomofo.service.http;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class HttpCommand {
+
+    public static final String GET = "GET";
+    public static final String POST = "POST";
 
     private final String method;
     private final String host;
@@ -124,8 +127,9 @@ public class HttpCommand {
         if (port != that.port) return false;
         if (method != null ? !method.equals(that.method) : that.method != null) return false;
         if (host != null ? !host.equals(that.host) : that.host != null) return false;
-        if (basePath != null ? !basePath.equals(that.basePath) : that.basePath != null) return false;
-        if (path != null ? !path.equals(that.path) : that.path != null) return false;
+        String thisFullPath = getFullPath();
+        String thatFullPath = that.getFullPath();
+        if (getFullPath()!=null ? !getFullPath().equals(that.getFullPath()) : that.getFullPath()!=null ) return false;
         if (params != null ? !params.equals(that.params) : that.params != null) return false;
         return payload != null ? payload.equals(that.payload) : that.payload == null;
     }

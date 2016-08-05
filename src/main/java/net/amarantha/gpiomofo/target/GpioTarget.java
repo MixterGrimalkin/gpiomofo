@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.target;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.gpio.GpioService;
+import net.amarantha.gpiomofo.service.gpio.GpioService;
 
 public class GpioTarget extends Target {
 

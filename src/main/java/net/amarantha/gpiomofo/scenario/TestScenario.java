@@ -1,13 +1,8 @@
 package net.amarantha.gpiomofo.scenario;
 
-import com.google.inject.Inject;
-import net.amarantha.gpiomofo.factory.LinkFactory;
-import net.amarantha.gpiomofo.factory.TargetFactory;
-import net.amarantha.gpiomofo.factory.TriggerFactory;
-import net.amarantha.gpiomofo.http.HttpCommand;
-import net.amarantha.gpiomofo.midi.MidiCommand;
-import net.amarantha.gpiomofo.osc.OscCommand;
-import net.amarantha.gpiomofo.target.ChainedTarget;
+import net.amarantha.gpiomofo.service.http.HttpCommand;
+import net.amarantha.gpiomofo.service.midi.MidiCommand;
+import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.QueuedTarget;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;

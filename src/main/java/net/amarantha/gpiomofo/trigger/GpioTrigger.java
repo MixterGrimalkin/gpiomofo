@@ -2,7 +2,7 @@ package net.amarantha.gpiomofo.trigger;
 
 import com.google.inject.Inject;
 import com.pi4j.io.gpio.PinPullResistance;
-import net.amarantha.gpiomofo.gpio.GpioService;
+import net.amarantha.gpiomofo.service.gpio.GpioService;
 
 public class GpioTrigger extends Trigger {
 

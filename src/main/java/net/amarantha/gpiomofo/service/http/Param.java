@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.http;
+package net.amarantha.gpiomofo.service.http;
 
 public class Param {
 

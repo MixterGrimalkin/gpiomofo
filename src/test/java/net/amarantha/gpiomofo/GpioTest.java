@@ -5,8 +5,8 @@ import com.googlecode.guicebehave.Expected;
 import com.googlecode.guicebehave.Modules;
 import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
-import net.amarantha.gpiomofo.gpio.GpioService;
-import net.amarantha.gpiomofo.gpio.GpioServiceMock;
+import net.amarantha.gpiomofo.service.gpio.GpioService;
+import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 

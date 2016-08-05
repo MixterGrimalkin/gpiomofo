@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.midi;
+package net.amarantha.gpiomofo.service.midi;
 
 import com.google.inject.Singleton;
 

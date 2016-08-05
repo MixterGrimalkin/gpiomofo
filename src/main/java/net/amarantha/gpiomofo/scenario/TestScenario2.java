@@ -1,6 +1,6 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.osc.OscCommand;
+import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;

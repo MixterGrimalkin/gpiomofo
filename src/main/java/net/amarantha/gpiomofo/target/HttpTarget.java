@@ -1,8 +1,8 @@
 package net.amarantha.gpiomofo.target;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.http.HttpCommand;
-import net.amarantha.gpiomofo.http.HttpService;
+import net.amarantha.gpiomofo.service.http.HttpCommand;
+import net.amarantha.gpiomofo.service.http.HttpService;
 
 public class HttpTarget extends Target {
 

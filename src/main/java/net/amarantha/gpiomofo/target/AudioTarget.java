@@ -1,6 +1,6 @@
 package net.amarantha.gpiomofo.target;
 
-import net.amarantha.gpiomofo.audio.AudioFile;
+import net.amarantha.gpiomofo.service.audio.AudioFile;
 
 public class AudioTarget extends Target {
 
