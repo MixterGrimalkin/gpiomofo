@@ -8,9 +8,7 @@ import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import org.junit.runner.RunWith;
 
-import static javax.sound.midi.ShortMessage.CONTROL_CHANGE;
-import static javax.sound.midi.ShortMessage.NOTE_OFF;
-import static javax.sound.midi.ShortMessage.NOTE_ON;
+import static javax.sound.midi.ShortMessage.*;
 
 @RunWith(StoryRunner.class) @Modules(TestModule.class)
 public class MidiTest extends TestBase {

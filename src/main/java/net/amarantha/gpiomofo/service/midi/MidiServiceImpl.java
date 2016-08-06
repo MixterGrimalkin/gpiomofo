@@ -19,6 +19,7 @@ public class MidiServiceImpl implements MidiService {
 
     @Override
     public void openDevice(String name) {
+        System.out.println("Opening MIDI Device...");
         try {
             midiOutDevice = getMidiOutDevice(name);
             midiOutDevice.open();

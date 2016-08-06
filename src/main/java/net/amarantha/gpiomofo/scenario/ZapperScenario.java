@@ -29,7 +29,7 @@ public class ZapperScenario extends Scenario {
 
         targets.gpio("setup1", 1, true);
         targets.gpio("setup2", 2, true);
-        targets.gpio("setup3", 4, true);
+//        targets.gpio("setup3", 4, true);
 
         targets.chain("Background")
 //            .add(targets.gpio(1, false))

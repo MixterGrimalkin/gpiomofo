@@ -2,6 +2,8 @@ package net.amarantha.gpiomofo.utility;
 
 import javax.inject.Singleton;
 import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 @Singleton
@@ -108,6 +110,17 @@ public class PropertyManager {
             ip = output.toString().trim();
         }
         return ip;
+    }
+
+    private static boolean withServer = true;
+
+    public boolean isWithServer() {
+        return withServer;
+    }
+
+    public static void processArgs(String[] args) {
+        List<String> arguments = Arrays.asList(args);
+        withServer = !arguments.contains("-noserver");
     }
 
 }

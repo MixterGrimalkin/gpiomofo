@@ -3,6 +3,7 @@ package net.amarantha.gpiomofo;
 import com.googlecode.guicebehave.Modules;
 import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
+import net.amarantha.gpiomofo.target.QueuedTarget;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import org.junit.runner.RunWith;
@@ -110,13 +111,16 @@ public class TargetsTest extends TestBase {
     @Story
     public void test_queued_targets() {
 
-        Trigger trigger = given_trigger_on_pin_$1(0);
+        Trigger trigger1 = given_trigger_on_pin_$1(0);
+        Trigger trigger2 = given_trigger_on_pin_$1(4);
         Target target1 = given_target_on_pin_$1(1);
         Target target2 = given_target_on_pin_$1(2);
         Target target3 = given_target_on_pin_$1(3);
 
-        Target queuedTarget = given_a_queued_target(target1, target2, target3);
-        given_link_between_$1_and_$2(trigger, queuedTarget);
+        QueuedTarget queuedTarget = given_a_queued_target(target1, target2, target3);
+        Target target4 = given_queue_reset_target(queuedTarget);
+        given_link_between_$1_and_$2(trigger1, queuedTarget);
+        given_link_between_$1_and_$2(trigger2, target4);
 
         then_pin_$1_is_$2(1, false);
         then_pin_$1_is_$2(2, false);
@@ -158,6 +162,20 @@ public class TargetsTest extends TestBase {
         then_pin_$1_is_$2(2, false);
         then_pin_$1_is_$2(3, false);
 
+        when_set_pin_$1_to_$2(4, true);
+        then_pin_$1_is_$2(1, false);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(1, true);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(1, false);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+
     }
 
     @Story
@@ -183,4 +201,88 @@ public class TargetsTest extends TestBase {
         then_pin_$1_is_$2(1, true);
 
     }
+
+    @Story
+    public void test_clear_delay() {
+
+        when_time_is_$1("12:00:00");
+
+        Trigger trigger = given_trigger_on_pin_$1(0);
+        Target target = given_target_on_pin_$1_with_clear_delay_$1(1, 3000L);
+        given_link_between_$1_and_$2(trigger, target);
+
+        then_pin_$1_is_$2(1, false);
+
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(1, true);
+        when_time_is_$1("12:00:02");
+        then_pin_$1_is_$2(1, true);
+        when_time_is_$1("12:00:04");
+        then_pin_$1_is_$2(1, false);
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(1, false);
+
+        when_time_is_$1("12:00:00");
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(1, true);
+        when_time_is_$1("12:00:02");
+        then_pin_$1_is_$2(1, true);
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(1, false);
+
+    }
+
+    @Story
+    public void test_clear_delay_no_follow() {
+
+        when_time_is_$1("12:00:00");
+
+        Trigger trigger = given_trigger_on_pin_$1(0);
+        Target target = given_non_following_target_on_pin_$1_with_clear_delay_$1(1, 3000L);
+        given_link_between_$1_and_$2(trigger, target);
+
+        then_pin_$1_is_$2(1, false);
+
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(1, true);
+        when_time_is_$1("12:00:02");
+        then_pin_$1_is_$2(1, true);
+        when_time_is_$1("12:00:04");
+        then_pin_$1_is_$2(1, false);
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(1, false);
+
+        when_time_is_$1("12:00:00");
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(1, true);
+        when_time_is_$1("12:00:02");
+        then_pin_$1_is_$2(1, true);
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(1, true);
+        when_time_is_$1("12:00:04");
+        then_pin_$1_is_$2(1, false);
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(1, false);
+
+    }
+
+    @Story
+    public void test_cancellation_targets() {
+
+        Trigger trigger1 = given_trigger_on_pin_$1(0);
+        Trigger trigger2 = given_trigger_on_pin_$1(1);
+        Target target1 = given_target_on_pin_$1(2);
+        Target target2 = given_cancellation_target_for(target1);
+        given_link_between_$1_and_$2(trigger1, target1);
+        given_link_between_$1_and_$2(trigger2, target2);
+
+        then_pin_$1_is_$2(1, false);
+
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(2, true);
+        when_set_pin_$1_to_$2(1, true);
+        then_pin_$1_is_$2(2, false);
+
+    }
+
 }

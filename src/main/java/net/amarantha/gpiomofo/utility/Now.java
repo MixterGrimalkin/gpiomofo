@@ -40,6 +40,10 @@ public class Now {
         setDateTime(date().toString(), time);
     }
 
+    public void setOffset(Long offset) {
+        this.offset = offset;
+    }
+
     public void setDateTime(String date, String time) {
         LocalDateTime target = LocalDateTime.parse(date + "T" + time);
         offset = target.toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);

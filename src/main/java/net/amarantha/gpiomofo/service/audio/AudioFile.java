@@ -50,12 +50,25 @@ public class AudioFile extends PlaybackListener implements Runnable {
         playing = false;
     }
 
+    private PlaybackFinishedCallback callback;
+
+    public void onPlaybackFinished(PlaybackFinishedCallback callback) {
+        this.callback = callback;
+    }
+
     public void run() {
         try {
             this.player.play();
+            if ( callback!=null ) {
+                callback.onPlaybackFinished();
+            }
         } catch (JavaLayerException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public interface PlaybackFinishedCallback {
+        void onPlaybackFinished();
     }
 
 }

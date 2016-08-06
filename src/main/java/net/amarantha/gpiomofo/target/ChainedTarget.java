@@ -14,7 +14,6 @@ public class ChainedTarget extends Target {
 
     @Override
     protected void onDeactivate() {
-        System.out.println("Deactivate Chained Target");
         stopTimer();
         if ( offTarget!=null ) {
             offTarget.activate();

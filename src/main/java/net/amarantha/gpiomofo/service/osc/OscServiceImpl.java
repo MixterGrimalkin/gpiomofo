@@ -7,6 +7,8 @@ import com.illposed.osc.OSCPortOut;
 
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OscServiceImpl implements OscService {
 
@@ -24,12 +26,24 @@ public class OscServiceImpl implements OscService {
     @Override
     public void onReceive(int port, String address, OSCListener listener) {
         try {
-            OSCPortIn receiver = new OSCPortIn(port);
+            OSCPortIn receiver = getInPort(port);
             receiver.addListener("/"+address, listener);
             receiver.startListening();
+            System.out.println("Listener Added");
         } catch (SocketException e) {
             e.printStackTrace();
         }
+    }
+
+    private Map<Integer, OSCPortIn> inPorts = new HashMap<>();
+
+    private OSCPortIn getInPort(int port) throws SocketException {
+        OSCPortIn result = inPorts.get(port);
+        if ( result==null ) {
+            result = new OSCPortIn(port);
+            inPorts.put(port, result);
+        }
+        return result;
     }
 
 }

@@ -22,7 +22,7 @@ public class WebService {
 
     public HttpServer start() {
 
-        System.out.println("Starting Web Service....");
+        System.out.println("Starting Web Service...");
 
         String fullUri = "http://" + props.getIp().trim() + ":8001/gpiomofo/";
 

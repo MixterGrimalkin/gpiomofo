@@ -161,6 +161,7 @@ public abstract class GpioService {
     }
 
     public void startInputMonitor(long period) {
+        System.out.println("Starting GPIO Monitor...");
         stopInputMonitor();
         monitorTimer = new Timer();
         monitorTimer.schedule(new TimerTask() {

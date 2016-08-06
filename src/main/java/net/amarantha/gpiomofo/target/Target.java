@@ -1,11 +1,15 @@
 package net.amarantha.gpiomofo.target;
 
+import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.HasName;
+import net.amarantha.gpiomofo.service.task.TaskService;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 public abstract class Target implements HasName {
+
+    @Inject private TaskService tasks;
 
     private boolean active = false;
     public Target offTarget;
@@ -34,10 +38,10 @@ public abstract class Target implements HasName {
 
     public final void activate() {
         System.out.println(" " + (oneShot?"--":"==") + ">> ["+getName()+"]");
-        stopTimer();
+        tasks.removeTask(this);
         if ( !oneShot ) {
             if (clearDelay != null) {
-                startTimer();
+                tasks.addTask(this, clearDelay, this::deactivate);
             }
             active = true;
         }
@@ -53,7 +57,7 @@ public abstract class Target implements HasName {
     protected final void deactivate(boolean force) {
         if ( active || force ) {
             System.out.println("  --  [" + getName() + "]");
-            stopTimer();
+            tasks.removeTask(this);
             active = false;
             onDeactivate();
         }
@@ -64,29 +68,6 @@ public abstract class Target implements HasName {
     }
 
     protected abstract void onDeactivate();
-
-    /////////////////
-    // Clear Timer //
-    /////////////////
-
-    private Timer clearTimer;
-
-    private void startTimer() {
-        clearTimer = new Timer();
-        clearTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                deactivate();
-            }
-        }, clearDelay);
-    }
-
-    private void stopTimer() {
-        if ( clearTimer !=null ) {
-            clearTimer.cancel();
-            clearTimer = null;
-        }
-    }
 
     ///////////
     // Setup //

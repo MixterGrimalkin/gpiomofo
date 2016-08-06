@@ -143,11 +143,21 @@ public class TargetFactory extends Factory<Target> {
         return audio(getNextName("Audio"), filename);
     }
 
+    public AudioTarget audio(String filename, boolean loop) {
+        return audio(getNextName("Audio"), filename, loop);
+    }
+
     public AudioTarget audio(String name, String filename) {
+        return audio(name, filename, false);
+
+    }
+
+    public AudioTarget audio(String name, String filename, boolean loop) {
 
         AudioTarget target =
             injector.getInstance(AudioTarget.class)
-                .setAudioFile(filename);
+                .setAudioFile(filename)
+                .loop(loop);
 
         register(name, target);
 
@@ -236,6 +246,23 @@ public class TargetFactory extends Factory<Target> {
         return target;
     }
 
+    public QueueResetTarget queueReset(QueuedTarget t) {
+        return queueReset(getNextName("QueueReset"), t);
+    }
+
+    public QueueResetTarget queueReset(String name, QueuedTarget t) {
+
+        QueueResetTarget target =
+            injector.getInstance(QueueResetTarget.class)
+                .queuedTarget(t);
+
+        target.oneShot(true);
+
+        register(name, target);
+
+        return target;
+    }
+
     //////////////
     // Inverted //
     //////////////
@@ -253,6 +280,27 @@ public class TargetFactory extends Factory<Target> {
         register(name, invertedTarget);
 
         return invertedTarget;
+    }
+
+    //////////////////
+    // Cancellation //
+    //////////////////
+
+    public CancellationTarget cancel(Target t) {
+        return cancel(getNextName("Cancel"), t);
+    }
+
+    public CancellationTarget cancel(String name, Target t) {
+
+        CancellationTarget target =
+            injector.getInstance(CancellationTarget.class)
+                .cancel(t);
+
+        target.oneShot(true);
+
+        register(name, target);
+
+        return target;
     }
 
 }

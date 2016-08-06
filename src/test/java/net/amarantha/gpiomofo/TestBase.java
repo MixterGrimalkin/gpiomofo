@@ -17,11 +17,11 @@ import net.amarantha.gpiomofo.service.midi.MidiServiceMock;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.service.osc.OscService;
 import net.amarantha.gpiomofo.service.osc.OscServiceMock;
-import net.amarantha.gpiomofo.target.GpioTarget;
-import net.amarantha.gpiomofo.target.QueuedTarget;
-import net.amarantha.gpiomofo.target.Target;
+import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.gpiomofo.target.*;
 import net.amarantha.gpiomofo.trigger.GpioTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.utility.Now;
 import net.amarantha.gpiomofo.webservice.TriggerResource;
 import org.junit.After;
 import org.junit.Assert;
@@ -41,6 +41,9 @@ public class TestBase {
     @Inject protected HttpService http;
     @Inject protected OscService osc;
 
+    @Inject protected Now now;
+    @Inject protected TaskService tasks;
+
     @Inject protected TriggerFactory triggers;
     @Inject protected TargetFactory targets;
     @Inject protected LinkFactory links;
@@ -53,6 +56,7 @@ public class TestBase {
         triggers.clearAll();
         targets.clearAll();
         midi.openDevice();
+        now.setOffset(0L);
     }
 
     @After
@@ -91,6 +95,11 @@ public class TestBase {
         return target;
     }
 
+    Target given_cancellation_target_for(Target t) {
+        CancellationTarget target = targets.cancel(t);
+        return target;
+    }
+
     Target given_chained_target(Target... ts) {
         return targets.chain().add(null, ts).build();
     }
@@ -113,15 +122,34 @@ public class TestBase {
         return target;
     }
 
+    Target given_target_on_pin_$1_with_clear_delay_$1(int pin, long clearDelay) {
+        Target target = targets.gpio(pin, true).clearDelay(clearDelay);
+        assertEquals(clearDelay, target.getClearDelay().longValue());
+        return target;
+    }
+
+    Target given_non_following_target_on_pin_$1_with_clear_delay_$1(int pin, long clearDelay) {
+        Target target = targets.gpio(pin, true).clearDelay(clearDelay).followTrigger(false);
+        assertEquals(clearDelay, target.getClearDelay().longValue());
+        assertEquals(false, target.isFollowTrigger());
+        return target;
+    }
+
     Target given_toggle_target_on_pin_$1(int pin) {
         GpioTarget target = targets.gpio(pin, null);
         assertNull(target.getOutputState());
         return target;
     }
 
-    Target given_a_queued_target(Target... ts) {
+    QueuedTarget given_a_queued_target(Target... ts) {
         QueuedTarget target = targets.queue(ts);
         assertEquals(ts.length, target.getComponentTargets().size());
+        return target;
+    }
+
+    Target given_queue_reset_target(QueuedTarget queuedTarget) {
+        QueueResetTarget target = targets.queueReset(queuedTarget);
+        assertEquals(true, target.isOneShot());
         return target;
     }
 
@@ -183,6 +211,11 @@ public class TestBase {
 
     void when_fire_osc_command_$1(OscCommand command) {
         ((OscServiceMock)osc).receive(command.getAddress(), new OSCMessage("/"+command.getAddress()));
+    }
+
+    void when_time_is_$1(String time) {
+        now.setTime(time);
+        tasks.scanTasks();
     }
 
     //////////

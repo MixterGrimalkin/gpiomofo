@@ -37,4 +37,8 @@ public class QueuedTarget extends Target {
     public List<Target> getComponentTargets() {
         return componentTargets;
     }
+
+    public void resetQueue() {
+        targetPointer = 0;
+    }
 }

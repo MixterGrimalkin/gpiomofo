@@ -1,6 +1,6 @@
 package net.amarantha.gpiomofo.service.osc;
 
-import com.illposed.osc.*;
+import com.illposed.osc.OSCListener;
 
 public interface OscService {
 
