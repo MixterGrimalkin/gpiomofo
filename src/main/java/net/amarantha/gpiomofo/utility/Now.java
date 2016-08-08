@@ -5,17 +5,24 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.temporal.TemporalField;
 
 import static java.time.ZoneOffset.UTC;
 
 @Singleton
 public class Now {
 
+    private boolean lockMode;
+
     public LocalDateTime now() {
         if ( offset==null ) {
             return LocalDateTime.now();
         }
         return LocalDateTime.ofEpochSecond(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) + offset, 0, ZoneOffset.UTC);
+    }
+
+    public long nano() {
+        return now().getNano();
     }
 
     public long epochMilli() {
@@ -55,6 +62,10 @@ public class Now {
 
     public void pushMinutes(long minutes) {
         pushSeconds(minutes * 60);
+    }
+
+    public void setLockMode(boolean lockMode) {
+        this.lockMode = lockMode;
     }
 
 }

@@ -20,7 +20,6 @@ public class QueuedTarget extends Target {
     @Override
     protected void onDeactivate() {
         if ( currentTarget!=null ) {
-            System.out.println("Deactivate " + currentTarget.getName());
             currentTarget.deactivate(true);
         }
     }

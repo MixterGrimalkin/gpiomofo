@@ -31,4 +31,19 @@ public class LinkFactory {
         return link(trigger, allTargets.toArray(new Target[allTargets.size()]));
     }
 
+    public LinkFactory lock(long lockTime, Target... targets) {
+        for ( Target t : targets ) {
+            t.lock(lockTime, targets);
+        }
+        return this;
+    }
+
+    public LinkFactory lock(long lockTime, String... targetNames) {
+        List<Target> ts = new LinkedList<>();
+        for ( String name : targetNames ) {
+            ts.add(targets.get(name));
+        }
+        return lock(lockTime, ts.toArray(new Target[ts.size()]));
+    }
+
 }

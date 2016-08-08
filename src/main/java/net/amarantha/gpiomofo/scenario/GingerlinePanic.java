@@ -5,19 +5,9 @@ import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
+import static net.amarantha.gpiomofo.scenario.GingerLineSetup.*;
 
 public class GingerlinePanic extends Scenario {
-
-    public static final String PANIC_IP = "192.168.1.70";
-
-    public static final int OSC_PORT = 53000;
-
-    public static final String PANIC_BRIEFING_ROOM = "panic_briefing_room";
-    public static final String PANIC_GAME_SHOW =     "panic_game_show_room";
-    public static final String PANIC_UNDERWATER =    "panic_underwater_room";
-    public static final String PANIC_BIKE_ROOM =     "panic_bike_room";
-    public static final String PANIC_KITCHEN_ROOM =  "panic_kitchen_room";
-    public static final String PANIC_TOY_BOX =       "panic_toy_box_room";
 
     private Trigger resetButton;
     private Trigger briefingRoom;
@@ -41,12 +31,12 @@ public class GingerlinePanic extends Scenario {
     public void setupTriggers() {
 
         resetButton =    triggers.gpio(0, PULL_DOWN, true);
-        briefingRoom =   triggers.osc(OSC_PORT, PANIC_BRIEFING_ROOM);
-        gameShowRoom =   triggers.osc(OSC_PORT, PANIC_GAME_SHOW);
-        underwaterRoom = triggers.osc(OSC_PORT, PANIC_UNDERWATER);
-        bikeRoom =       triggers.osc(OSC_PORT, PANIC_BIKE_ROOM);
-        kitchenRoom =    triggers.osc(OSC_PORT, PANIC_KITCHEN_ROOM);
-        toyBoxRoom =     triggers.osc(OSC_PORT, PANIC_TOY_BOX);
+        briefingRoom =   triggers.osc(PANIC_OSC_PORT, PANIC_BRIEFING_ROOM);
+        gameShowRoom =   triggers.osc(PANIC_OSC_PORT, PANIC_GAME_SHOW);
+        underwaterRoom = triggers.osc(PANIC_OSC_PORT, PANIC_UNDERWATER);
+        bikeRoom =       triggers.osc(PANIC_OSC_PORT, PANIC_BIKE_ROOM);
+        kitchenRoom =    triggers.osc(PANIC_OSC_PORT, PANIC_KITCHEN_ROOM);
+        toyBoxRoom =     triggers.osc(PANIC_OSC_PORT, PANIC_TOY_BOX);
 
     }
 

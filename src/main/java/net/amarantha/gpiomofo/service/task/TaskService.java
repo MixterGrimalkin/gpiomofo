@@ -17,6 +17,7 @@ public class TaskService {
     @Inject private Now now;
 
     private Map<Object, Task> tasks = new HashMap<>();
+    private Map<Object, Task> newTasks = new HashMap<>();
     private List<Object> deadTaskKeys = new LinkedList<>();
 
     private Thread taskThread;
@@ -24,15 +25,17 @@ public class TaskService {
     private boolean run = false;
 
     public synchronized void addTask(Object key, long interval, TaskCallback callback) {
-        tasks.put(key, new Task(now.epochMilli(), interval, false, callback));
+        newTasks.put(key, new Task(now.epochMilli(), interval, false, callback));
     }
 
     public synchronized void addRepeatingTask(Object key, long interval, TaskCallback callback) {
-        tasks.put(key, new Task(now.epochMilli(), interval, true, callback));
+        newTasks.put(key, new Task(now.epochMilli(), interval, true, callback));
     }
 
     public synchronized void removeTask(Object key) {
-        tasks.remove(key);
+        if ( tasks.containsKey(key) ) {
+            deadTaskKeys.add(key);
+        }
     }
 
     public void start() {
@@ -56,6 +59,10 @@ public class TaskService {
     }
 
     public synchronized void scanTasks() {
+        for ( Entry<Object, Task> entry : newTasks.entrySet() ) {
+            tasks.put(entry.getKey(), entry.getValue());
+        }
+        newTasks.clear();
         for ( Entry<Object, Task> entry : tasks.entrySet() ) {
             if ( checkAndRun(entry.getValue()) ) {
                 deadTaskKeys.add(entry.getKey());

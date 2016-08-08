@@ -110,4 +110,23 @@ public class TriggerFactory extends Factory<Trigger> {
         return trigger;
     }
 
+    ///////////
+    // Range //
+    ///////////
+
+    public RangeTrigger range() {
+        return range(getNextName("Range"));
+    }
+
+    public RangeTrigger range(String name) {
+
+        RangeTrigger trigger =
+            injector.getInstance(RangeTrigger.class);
+
+        register(name, trigger);
+
+        return trigger;
+
+    }
+
 }

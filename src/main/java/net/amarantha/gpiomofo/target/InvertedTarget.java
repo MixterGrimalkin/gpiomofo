@@ -6,7 +6,7 @@ public class InvertedTarget extends Target {
 
     @Override
     public void processTrigger(boolean inputState) {
-        System.out.println("FIRE INVERTED: " + inputState);
+//        System.out.println("FIRE INVERTED: " + inputState);
 //        if ( target!=null ) {
 //            System.out.println("Have target");
 //            if ( inputState==getTriggerState() ) {

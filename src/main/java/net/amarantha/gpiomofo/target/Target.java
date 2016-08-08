@@ -4,8 +4,7 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.HasName;
 import net.amarantha.gpiomofo.service.task.TaskService;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public abstract class Target implements HasName {
 
@@ -37,15 +36,22 @@ public abstract class Target implements HasName {
     //////////////
 
     public final void activate() {
-        System.out.println(" " + (oneShot?"--":"==") + ">> ["+getName()+"]");
-        tasks.removeTask(this);
-        if ( !oneShot ) {
-            if (clearDelay != null) {
-                tasks.addTask(this, clearDelay, this::deactivate);
+        if ( !locked ) {
+            System.out.println(" " + (oneShot ? "--" : "==") + ">> [" + getName() + "]");
+            if ( lockTime!=null ) {
+                for ( Target target : lockTargets ) {
+                    target.lockFor(lockTime);
+                }
             }
-            active = true;
+            tasks.removeTask(this);
+            if (!oneShot) {
+                if (clearDelay != null) {
+                    tasks.addTask(this, clearDelay, this::deactivate);
+                }
+                active = true;
+            }
+            onActivate();
         }
-        onActivate();
     }
 
     protected abstract void onActivate();
@@ -68,6 +74,31 @@ public abstract class Target implements HasName {
     }
 
     protected abstract void onDeactivate();
+
+    /////////////
+    // Locking //
+    /////////////
+
+    private Long lockTime;
+
+    public Target lock(Long lockTime, Target... ts) {
+        this.lockTargets.addAll(Arrays.asList(ts));
+        this.lockTime = lockTime;
+        return this;
+    }
+
+    private List<Target> lockTargets = new LinkedList<>();
+
+    private boolean locked;
+
+    private void lockFor(long lockTime) {
+        locked = true;
+        tasks.addTask("Lock"+getName(), lockTime, this::unlock);
+    }
+
+    private void unlock() {
+        locked = false;
+    }
 
     ///////////
     // Setup //

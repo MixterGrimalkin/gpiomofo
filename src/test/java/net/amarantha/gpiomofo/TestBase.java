@@ -20,6 +20,7 @@ import net.amarantha.gpiomofo.service.osc.OscServiceMock;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.gpiomofo.target.*;
 import net.amarantha.gpiomofo.trigger.GpioTrigger;
+import net.amarantha.gpiomofo.trigger.RangeTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.utility.Now;
 import net.amarantha.gpiomofo.webservice.TriggerResource;
@@ -83,6 +84,18 @@ public class TestBase {
 
     Trigger given_composed_trigger(Trigger... ts) {
         return triggers.composite(ts);
+    }
+
+    RangeTrigger given_range_trigger() {
+        return triggers.range();
+    }
+
+    RangeTrigger on_target_$4_between_$2_and_$3(RangeTrigger trigger, double min, double max, Target target) {
+        return trigger.addRange(min, max, target);
+    }
+
+    void when_range_trigger_$1_fires_value_$2(RangeTrigger trigger, double value) {
+        trigger.fire(value);
     }
 
     Target given_target_on_pin_$1(int pin) {
@@ -151,6 +164,10 @@ public class TestBase {
         QueueResetTarget target = targets.queueReset(queuedTarget);
         assertEquals(true, target.isOneShot());
         return target;
+    }
+
+    void given_lock_of_$1_on_targets(long lockFor, Target... ts) {
+        links.lock(lockFor, ts);
     }
 
     Target given_midi_target(MidiCommand on) {

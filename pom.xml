@@ -10,6 +10,14 @@
 
     <dependencies>
 
+        <!-- diozero (for NeoPixel) -->
+        <!--<dependency>-->
+            <!--<groupId>com.diozero</groupId>-->
+            <!--<artifactId>diozero</artifactId>-->
+            <!--<version>0.8</version>-->
+            <!--<type>pom</type>-->
+        <!--</dependency>-->
+
         <!-- Guice -->
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -128,6 +136,8 @@
 
     </dependencies>
 
+
+
     <build>
 
         <pluginManagement>
@@ -163,6 +173,22 @@
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/main/bash</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-c</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/gpiomofo/c</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/c</directory>
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>
@@ -218,7 +244,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>net.amarantha.gpiomofo.Main</mainClass>
+                            <mainClass>net.amarantha.gpiomofo.PwmLedTest</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>.</Class-Path>

@@ -285,4 +285,44 @@ public class TargetsTest extends TestBase {
 
     }
 
+    @Story
+    public void test_target_lockout() {
+
+        Trigger trigger1 = given_trigger_on_pin_$1(0);
+        Trigger trigger2 = given_trigger_on_pin_$1(1);
+        Target target1 = given_target_on_pin_$1(2);
+        Target target2 = given_target_on_pin_$1(3);
+        given_lock_of_$1_on_targets(10000, target1, target2);
+        given_link_between_$1_and_$2(trigger1, target1);
+        given_link_between_$1_and_$2(trigger2, target2);
+
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+
+        when_time_is_$1("12:00:00");
+        when_set_pin_$1_to_$2(0, true);
+        then_pin_$1_is_$2(2, true);
+        then_pin_$1_is_$2(3, false);
+        when_set_pin_$1_to_$2(0, false);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+
+        when_time_is_$1("12:00:02");
+        when_set_pin_$1_to_$2(1, true);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+        when_set_pin_$1_to_$2(1, false);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+
+        when_time_is_$1("12:00:15");
+        when_set_pin_$1_to_$2(1, true);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, true);
+        when_set_pin_$1_to_$2(1, false);
+        then_pin_$1_is_$2(2, false);
+        then_pin_$1_is_$2(3, false);
+
+    }
+
 }
