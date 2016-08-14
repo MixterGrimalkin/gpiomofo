@@ -10,10 +10,21 @@ int ECHO = 5;
 
 int TIMEOUT = 10000000;
 
+void init() {
+    printf("Setting up native HC-SR04...\n");
+    wiringPiSetup() ;
+    pinMode(TRIG, OUTPUT);
+    pinMode(ECHO, INPUT);
+    digitalWrite(TRIG, LOW);
+    delay(1000);
+}
+
+long lastTravelTime = 0;
+
 long measure() {
 
     digitalWrite(TRIG, HIGH);
-    delayMicroseconds(20);
+    delayMicroseconds(10);
     digitalWrite(TRIG, LOW);
 
     long startTime = 0;
@@ -27,17 +38,17 @@ long measure() {
     }
     long travelTime = endTime - startTime;
 
+    if ( travelTime==0 ) {
+        wiringPiSetup() ;
+        pinMode(TRIG, OUTPUT);
+        pinMode(ECHO, INPUT);
+        return lastTravelTime;
+    }
+
+    lastTravelTime = travelTime;
+
     return travelTime;
 
-}
-
-void init() {
-    printf("Setting up native HC-SR04...\n");
-    wiringPiSetup() ;
-    pinMode(TRIG, OUTPUT);
-    pinMode(ECHO, INPUT);
-    digitalWrite(TRIG, LOW);
-    delay(30);
 }
 
 int main(void) {
@@ -48,6 +59,7 @@ int main(void) {
         printf("time=");
         printf("%d",measure());
         printf("\n");
+        delay(100);
     }
 
 }

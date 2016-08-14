@@ -244,7 +244,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>net.amarantha.gpiomofo.PwmLedTest</mainClass>
+                            <mainClass>net.amarantha.gpiomofo.Main</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>.</Class-Path>
