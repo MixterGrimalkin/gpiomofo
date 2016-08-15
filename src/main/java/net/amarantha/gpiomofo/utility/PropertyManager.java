@@ -11,6 +11,8 @@ public class PropertyManager {
 
     public static final String PROPS_FILENAME = "application.properties";
 
+    private static boolean simulationMode;
+
     protected Properties props;
 
     public PropertyManager() {
@@ -118,9 +120,14 @@ public class PropertyManager {
         return withServer;
     }
 
+    public static boolean isSimulationMode() {
+        return simulationMode;
+    }
+
     public static void processArgs(String[] args) {
         List<String> arguments = Arrays.asList(args);
-        withServer = !arguments.contains("-noserver");
+        withServer = arguments.contains("-withserver");
+        simulationMode = arguments.contains("-simulation");
     }
 
 }

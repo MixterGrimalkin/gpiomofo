@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo;
+package net.amarantha.gpiomofo.module;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
@@ -37,12 +37,13 @@ public class LiveModule extends AbstractModule {
         bind(MidiService.class).to(MidiServiceImpl.class).in(Scopes.SINGLETON);
         bind(HttpService.class).to(HttpServiceImpl.class).in(Scopes.SINGLETON);
         bind(OscService.class).to(OscServiceImpl.class).in(Scopes.SINGLETON);
+        configureAdditional();
+    }
 
-//        bind(GpioService.class).to(GpioServiceMock.class).in(Scopes.SINGLETON);
+    protected void configureAdditional() {
         bind(GpioService.class).to(RaspberryPi3.class).in(Scopes.SINGLETON);
-
-//        bind(PixelTape.class).to(PixelTapeMock.class).in(Scopes.SINGLETON);
         bind(PixelTape.class).to(PixelTapeWS281x.class).in(Scopes.SINGLETON);
+        bindConstant().annotatedWith(TapeRefresh.class).to(1);
     }
 
 }

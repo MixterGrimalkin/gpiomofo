@@ -1,6 +1,7 @@
-package net.amarantha.gpiomofo.pixeltape;
+package net.amarantha.gpiomofo.pixeltape.pattern;
 
 import com.google.inject.Inject;
+import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.utility.Now;
 
 public abstract class PixelTapePattern {
@@ -48,6 +49,12 @@ public abstract class PixelTapePattern {
     public PixelTapePattern setRefreshInterval(long refreshInterval) {
         this.refreshInterval = refreshInterval;
         return this;
+    }
+
+    protected void clear() {
+        for ( int i=0; i<currentPattern.length; i++ ) {
+            currentPattern[i] = new RGB(0,0,0);
+        }
     }
 
     public void start() {

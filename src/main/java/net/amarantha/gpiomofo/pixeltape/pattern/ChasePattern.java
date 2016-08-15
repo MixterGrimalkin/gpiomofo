@@ -1,8 +1,5 @@
-package net.amarantha.gpiomofo.pixeltape;
+package net.amarantha.gpiomofo.pixeltape.pattern;
 
-
-import java.util.LinkedList;
-import java.util.List;
 
 import static java.lang.Math.round;
 
@@ -13,6 +10,8 @@ public class ChasePattern extends PixelTapePattern {
 
     @Override
     protected void update() {
+
+        clear();
 
         int g = (int) round(greenMin + ((greenMax-greenMin)*getIntensity()));
         int r = (int) round(redMin + ((redMax-redMin)*getIntensity()));

@@ -1,4 +1,6 @@
-package net.amarantha.gpiomofo.pixeltape;
+package net.amarantha.gpiomofo.pixeltape.pattern;
+
+import net.amarantha.gpiomofo.pixeltape.RGB;
 
 public class SolidColour extends PixelTapePattern {
 

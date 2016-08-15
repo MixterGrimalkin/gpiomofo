@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.pixeltape.ChasePattern;
+import net.amarantha.gpiomofo.pixeltape.pattern.ChasePattern;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;

@@ -3,7 +3,8 @@ package net.amarantha.gpiomofo.scenario;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.RGB;
-import net.amarantha.gpiomofo.pixeltape.RotatingBars;
+import net.amarantha.gpiomofo.pixeltape.pattern.ChasePattern;
+import net.amarantha.gpiomofo.pixeltape.pattern.SlidingBars;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 
@@ -15,15 +16,15 @@ public class GingerlineBriefingRoom extends Scenario {
 
     @Inject private PixelTapeController tape;
 
-    @Inject private RotatingBars domeBackground1;
-    @Inject private RotatingBars domeBackground2;
-    @Inject private RotatingBars domeBackground3;
-    @Inject private RotatingBars domeBackground4;
+    @Inject private SlidingBars domeBackground1;
+    @Inject private SlidingBars domeBackground2;
+    @Inject private SlidingBars domeBackground3;
+    @Inject private SlidingBars domeBackground4;
 
-    @Inject private RotatingBars domeActive1;
-    @Inject private RotatingBars domeActive2;
-    @Inject private RotatingBars domeActive3;
-    @Inject private RotatingBars domeActive4;
+    @Inject private SlidingBars domeActive1;
+    @Inject private SlidingBars domeActive2;
+    @Inject private SlidingBars domeActive3;
+    @Inject private SlidingBars domeActive4;
 
     @Override
     public void setupTriggers() {
@@ -39,6 +40,8 @@ public class GingerlineBriefingRoom extends Scenario {
 
     }
 
+    @Inject private ChasePattern chasePattern;
+
     @Override
     public void setupLinks() {
 
@@ -52,10 +55,10 @@ public class GingerlineBriefingRoom extends Scenario {
         int refresh = 350;
 
         RGB colour = RGB.WHITE;//.withBrightness(0.8);
-//        domeBackground1.setColour(colour).setRefreshInterval(refresh).init(domeSize);
-//        domeBackground2.setColour(colour).setRefreshInterval(refresh+5).init(domeSize);
-//        domeBackground3.setColour(colour).setRefreshInterval(refresh+10).init(domeSize);
-//        domeBackground4.setColour(colour).setRefreshInterval(refresh+15).init(domeSize);
+        domeBackground1.setColour(colour).setRefreshInterval(refresh).init(domeSize);
+        domeBackground2.setColour(colour).setRefreshInterval(refresh+5).init(domeSize);
+        domeBackground3.setColour(colour).setRefreshInterval(refresh+10).init(domeSize);
+        domeBackground4.setColour(colour).setRefreshInterval(refresh+15).init(domeSize);
 
         domeActive1.setColour(new RGB(255, 100, 0)).setRefreshInterval(8).init(domeSize);
         domeActive2.setColour(new RGB(100, 0, 255)).setRefreshInterval(10).init(domeSize);
@@ -67,11 +70,14 @@ public class GingerlineBriefingRoom extends Scenario {
         tape.addPattern(2*domeSize, domeActive3);
         tape.addPattern(3*domeSize, domeActive4);
 
+//        chasePattern.setMinColour(255,0,0).setBlockWidth(30).setMovement(5).setBounce(true).setRefreshInterval(50).init(4*domeSize);
+//        tape.addPattern(0, chasePattern);
+
 //        tape.addPattern(0, domeBackground1);
 //        tape.addPattern(domeSize, domeBackground2);
 //        tape.addPattern(2*domeSize, domeBackground3);
 //        tape.addPattern(3*domeSize, domeBackground4);
-//
+
         tape.init(4*domeSize);
         tape.start();
 

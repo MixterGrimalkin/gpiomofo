@@ -1,6 +1,8 @@
-package net.amarantha.gpiomofo.pixeltape;
+package net.amarantha.gpiomofo.pixeltape.pattern;
 
-public class RotatingBars extends PixelTapePattern {
+import net.amarantha.gpiomofo.pixeltape.RGB;
+
+public class SlidingBars extends PixelTapePattern {
 
     private int barSize = 10;
     private int spaceSize = 5;
@@ -8,7 +10,7 @@ public class RotatingBars extends PixelTapePattern {
     private RGB colour = new RGB(255,255,255);
     private RGB backColour = new RGB(0,0,0);
 
-    public RotatingBars setColour(RGB colour) {
+    public SlidingBars setColour(RGB colour) {
         this.colour = colour;
         return this;
     }
@@ -30,10 +32,10 @@ public class RotatingBars extends PixelTapePattern {
         spaceSize -= dBarSize;
         if ( barSize<=minBarSize ) {
             barSize = minBarSize;
-            dBarSize = 1;
+            dBarSize = 2;
         } else if ( barSize>=maxBarSize ) {
             barSize = maxBarSize;
-            dBarSize = -1;
+            dBarSize = -2;
         }
     }
 
