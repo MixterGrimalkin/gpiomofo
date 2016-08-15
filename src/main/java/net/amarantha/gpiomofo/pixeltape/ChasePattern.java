@@ -1,9 +1,6 @@
 package net.amarantha.gpiomofo.pixeltape;
 
 
-import com.google.inject.Inject;
-import net.amarantha.gpiomofo.service.task.TaskService;
-
 import static java.lang.Math.round;
 
 public class ChasePattern extends PixelTapePattern {
@@ -11,14 +8,51 @@ public class ChasePattern extends PixelTapePattern {
     private int currentPixel = 0;
     private int dir = 1;
 
-    private boolean bounce;
+    @Override
+    protected void update() {
+
+        int g = (int) round(greenMin + ((greenMax-greenMin)*getIntensity()));
+        int r = (int) round(redMin + ((redMax-redMin)*getIntensity()));
+        int b = (int) round(blueMin + ((blueMax-blueMin)*getIntensity()));
+
+        pixelTape.allOff();
+        for ( int i=0; i<width; i++ ) {
+            if ( currentPixel+i>=0 && currentPixel+i < getPixelCount() ) {
+                pixelTape.setPixelColourRGB(currentPixel+i, g, r, b);
+            }
+        }
+        pixelTape.render();
+
+        currentPixel += dir * movement;
+        if ( currentPixel+width < 0 ) {
+            currentPixel = -width;
+            dir = 1;
+        } else if ( (currentPixel+movement) >= getPixelCount() ) {
+            if ( bounce ) {
+                currentPixel = getPixelCount() - (2*movement);
+                dir = -1;
+            } else {
+                currentPixel = -width;
+            }
+        }
+
+        delay(minDelay + (int) round((1-getSpeed()) * (maxDelay-minDelay)));
+    }
+
+    @Override
+    public void start() {
+        super.start();
+        currentPixel = -width;
+    }
 
     private int width = 10;
     private int movement = 1;
+    private boolean bounce;
 
     private int redMin;
     private int greenMin;
     private int blueMin;
+
     private int redMax;
     private int greenMax;
     private int blueMax;
@@ -26,12 +60,7 @@ public class ChasePattern extends PixelTapePattern {
     private int minDelay = 30;
     private int maxDelay = 500;
 
-    @Inject
-    public ChasePattern(TaskService tasks) {
-        super(tasks);
-    }
-
-    public ChasePattern setWidth(int width) {
+    public ChasePattern setBlockWidth(int width) {
         this.width = width;
         this.movement = width;
         return this;
@@ -65,39 +94,6 @@ public class ChasePattern extends PixelTapePattern {
         this.minDelay = minDelay;
         this.maxDelay = maxDelay;
         return this;
-    }
-
-    @Override
-    protected void update() {
-
-        int g = (int) round(greenMin + ((greenMax-greenMin)*getIntensity()));
-        int r = (int) round(redMin + ((redMax-redMin)*getIntensity()));
-        int b = (int) round(blueMin + ((blueMax-blueMin)*getIntensity()));
-
-//        System.out.println(getIntensity() + " : " + r + ", " + g + ", " + b);
-
-        pixelTape.allOff();
-        for ( int i=0; i<width; i++ ) {
-            if ( currentPixel +i < getPixelCount() ) {
-                pixelTape.setPixelColourRGB(currentPixel+i, g, r, b);
-            }
-        }
-        pixelTape.render();
-
-        currentPixel += dir * movement;
-        if ( currentPixel <=0 ) {
-            currentPixel = 0;
-            dir = 1;
-        } else if ( (currentPixel+movement) >= getPixelCount() ) {
-            if ( bounce ) {
-                currentPixel = getPixelCount() - (2*movement);
-                dir = -1;
-            } else {
-                currentPixel = 0;
-            }
-        }
-
-        delay(minDelay + (int) round((1-getSpeed()) * (maxDelay-minDelay)));
     }
 
 }

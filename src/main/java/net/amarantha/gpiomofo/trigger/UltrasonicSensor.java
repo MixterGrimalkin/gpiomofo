@@ -3,18 +3,16 @@ package net.amarantha.gpiomofo.trigger;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.service.task.TaskService;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class UltrasonicSensor extends RangeTrigger {
 
     static {
         System.loadLibrary("hc-sr04");
     }
 
-    private TaskService tasks;
-
-    @Inject
-    public UltrasonicSensor(TaskService tasks) {
-        this.tasks = tasks;
-    }
+    @Inject private TaskService tasks;
 
     private final static int SAMPLES = 7;
 
@@ -34,7 +32,25 @@ public class UltrasonicSensor extends RangeTrigger {
         double avg = total / SAMPLES;
         double norm = 1 - ((avg-MIN_VALUE) / (MAX_VALUE-MIN_VALUE));
         norm = Math.max(0, Math.min(1, norm));
-        fire(norm);
+        fireTriggers(norm);
+        fireCallbacks(norm);
+    }
+
+    private void fireCallbacks(double value) {
+        for ( Callback c : callbacks ) {
+            c.call(value);
+        }
+    }
+
+    public UltrasonicSensor onReadSensor(Callback callback) {
+        callbacks.add(callback);
+        return this;
+    }
+
+    private List<Callback> callbacks = new LinkedList<>();
+
+    public interface Callback {
+        void call(double value);
     }
 
     public native void init();

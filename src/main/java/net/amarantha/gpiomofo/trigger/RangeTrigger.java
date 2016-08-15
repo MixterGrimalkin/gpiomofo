@@ -11,7 +11,7 @@ public class RangeTrigger extends Trigger {
 
     private Target currentTarget;
 
-    public void fire(double value) {
+    public void fireTriggers(double value) {
         for ( Range range : ranges ) {
             if ( range.isInRange(value) ) {
                 activateTarget(range.target);

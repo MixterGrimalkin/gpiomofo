@@ -95,7 +95,7 @@ public class TestBase {
     }
 
     void when_range_trigger_$1_fires_value_$2(RangeTrigger trigger, double value) {
-        trigger.fire(value);
+        trigger.fireTriggers(value);
     }
 
     Target given_target_on_pin_$1(int pin) {

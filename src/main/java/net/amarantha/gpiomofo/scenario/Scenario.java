@@ -21,6 +21,8 @@ public abstract class Scenario {
         System.out.println(BAR);
     }
 
+    public void stop() {}
+
     public abstract void setupTriggers();
 
     public abstract void setupTargets();

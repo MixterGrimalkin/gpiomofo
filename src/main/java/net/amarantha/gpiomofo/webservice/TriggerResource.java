@@ -24,7 +24,7 @@ public class TriggerResource extends Resource {
     }
 
     @POST
-    @Path("{trigger}/fire")
+    @Path("{trigger}/fireTriggers")
     @Produces(MediaType.TEXT_PLAIN)
     public Response fireTrigger(@PathParam("trigger") String triggerName) {
         if ( fireTrigger(triggerName, true) ) {
