@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-ip="192.168.0.69"
+ip="192.168.1.201"
 echo "Deploy GpioMofo to ${ip}..."
 if [ "$1" != "-skipjava" ]
 then

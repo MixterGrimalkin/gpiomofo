@@ -1,6 +1,9 @@
 package net.amarantha.gpiomofo.pixeltape;
 
 
+import java.util.LinkedList;
+import java.util.List;
+
 import static java.lang.Math.round;
 
 public class ChasePattern extends PixelTapePattern {
@@ -15,13 +18,11 @@ public class ChasePattern extends PixelTapePattern {
         int r = (int) round(redMin + ((redMax-redMin)*getIntensity()));
         int b = (int) round(blueMin + ((blueMax-blueMin)*getIntensity()));
 
-        pixelTape.allOff();
         for ( int i=0; i<width; i++ ) {
             if ( currentPixel+i>=0 && currentPixel+i < getPixelCount() ) {
-                pixelTape.setPixelColourRGB(currentPixel+i, g, r, b);
+                setPixel(currentPixel+i, r, g, b);
             }
         }
-        pixelTape.render();
 
         currentPixel += dir * movement;
         if ( currentPixel+width < 0 ) {
@@ -36,7 +37,7 @@ public class ChasePattern extends PixelTapePattern {
             }
         }
 
-        delay(minDelay + (int) round((1-getSpeed()) * (maxDelay-minDelay)));
+//        delay(minDelay + (int) round((1-getSpeed()) * (maxDelay-minDelay)));
     }
 
     @Override

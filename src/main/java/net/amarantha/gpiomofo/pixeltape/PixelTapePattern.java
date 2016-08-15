@@ -1,37 +1,61 @@
 package net.amarantha.gpiomofo.pixeltape;
 
-import com.diozero.ws281xj.WS281x;
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.gpiomofo.utility.Now;
 
 public abstract class PixelTapePattern {
 
-    @Inject private TaskService tasks;
+    @Inject private Now now;
 
-    public static final int PWM_GPIO = 18;
+    protected RGB[] currentPattern;
 
-    protected WS281x pixelTape;
+    public RGB[] render() {
+        if ( currentPattern==null ) {
+            throw new IllegalStateException("Pattern not initialised");
+        }
+        if ( now.epochMilli()-lastRefreshed >= refreshInterval ) {
+            update();
+            lastRefreshed = now.epochMilli();
+        }
+        return currentPattern;
+    }
 
+    public void init(int pixelCount) {
+        if ( currentPattern!=null ) {
+            throw new IllegalStateException("Pattern already initialised");
+        }
+        this.pixelCount = pixelCount;
+        currentPattern = new RGB[pixelCount];
+    }
+
+    protected void setPixel(int pixel, RGB rgb) {
+        setPixel(pixel, rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+    }
+
+    protected void setPixel(int pixel, int red, int green, int blue) {
+        currentPattern[pixel] = new RGB(red, green, blue);
+    }
 
     protected abstract void update();
 
+    private long refreshInterval = 10;
+    private long lastRefreshed;
+
+    public long getRefreshInterval() {
+        return refreshInterval;
+    }
+
+    public PixelTapePattern setRefreshInterval(long refreshInterval) {
+        this.refreshInterval = refreshInterval;
+        return this;
+    }
 
     public void start() {
-        System.out.println("Starting WS281x...");
-        pixelTape = new WS281x(PWM_GPIO, 255, pixelCount);
-        tasks.addRepeatingTask(this, 1, this::update);
+
     }
 
     public void stop() {
-        pixelTape.close();
-    }
 
-    protected void delay(int ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     ////////////
