@@ -3,14 +3,12 @@
 #
 # Direct port of the Arduino NeoPixel library strandtest example.  Showcases
 # various animations on a strip of NeoPixels.
-import time
 import sys
-
+import time
 from neopixel import *
 
-
 # LED strip configuration:
-LED_COUNT      = 150      # Number of LED pixels.
+LED_COUNT      = 538      # Number of LED pixels.
 LED_PIN        = 18      # GPIO pin connected to the pixels (must support PWM!).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 5       # DMA channel to use for generating signal (try 5)
@@ -90,6 +88,10 @@ if __name__ == '__main__':
 
     if mode == "clear":
         colorWipe(strip, Color(0, 0, 0), 0)
+        exit(0)
+
+    if mode == "white":
+        colorWipe(strip, Color(127, 127, 127), 0)
         exit(0)
 
     if mode == "chase-red":

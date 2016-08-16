@@ -7,6 +7,8 @@ import net.amarantha.gpiomofo.pixeltape.pattern.PixelTapePattern;
 import net.amarantha.gpiomofo.service.task.TaskService;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -17,7 +19,7 @@ public class PixelTapeController {
     private PixelTape pixelTape;
     private int tapeRefresh;
 
-    private Map<Integer, PixelTapePattern> patterns = new HashMap<>();
+    private List<PixelTapePattern> patterns = new LinkedList<>();
     private int totalPixels;
 
     @Inject
@@ -27,8 +29,8 @@ public class PixelTapeController {
         this.tasks = tasks;
     }
 
-    public PixelTapeController addPattern(int startPixel, PixelTapePattern pattern) {
-        patterns.put(startPixel, pattern);
+    public PixelTapeController addPattern(PixelTapePattern pattern) {
+        patterns.add(pattern);
         return this;
     }
 
@@ -43,18 +45,36 @@ public class PixelTapeController {
         tasks.addRepeatingTask(this, tapeRefresh, this::render);
     }
 
+    public void stop() {
+        pixelTape.close();
+        System.out.println("Shutting down pixel tape");
+    }
+
     public void render() {
-        for ( Entry<Integer, PixelTapePattern> entry : patterns.entrySet() ) {
-            int start = entry.getKey();
-            RGB[] pattern = entry.getValue().render();
-            for ( int i=0; i<pattern.length; i++ ) {
-                RGB rgb = pattern[i];
-                if ( rgb!=null ) {
-                    pixelTape.setPixelColourRGB(start + i, rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+        for ( PixelTapePattern pattern : patterns ) {
+            if ( pattern.isActive() ) {
+                int start = pattern.getStartPixel();
+                RGB[] patternContents = pattern.render();
+                for (int i = 0; i < patternContents.length; i++) {
+                    RGB rgb = patternContents[i];
+                    if (rgb != null) {
+                        pixelTape.setPixelColourRGB(start + i, rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+                    }
                 }
             }
         }
         pixelTape.render();
+    }
+
+    public void stopAll() {
+        patterns.forEach(PixelTapePattern::stop);
+        pixelTape.allOff();
+    }
+
+    public void setAll(RGB colour) {
+        for ( int i=0; i<totalPixels; i++ ) {
+            pixelTape.setPixelColourRGB(i, colour);
+        }
     }
 
 }

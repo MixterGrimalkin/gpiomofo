@@ -3,6 +3,7 @@ package net.amarantha.gpiomofo.factory;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import net.amarantha.gpiomofo.pixeltape.pattern.PixelTapePattern;
 import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.midi.MidiCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
@@ -295,6 +296,41 @@ public class TargetFactory extends Factory<Target> {
         CancellationTarget target =
             injector.getInstance(CancellationTarget.class)
                 .cancel(t);
+
+        target.oneShot(true);
+
+        register(name, target);
+
+        return target;
+    }
+
+    ////////////////
+    // Pixel Tape //
+    ////////////////
+
+    public PixelTapeTarget pixelTape(PixelTapePattern pattern) {
+        return pixelTape(getNextName("PixelTape"), pattern);
+    }
+
+    public PixelTapeTarget pixelTape(String name, PixelTapePattern pattern) {
+
+        PixelTapeTarget target =
+            injector.getInstance(PixelTapeTarget.class)
+                .setPattern(pattern);
+
+        register(name, target);
+
+        return target;
+    }
+
+    public StopPixelTapeTarget stopPixelTape() {
+        return stopPixelTape(getNextName("StopPixelTape"));
+    }
+
+    public StopPixelTapeTarget stopPixelTape(String name) {
+
+        StopPixelTapeTarget target =
+            injector.getInstance(StopPixelTapeTarget.class);
 
         target.oneShot(true);
 

@@ -8,6 +8,8 @@ public abstract class PixelTapePattern {
 
     @Inject private Now now;
 
+    private int startPixel;
+
     protected RGB[] currentPattern;
 
     public RGB[] render() {
@@ -21,12 +23,17 @@ public abstract class PixelTapePattern {
         return currentPattern;
     }
 
-    public void init(int pixelCount) {
+    public void init(int startPixel, int pixelCount) {
         if ( currentPattern!=null ) {
             throw new IllegalStateException("Pattern already initialised");
         }
+        this.startPixel = startPixel;
         this.pixelCount = pixelCount;
         currentPattern = new RGB[pixelCount];
+    }
+
+    public int getStartPixel() {
+        return startPixel;
     }
 
     protected void setPixel(int pixel, RGB rgb) {
@@ -35,6 +42,13 @@ public abstract class PixelTapePattern {
 
     protected void setPixel(int pixel, int red, int green, int blue) {
         currentPattern[pixel] = new RGB(red, green, blue);
+    }
+
+    protected void setAll(RGB colour) {
+        for ( int i=0; i<pixelCount; i++ ) {
+            currentPattern[i] = colour;
+        }
+
     }
 
     protected abstract void update();
@@ -57,11 +71,18 @@ public abstract class PixelTapePattern {
         }
     }
 
-    public void start() {
+    private boolean active;
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void start() {
+        active = true;
     }
 
     public void stop() {
+        active = false;
 
     }
 

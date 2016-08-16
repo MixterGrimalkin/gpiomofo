@@ -1,9 +1,7 @@
 package net.amarantha.gpiomofo.pixeltape;
 
 import com.google.inject.Inject;
-import javafx.collections.ObservableList;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -11,7 +9,11 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import net.amarantha.gpiomofo.Main;
+import net.amarantha.gpiomofo.scenario.GingerlineBikeRoom;
+import net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom;
 import net.amarantha.gpiomofo.utility.Now;
+
+import static net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom.*;
 
 public class PixelTapeMock implements PixelTape {
 
@@ -20,7 +22,7 @@ public class PixelTapeMock implements PixelTape {
     @Inject private Main main;
     @Inject private Stage stage;
 
-    private int[] widths = { 47, 47, 47, 47 };
+    private int[] widths = { 47, 47, 47, 47, PIPE_4, PIPE_3, PIPE_2, PIPE_1 };
 
     private Circle[] pixels;
     private RGB[] colours;
@@ -41,8 +43,8 @@ public class PixelTapeMock implements PixelTape {
         pane.getChildren().add(tape);
 
         int margin = 5;
-        int r = 10;
-        int s = 2;
+        int r = 5;
+        int s = 1;
 
         int x = 0;
         int y = 0;
@@ -106,6 +108,18 @@ public class PixelTapeMock implements PixelTape {
                 }
             }
             lastDrawn = now.epochMilli();
+        }
+    }
+
+    @Override
+    public void close() {
+
+    }
+
+    @Override
+    public void allOff() {
+        for ( int i=0; i<pixelCount; i++ ) {
+            colours[i] = new RGB(0,0,0);
         }
     }
 }

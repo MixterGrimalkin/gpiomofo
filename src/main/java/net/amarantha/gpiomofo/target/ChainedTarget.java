@@ -19,7 +19,7 @@ public class ChainedTarget extends Target {
             offTarget.activate();
         }
         for ( int i=0; i<nextId; i++ ) {
-            componentTargets.get(i).deactivate();
+            componentTargets.get(i).deactivate(true);
         }
     }
 

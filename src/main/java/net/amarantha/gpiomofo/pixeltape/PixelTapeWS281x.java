@@ -28,4 +28,18 @@ public class PixelTapeWS281x implements PixelTape {
     public void render() {
         ws281x.render();
     }
+
+    @Override
+    public void close() {
+        if ( ws281x!=null ) {
+            ws281x.close();
+        }
+    }
+
+    @Override
+    public void allOff() {
+        if ( ws281x!=null ) {
+            ws281x.allOff();
+        }
+    }
 }

@@ -9,6 +9,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 import javax.inject.Inject;
 import java.net.URI;
 
+import static net.amarantha.gpiomofo.utility.PropertyManager.isSimulationMode;
+
 @Singleton
 public class WebService {
 
@@ -24,7 +26,8 @@ public class WebService {
 
         System.out.println("Starting Web Service...");
 
-        String fullUri = "http://" + props.getIp().trim() + ":8001/gpiomofo/";
+        String ip = isSimulationMode() ? "127.0.0.1" : props.getIp().trim();
+        String fullUri = "http://" + ip + ":8001/gpiomofo/";
 
         try {
             final ResourceConfig rc = new ResourceConfig().packages("net.amarantha.gpiomofo.webservice");

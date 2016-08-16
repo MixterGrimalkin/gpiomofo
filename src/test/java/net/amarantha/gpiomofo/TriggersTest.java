@@ -6,7 +6,6 @@ import com.googlecode.guicebehave.StoryRunner;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.RangeTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
 @RunWith(StoryRunner.class) @Modules(TestModule.class)

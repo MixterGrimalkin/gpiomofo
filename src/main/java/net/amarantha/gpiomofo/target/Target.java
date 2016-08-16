@@ -4,7 +4,9 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.HasName;
 import net.amarantha.gpiomofo.service.task.TaskService;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class Target implements HasName {
 

@@ -3,11 +3,9 @@ package net.amarantha.gpiomofo.module;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import net.amarantha.gpiomofo.pixeltape.PixelTape;
-import net.amarantha.gpiomofo.pixeltape.PixelTapeMock;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeWS281x;
 import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
-import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 import net.amarantha.gpiomofo.service.gpio.RaspberryPi3;
 import net.amarantha.gpiomofo.service.http.HttpService;
 import net.amarantha.gpiomofo.service.http.HttpServiceImpl;
@@ -21,9 +19,12 @@ public class LiveModule extends AbstractModule {
 
     private Class<? extends Scenario> scenarioClass;
 
+    private int pixelTapeRefresh;
+
     public LiveModule() {
         PropertyManager props = new PropertyManager();
         String className = props.getString("Scenario", "TestScenario");
+        pixelTapeRefresh = props.getInt("PixelTapeRefresh", 50);
         try {
             scenarioClass = (Class<? extends Scenario>) Class.forName("net.amarantha.gpiomofo.scenario."+className);
         } catch (ClassNotFoundException e) {
@@ -43,7 +44,7 @@ public class LiveModule extends AbstractModule {
     protected void configureAdditional() {
         bind(GpioService.class).to(RaspberryPi3.class).in(Scopes.SINGLETON);
         bind(PixelTape.class).to(PixelTapeWS281x.class).in(Scopes.SINGLETON);
-        bindConstant().annotatedWith(TapeRefresh.class).to(1);
+        bindConstant().annotatedWith(TapeRefresh.class).to(pixelTapeRefresh);
     }
 
 }

@@ -5,7 +5,7 @@ public class CancellationTarget extends Target {
     @Override
     protected void onActivate() {
         if ( targetToCancel!=null ) {
-            targetToCancel.deactivate();
+            targetToCancel.deactivate(force);
         }
     }
 
@@ -18,6 +18,13 @@ public class CancellationTarget extends Target {
 
     public CancellationTarget cancel(Target t) {
         this.targetToCancel = t;
+        return this;
+    }
+
+    private boolean force;
+
+    public CancellationTarget setForce(boolean force) {
+        this.force = force;
         return this;
     }
 }

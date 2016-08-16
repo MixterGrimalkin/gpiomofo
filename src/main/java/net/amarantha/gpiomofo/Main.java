@@ -2,12 +2,9 @@ package net.amarantha.gpiomofo;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Module;
 import com.google.inject.Singleton;
-import javafx.application.Application;
-import javafx.stage.Stage;
 import net.amarantha.gpiomofo.module.LiveModule;
-import net.amarantha.gpiomofo.module.SimulationModule;
+import net.amarantha.gpiomofo.pixeltape.PixelTape;
 import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.midi.MidiService;
@@ -22,17 +19,13 @@ import static net.amarantha.gpiomofo.utility.PropertyManager.isSimulationMode;
 import static net.amarantha.gpiomofo.utility.PropertyManager.processArgs;
 
 @Singleton
-public class Main extends Application {
+public class Main {
 
     public static void main(String[] args) {
         processArgs(args);
-        if ( isSimulationMode() ) {
-            launch(args);
-        } else {
-            Guice.createInjector(new LiveModule())
-                .getInstance(Main.class)
-                    .start();
-        }
+        Guice.createInjector(new LiveModule())
+            .getInstance(Main.class)
+                .start();
     }
 
     @Inject private Scenario scenario;
@@ -42,6 +35,7 @@ public class Main extends Application {
     @Inject private MidiService midi;
     @Inject private TaskService tasks;
     @Inject private PropertyManager props;
+    @Inject private PixelTape pixelTape;
 
     public void start() {
 
@@ -68,6 +62,7 @@ public class Main extends Application {
     public void stop() {
         System.out.println("Shutting Down...");
         tasks.stop();
+        pixelTape.close();
         scenario.stop();
         gpio.shutdown();
         midi.closeDevice();
@@ -79,10 +74,4 @@ public class Main extends Application {
         System.exit(0);
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        Guice.createInjector(new SimulationModule(primaryStage))
-            .getInstance(Main.class)
-                .start();
-    }
 }

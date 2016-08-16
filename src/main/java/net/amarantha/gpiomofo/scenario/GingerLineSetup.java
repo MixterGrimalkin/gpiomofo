@@ -2,8 +2,8 @@ package net.amarantha.gpiomofo.scenario;
 
 public class GingerLineSetup {
 
-    public static final String MEDIA_SERVER_IP =    "192.168.1.70";
-    public static final int MEDIA_SERVER_OSC_PORT =  53000;
+    public static final String MEDIA_SERVER_IP =    "192.168.42.3";
+    public static final int MEDIA_SERVER_OSC_PORT =  7700;
 
     public static final String PANIC_IP =           "192.168.1.70";
     public static final int PANIC_OSC_PORT =        53000;
