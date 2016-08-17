@@ -8,4 +8,5 @@ public interface PixelTape {
     void render();
     void close();
     void allOff();
+
 }

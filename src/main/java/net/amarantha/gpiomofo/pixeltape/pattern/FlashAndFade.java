@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.utility.Now;
 
-public class FlashBang extends PixelTapePattern {
+public class FlashAndFade extends PixelTapePattern {
 
     int totalFlashes = 5;
     int flashCount;
@@ -35,7 +35,7 @@ public class FlashBang extends PixelTapePattern {
     private int moveAmount = 3;
     private long moveInterval = 60;
 
-    public FlashBang setReverse(boolean reverse) {
+    public FlashAndFade setReverse(boolean reverse) {
         this.reverseSpark = reverse;
 
         return this;

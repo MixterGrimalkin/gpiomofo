@@ -7,7 +7,6 @@ public class QueueResetTarget extends Target {
         if ( queuedTarget!=null ) {
             queuedTarget.resetQueue();
         }
-
     }
 
     @Override

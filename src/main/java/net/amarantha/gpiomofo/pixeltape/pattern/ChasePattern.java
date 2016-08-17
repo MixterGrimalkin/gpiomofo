@@ -36,7 +36,6 @@ public class ChasePattern extends PixelTapePattern {
             }
         }
 
-//        delay(minDelay + (int) round((1-getSpeed()) * (maxDelay-minDelay)));
     }
 
     @Override

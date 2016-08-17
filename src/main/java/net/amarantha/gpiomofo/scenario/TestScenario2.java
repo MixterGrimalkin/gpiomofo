@@ -3,7 +3,7 @@ package net.amarantha.gpiomofo.scenario;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.pattern.ChasePattern;
-import net.amarantha.gpiomofo.pixeltape.pattern.FlashBang;
+import net.amarantha.gpiomofo.pixeltape.pattern.FlashAndFade;
 
 import static net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom.*;
 
@@ -18,10 +18,10 @@ public class TestScenario2 extends Scenario {
 
     @Inject private ChasePattern chasePattern;
 
-    @Inject private FlashBang flashBang1;
-    @Inject private FlashBang flashBang2;
-    @Inject private FlashBang flashBang3;
-    @Inject private FlashBang flashBang4;
+    @Inject private FlashAndFade flashBang1;
+    @Inject private FlashAndFade flashBang2;
+    @Inject private FlashAndFade flashBang3;
+    @Inject private FlashAndFade flashBang4;
 
     @Override
     public void setupTargets() {
@@ -44,10 +44,10 @@ public class TestScenario2 extends Scenario {
 //
 //        pixelTape.addPattern(chasePattern);
 
-        flashBang1.setReverse(true).init(PIPE_1_START, PIPE_1);
-        flashBang2.init(PIPE_2_START, PIPE_2);
-        flashBang3.setReverse(true).init(PIPE_3_START, PIPE_3);
-        flashBang4.init(PIPE_4_START, PIPE_4);
+        flashBang1.setReverse(true).init(PIPE_1_START, PIPE_1_SIZE);
+        flashBang2.init(PIPE_2_START, PIPE_2_SIZE);
+        flashBang3.setReverse(true).init(PIPE_3_START, PIPE_3_SIZE);
+        flashBang4.init(PIPE_4_START, PIPE_4_SIZE);
 
         pixelTape.addPattern(flashBang1);
         pixelTape.addPattern(flashBang2);

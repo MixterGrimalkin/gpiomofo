@@ -9,8 +9,6 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import net.amarantha.gpiomofo.Main;
-import net.amarantha.gpiomofo.scenario.GingerlineBikeRoom;
-import net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom;
 import net.amarantha.gpiomofo.utility.Now;
 
 import static net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom.*;
@@ -22,7 +20,7 @@ public class PixelTapeMock implements PixelTape {
     @Inject private Main main;
     @Inject private Stage stage;
 
-    private int[] widths = { 47, 47, 47, 47, PIPE_4, PIPE_3, PIPE_2, PIPE_1 };
+    private int[] widths = { 47, 47, 47, 47, PIPE_4_SIZE, PIPE_3_SIZE, PIPE_2_SIZE, PIPE_1_SIZE};
 
     private Circle[] pixels;
     private RGB[] colours;

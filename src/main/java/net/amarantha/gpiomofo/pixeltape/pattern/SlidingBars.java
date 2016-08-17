@@ -1,7 +1,6 @@
 package net.amarantha.gpiomofo.pixeltape.pattern;
 
 import com.google.inject.Inject;
-import com.sun.enterprise.security.SecurityLifecycle;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.utility.Now;
 

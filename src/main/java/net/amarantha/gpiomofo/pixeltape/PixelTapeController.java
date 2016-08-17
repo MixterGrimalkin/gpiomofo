@@ -6,11 +6,8 @@ import net.amarantha.gpiomofo.module.TapeRefresh;
 import net.amarantha.gpiomofo.pixeltape.pattern.PixelTapePattern;
 import net.amarantha.gpiomofo.service.task.TaskService;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 @Singleton
 public class PixelTapeController {
@@ -37,7 +34,6 @@ public class PixelTapeController {
     public void init(int totalPixels) {
         this.totalPixels = totalPixels;
         pixelTape.init(totalPixels);
-        System.out.println("inited");
     }
 
     public void start() {
