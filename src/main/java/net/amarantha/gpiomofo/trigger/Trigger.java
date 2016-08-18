@@ -8,7 +8,10 @@ import java.util.List;
 
 public class Trigger implements HasName {
 
+    private boolean lastState;
+
     public void fire(boolean active) {
+        lastState = active;
         System.out.println("["+getName()+"] " + (active?"==>>":" -- "));
         for ( TriggerCallback callback : triggerCallbacks) {
             callback.onTrigger(active);
@@ -16,6 +19,10 @@ public class Trigger implements HasName {
         for ( TriggerCallback callback : compositeCallbacks) {
             callback.onTrigger(active);
         }
+    }
+
+    public boolean isActive() {
+        return lastState;
     }
 
     ///////////////

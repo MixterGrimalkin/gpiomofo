@@ -8,20 +8,36 @@ public class PixelTapeWS281x implements PixelTape {
 
     private WS281x ws281x;
 
+    private double masterBrightness = 1.0;
+
+    private int pixelCount;
+
     @Override
     public void init(int pixelCount) {
+        this.pixelCount = pixelCount;
         ws281x = new WS281x(PWM_GPIO, 255, pixelCount);
     }
 
     @Override
-    public void setPixelColourRGB(int pixel, RGB rgb) {
-        ws281x.setPixelColourRGB(pixel, rgb.getGreen(), rgb.getRed(), rgb.getBlue());
+    public void setPixelColourRGB(int pixel, RGB colour) {
+        setPixelColourRGB(pixel, colour, false);
+    }
+
+    @Override
+    public void setPixelColourRGB(int pixel, RGB colour, boolean forceRGB) {
+        if ( pixel < pixelCount ) {
+            RGB rgb = colour.withBrightness(masterBrightness);
+            if (forceRGB) {
+                ws281x.setPixelColourRGB(pixel, rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+            } else {
+                ws281x.setPixelColourRGB(pixel, rgb.getGreen(), rgb.getRed(), rgb.getBlue());
+            }
+        }
     }
 
     @Override
     public void setPixelColourRGB(int pixel, int red, int green, int blue) {
-        ws281x.setPixelColourRGB(pixel, green, red, blue);
-
+        setPixelColourRGB(pixel, new RGB(red, green, blue));
     }
 
     @Override
@@ -41,6 +57,17 @@ public class PixelTapeWS281x implements PixelTape {
         if ( ws281x!=null ) {
             ws281x.allOff();
         }
+    }
+
+
+    @Override
+    public void setMasterBrightness(double brightness) {
+        masterBrightness = brightness;
+    }
+
+    @Override
+    public double getMasterBrightness() {
+        return masterBrightness;
     }
 
     @Override

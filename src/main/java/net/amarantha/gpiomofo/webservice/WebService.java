@@ -19,6 +19,7 @@ public class WebService {
     @Inject private PropertyManager props;
 
     @Inject private TriggerResource triggerResource;
+    @Inject private MonitorResource monitorResource;
 
     private boolean running = false;
 

@@ -211,6 +211,23 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <!-- Include HTML, JS and CSS -->
+                    <execution>
+                        <id>copy-html</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/gpiomofo/html</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/html</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 

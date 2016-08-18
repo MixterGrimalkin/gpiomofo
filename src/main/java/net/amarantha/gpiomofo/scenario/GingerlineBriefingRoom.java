@@ -71,7 +71,7 @@ public class GingerlineBriefingRoom extends Scenario {
     private void configurePixelTapePatterns() {
 
         fadeToBlack
-                .setFadeTime(3000)
+                .setFadeTime(1000)
                 .setRefreshInterval(50)
                 .init(DOME_1_START, WHOLE_TAPE);
 

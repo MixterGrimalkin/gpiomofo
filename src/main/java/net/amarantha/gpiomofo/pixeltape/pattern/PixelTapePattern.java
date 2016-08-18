@@ -9,6 +9,15 @@ public abstract class PixelTapePattern {
 
     @Inject private Now now;
     @Inject private PixelTapeController controller;
+    private boolean forceRGB;
+
+    public boolean isForceRGB() {
+        return forceRGB;
+    }
+
+    public void setForceRGB(boolean forceRGB) {
+        this.forceRGB = forceRGB;
+    }
 
     private int startPixel;
 

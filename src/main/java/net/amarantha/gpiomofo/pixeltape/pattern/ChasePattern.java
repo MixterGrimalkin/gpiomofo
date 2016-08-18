@@ -1,6 +1,8 @@
 package net.amarantha.gpiomofo.pixeltape.pattern;
 
 
+import net.amarantha.gpiomofo.pixeltape.RGB;
+
 import static java.lang.Math.round;
 
 public class ChasePattern extends PixelTapePattern {
@@ -95,4 +97,7 @@ public class ChasePattern extends PixelTapePattern {
         return this;
     }
 
+    public ChasePattern setColour(RGB colour) {
+        return setMinColour(colour.getRed(), colour.getGreen(), colour.getBlue());
+    }
 }

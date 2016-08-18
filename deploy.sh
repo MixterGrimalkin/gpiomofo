@@ -34,6 +34,7 @@ else
     sshpass -p raspberry scp src/main/bash/*.sh pi@${ip}:gpiomofo
     sshpass -p raspberry scp target/gpiomofo/*.jar pi@${ip}:gpiomofo
     sshpass -p raspberry scp src/main/c/* pi@${ip}:gpiomofo/c
+    sshpass -p raspberry scp -r src/main/html/* pi@${ip}:gpiomofo/html
 fi
 echo "Activating Scripts..."
 sshpass -p raspberry ssh pi@${ip} "cd /home/pi/gpiomofo; sudo chmod +x *.sh; cd c; chmod +x *.sh"

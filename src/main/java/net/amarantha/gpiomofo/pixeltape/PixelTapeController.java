@@ -37,7 +37,7 @@ public class PixelTapeController {
     }
 
     public void start() {
-        System.out.println("Starting PixelTape..." + tapeRefresh);
+        System.out.println("Starting PixelTape...");
         tasks.addRepeatingTask(this, tapeRefresh, this::render);
     }
 
@@ -54,7 +54,7 @@ public class PixelTapeController {
                 for (int i = 0; i < patternContents.length; i++) {
                     RGB rgb = patternContents[i];
                     if (rgb != null) {
-                        pixelTape.setPixelColourRGB(start + i, rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+                        pixelTape.setPixelColourRGB(start + i, rgb, pattern.isForceRGB());
                     }
                 }
             }

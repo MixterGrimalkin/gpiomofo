@@ -11,6 +11,7 @@ import javafx.stage.StageStyle;
 import net.amarantha.gpiomofo.Main;
 import net.amarantha.gpiomofo.utility.Now;
 
+import static javafx.scene.paint.Color.color;
 import static net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom.*;
 
 public class PixelTapeGUI implements PixelTape {
@@ -25,7 +26,10 @@ public class PixelTapeGUI implements PixelTape {
     private Circle[] pixels;
     private RGB[] colours;
 
+    private double masterBrightness = 1.0;
+
     private Group tape;
+    private int defaultWidth = 50;
 
     @Override
     public void init(final int pixelCount) {
@@ -49,12 +53,13 @@ public class PixelTapeGUI implements PixelTape {
         int p = 0;
         int maxWidth = 0;
         while ( p < pixelCount ) {
-            maxWidth = Math.max(maxWidth, widths[y]);
-            if ( x >= widths[y] ) {
+            int widthCheck = y >= widths.length ? defaultWidth : widths[y] ;
+            maxWidth = Math.max(maxWidth, widthCheck);
+            if ( x >= widthCheck ) {
                 x = 0;
                 y++;
             }
-            Circle pixel = new Circle(r, Color.color(0, 0, 0));
+            Circle pixel = new Circle(r, color(0, 0, 0));
             pixels[p] = pixel;
             int left = margin + r + ((2*r)+s)*x;
             int top = margin + r + ((2*r)+s)*y;
@@ -85,7 +90,14 @@ public class PixelTapeGUI implements PixelTape {
 
     @Override
     public void setPixelColourRGB(int pixel, RGB rgb) {
-        colours[pixel] = rgb;
+        if ( pixel < pixelCount ) {
+            colours[pixel] = rgb;
+        }
+    }
+
+    @Override
+    public void setPixelColourRGB(int pixel, RGB colour, boolean forceRGB) {
+        setPixelColourRGB(pixel, colour);
     }
 
     @Override
@@ -107,7 +119,8 @@ public class PixelTapeGUI implements PixelTape {
         if ( now.epochMilli()-lastDrawn >= refreshInterval ) {
             for (int i = 0; i < pixels.length; i++) {
                 if ( colours[i]!=null ) {
-                    pixels[i].setFill(Color.color(colours[i].getRed() / 255.0, colours[i].getGreen() / 255.0, colours[i].getBlue() / 255.0));
+                    RGB rgb = colours[i].withBrightness(masterBrightness);
+                    pixels[i].setFill(color(rgb.getRed() / 255.0, rgb.getGreen() / 255.0, rgb.getBlue() / 255.0));
                 }
             }
             lastDrawn = now.epochMilli();
@@ -124,5 +137,15 @@ public class PixelTapeGUI implements PixelTape {
         for ( int i=0; i<pixelCount; i++ ) {
             colours[i] = new RGB(0,0,0);
         }
+    }
+
+    @Override
+    public void setMasterBrightness(double brightness) {
+        masterBrightness = brightness;
+    }
+
+    @Override
+    public double getMasterBrightness() {
+        return masterBrightness;
     }
 }
