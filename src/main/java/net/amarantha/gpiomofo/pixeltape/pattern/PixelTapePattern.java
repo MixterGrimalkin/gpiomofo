@@ -1,12 +1,14 @@
 package net.amarantha.gpiomofo.pixeltape.pattern;
 
 import com.google.inject.Inject;
+import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.utility.Now;
 
 public abstract class PixelTapePattern {
 
     @Inject private Now now;
+    @Inject private PixelTapeController controller;
 
     private int startPixel;
 
@@ -42,6 +44,10 @@ public abstract class PixelTapePattern {
 
     protected void setPixel(int pixel, int red, int green, int blue) {
         currentPattern[pixel] = new RGB(red, green, blue);
+    }
+
+    protected RGB getPixel(int pixel) {
+        return controller.getPixel(pixel);
     }
 
     protected void setAll(RGB colour) {
@@ -83,7 +89,6 @@ public abstract class PixelTapePattern {
 
     public void stop() {
         active = false;
-
     }
 
     ////////////

@@ -6,16 +6,29 @@ import net.amarantha.gpiomofo.utility.Now;
 
 public class FlashAndFade extends PixelTapePattern {
 
-    int totalFlashes = 5;
-    int flashCount;
-    boolean inFlash;
-    long lastStart;
-    long flashDuration = 50;
-    long darkDuration = 500;
-
     private RGB flashColour = new RGB(255,255,255);
     private RGB darkColour = new RGB(0,0,0);
     private RGB sparkColour = new RGB(150,150,150);
+    int totalFlashes = 5;
+    long flashDuration = 50;
+    long darkDuration = 500;
+    private int sparkSpacing = 8;
+    private boolean reverseSpark;
+    private int moveAmount = 3;
+    private long moveInterval = 60;
+    private boolean useSpark = true;
+    private boolean fadeOut = true;
+    private long fadeOutInterval = 200;
+    private double intensityDelta = 0.1;
+
+    int flashCount;
+    boolean inFlash;
+    long lastStart;
+    private int offset;
+    private long lastMove;
+    private long lastChangedIntensity;
+    private double intensity = 1.0;
+
 
     @Inject private Now now;
 
@@ -26,19 +39,6 @@ public class FlashAndFade extends PixelTapePattern {
         intensity = 1.0;
         flashCount = 0;
         inFlash = false;
-    }
-
-    private int offset;
-    private int sparkSpacing = 10;
-    private boolean reverseSpark;
-    private long lastMove;
-    private int moveAmount = 3;
-    private long moveInterval = 60;
-
-    public FlashAndFade setReverse(boolean reverse) {
-        this.reverseSpark = reverse;
-
-        return this;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class FlashAndFade extends PixelTapePattern {
                     setAll(flashColour);
                     inFlash = true;
                     lastStart = now.epochMilli();
-                } else if (now.epochMilli() - lastMove >= moveInterval) {
+                } else if (useSpark && now.epochMilli() - lastMove >= moveInterval) {
                     for (int i = 0; i < getPixelCount(); i += sparkSpacing) {
                         int p = (i + offset) % getPixelCount();
                         setPixel(p, sparkColour);
@@ -82,7 +82,7 @@ public class FlashAndFade extends PixelTapePattern {
                 }
 
             }
-        } else if (intensity>0) {
+        } else if (fadeOut && intensity>0) {
             if ( now.epochMilli() - lastChangedIntensity > fadeOutInterval ) {
                 setAll(flashColour.withBrightness(intensity));
                 intensity -= intensityDelta;
@@ -92,10 +92,34 @@ public class FlashAndFade extends PixelTapePattern {
 
     }
 
-    private double intensityDelta = 0.1;
-    private long lastChangedIntensity;
-    private long fadeOutInterval = 200;
-    private double intensity = 1.0;
+    public FlashAndFade setReverse(boolean reverse) {
+        this.reverseSpark = reverse;
+        return this;
+    }
 
+    public FlashAndFade setUseSpark(boolean useSpark) {
+        this.useSpark = useSpark;
+        return this;
+    }
+
+    public FlashAndFade setFadeOut(boolean fadeOut) {
+        this.fadeOut = fadeOut;
+        return this;
+    }
+
+    public FlashAndFade setFlashColour(RGB flashColour) {
+        this.flashColour = flashColour;
+        return this;
+    }
+
+    public FlashAndFade setDarkColour(RGB darkColour) {
+        this.darkColour = darkColour;
+        return this;
+    }
+
+    public FlashAndFade setSparkColour(RGB sparkColour) {
+        this.sparkColour = sparkColour;
+        return this;
+    }
 
 }

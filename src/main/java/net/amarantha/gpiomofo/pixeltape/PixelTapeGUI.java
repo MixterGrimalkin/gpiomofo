@@ -13,7 +13,7 @@ import net.amarantha.gpiomofo.utility.Now;
 
 import static net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom.*;
 
-public class PixelTapeMock implements PixelTape {
+public class PixelTapeGUI implements PixelTape {
 
     private int pixelCount;
 
@@ -91,6 +91,11 @@ public class PixelTapeMock implements PixelTape {
     @Override
     public void setPixelColourRGB(int pixel, int red, int green, int blue) {
         setPixelColourRGB(pixel, new RGB(red, green, blue));
+    }
+
+    @Override
+    public RGB getPixelRGB(int pixel) {
+        return colours[pixel];
     }
 
     @Inject private Now now;

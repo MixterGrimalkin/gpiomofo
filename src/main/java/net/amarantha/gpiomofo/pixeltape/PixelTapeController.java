@@ -63,14 +63,24 @@ public class PixelTapeController {
     }
 
     public void stopAll() {
+        stopAll(true);
+    }
+
+    public void stopAll(boolean clearPixels) {
         patterns.forEach(PixelTapePattern::stop);
-        pixelTape.allOff();
+        if ( clearPixels ) {
+            pixelTape.allOff();
+        }
     }
 
     public void setAll(RGB colour) {
         for ( int i=0; i<totalPixels; i++ ) {
             pixelTape.setPixelColourRGB(i, colour);
         }
+    }
+
+    public RGB getPixel(int pixel) {
+        return pixelTape.getPixelRGB(pixel);
     }
 
 }

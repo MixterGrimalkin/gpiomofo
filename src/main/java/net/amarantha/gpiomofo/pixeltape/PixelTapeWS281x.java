@@ -42,4 +42,12 @@ public class PixelTapeWS281x implements PixelTape {
             ws281x.allOff();
         }
     }
+
+    @Override
+    public RGB getPixelRGB(int pixel) {
+        if ( ws281x!=null ) {
+            return new RGB(ws281x.getGreenComponent(pixel), ws281x.getRedComponent(pixel), ws281x.getBlueComponent(pixel));
+        }
+        return null;
+    }
 }

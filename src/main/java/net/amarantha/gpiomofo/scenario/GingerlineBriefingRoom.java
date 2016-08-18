@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.pattern.ChasePattern;
+import net.amarantha.gpiomofo.pixeltape.pattern.FadeToBlack;
 import net.amarantha.gpiomofo.pixeltape.pattern.FlashAndFade;
 import net.amarantha.gpiomofo.pixeltape.pattern.SlidingBars;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
@@ -50,6 +51,11 @@ public class GingerlineBriefingRoom extends Scenario {
     @Inject private SlidingBars colourSpinDome3;
     @Inject private SlidingBars colourSpinDome4;
 
+    @Inject private FlashAndFade flashFadeDome1;
+    @Inject private FlashAndFade flashFadeDome2;
+    @Inject private FlashAndFade flashFadeDome3;
+    @Inject private FlashAndFade flashFadeDome4;
+
     @Inject private SlidingBars colourBarsPipe1;
     @Inject private SlidingBars colourBarsPipe2;
     @Inject private SlidingBars colourBarsPipe3;
@@ -60,7 +66,14 @@ public class GingerlineBriefingRoom extends Scenario {
     @Inject private FlashAndFade flashFadePipe3;
     @Inject private FlashAndFade flashFadePipe4;
 
+    @Inject private FadeToBlack fadeToBlack;
+
     private void configurePixelTapePatterns() {
+
+        fadeToBlack
+                .setFadeTime(3000)
+                .setRefreshInterval(50)
+                .init(DOME_1_START, WHOLE_TAPE);
 
         ////////////////
         // Background //
@@ -77,7 +90,7 @@ public class GingerlineBriefingRoom extends Scenario {
 
         slowBarsPipe1
                 .setColour(backColour)
-                .setFadeInTime(500)
+                .setFadeInTime(2000)
                 .setReverse(true)
                 .setBarSize(5, 10)
                 .setRefreshInterval(250)
@@ -85,14 +98,14 @@ public class GingerlineBriefingRoom extends Scenario {
 
         slowBarsPipe2
                 .setColour(backColour)
-                .setFadeInTime(500)
+                .setFadeInTime(2000)
                 .setBarSize(5, 10)
                 .setRefreshInterval(250)
                 .init(PIPE_2_START, PIPE_2_SIZE);
 
         slowBarsPipe3
                 .setColour(backColour)
-                .setFadeInTime(500)
+                .setFadeInTime(2000)
                 .setBarSize(5, 10)
                 .setRefreshInterval(250)
                 .setReverse(true)
@@ -100,7 +113,7 @@ public class GingerlineBriefingRoom extends Scenario {
 
         slowBarsPipe4
                 .setColour(backColour)
-                .setFadeInTime(500)
+                .setFadeInTime(2000)
                 .setBarSize(5, 10)
                 .setRefreshInterval(250)
                 .init(PIPE_4_START, PIPE_4_SIZE);
@@ -142,6 +155,7 @@ public class GingerlineBriefingRoom extends Scenario {
                 .setFadeInTime(5000)
                 .init(DOME_4_START, DOME_SIZE);
 
+
         int pipeActiveBar = 10;
         int pipeActiveSpace = 5;
 
@@ -175,27 +189,64 @@ public class GingerlineBriefingRoom extends Scenario {
                 .setFadeInTime(5000)
                 .init(PIPE_4_START, PIPE_4_SIZE);
 
-        flashFadePipe1.setReverse(true)
+        flashFadePipe1
+                .setReverse(true)
+                .setSparkColour(colour1)
                 .init(PIPE_1_START, PIPE_1_SIZE);
 
         flashFadePipe2
+                .setSparkColour(colour2)
                 .init(PIPE_2_START, PIPE_2_SIZE);
 
-        flashFadePipe3.setReverse(true)
+        flashFadePipe3
+                .setReverse(true)
+                .setSparkColour(colour3)
                 .init(PIPE_3_START, PIPE_3_SIZE);
 
         flashFadePipe4
+                .setSparkColour(colour4)
                 .init(PIPE_4_START, PIPE_4_SIZE);
+
+        flashFadeDome1
+                .setDarkColour(colour1)
+                .setUseSpark(false)
+                .setFadeOut(false)
+                .init(DOME_1_START, DOME_SIZE);
+
+        flashFadeDome2
+                .setDarkColour(colour2)
+                .setUseSpark(false)
+                .setFadeOut(false)
+                .init(DOME_2_START, DOME_SIZE);
+
+        flashFadeDome3
+                .setDarkColour(colour3)
+                .setUseSpark(false)
+                .setFadeOut(false)
+                .init(DOME_3_START, DOME_SIZE);
+
+        flashFadeDome4
+                .setDarkColour(colour4)
+                .setUseSpark(false)
+                .setFadeOut(false)
+                .init(DOME_4_START, DOME_SIZE);
+
+
 
         ////////////////
         // Setup Tape //
         ////////////////
 
         pixeltape
+                .addPattern(fadeToBlack)
                 .addPattern(flashFadePipe1)
                 .addPattern(flashFadePipe2)
                 .addPattern(flashFadePipe3)
                 .addPattern(flashFadePipe4)
+                .addPattern(flashFadeDome1)
+                .addPattern(flashFadeDome2)
+                .addPattern(flashFadeDome3)
+                .addPattern(flashFadeDome4)
                 .addPattern(colourSpinDome1)
                 .addPattern(colourSpinDome2)
                 .addPattern(colourSpinDome3)
@@ -233,6 +284,7 @@ public class GingerlineBriefingRoom extends Scenario {
     }
 
     private Target stopPixelTape;
+    private Target fadeOutPixelTape;
     private Target backgroundScene;
     private Target activationScene;
     private Target sendOscCommand;
@@ -241,6 +293,7 @@ public class GingerlineBriefingRoom extends Scenario {
     public void setupTargets() {
 
         stopPixelTape = targets.stopPixelTape();
+        fadeOutPixelTape = targets.pixelTape(fadeToBlack);
 
         backgroundScene =
             targets.chain()
@@ -252,48 +305,83 @@ public class GingerlineBriefingRoom extends Scenario {
                 .add(targets.pixelTape(slowBarsPipe4))
             .build().oneShot(true);
 
-        Target pipe1 = targets.pixelTape(colourBarsPipe1);
-        Target flash1 =
+        Target domeBars1 = targets.pixelTape(colourSpinDome1);
+        Target domeFlash1 =
             targets.chain()
-                .add(targets.cancel(pipe1).setForce(true))
+                .add(targets.cancel(domeBars1).setForce(true))
+                .add(targets.pixelTape(flashFadeDome1))
+            .build().oneShot(true);
+
+        Target domeBars2 = targets.pixelTape(colourSpinDome2);
+        Target domeFlash2 =
+            targets.chain()
+                .add(targets.cancel(domeBars2).setForce(true))
+                .add(targets.pixelTape(flashFadeDome2))
+            .build().oneShot(true);
+
+        Target domeBars3 = targets.pixelTape(colourSpinDome3);
+        Target domeFlash3 =
+            targets.chain()
+                .add(targets.cancel(domeBars3).setForce(true))
+                .add(targets.pixelTape(flashFadeDome3))
+            .build().oneShot(true);
+
+        Target domeBars4 = targets.pixelTape(colourSpinDome4);
+        Target domeFlash4 =
+            targets.chain()
+                .add(targets.cancel(domeBars4).setForce(true))
+                .add(targets.pixelTape(flashFadeDome4))
+            .build().oneShot(true);
+
+        Target pipeBars1 = targets.pixelTape(colourBarsPipe1);
+        Target pipeFlash1 =
+            targets.chain()
+                .add(targets.cancel(pipeBars1).setForce(true))
                 .add(targets.pixelTape(flashFadePipe1))
             .build();
 
-        Target pipe2 = targets.pixelTape(colourBarsPipe2);
-        Target flash2 =
+        Target pipeBars2 = targets.pixelTape(colourBarsPipe2);
+        Target pipeFlash2 =
             targets.chain()
-                .add(targets.cancel(pipe2).setForce(true))
+                .add(targets.cancel(pipeBars2).setForce(true))
                 .add(targets.pixelTape(flashFadePipe2))
             .build();
 
-        Target pipe3 = targets.pixelTape(colourBarsPipe3);
-        Target flash3 = targets.chain()
-                .add(targets.cancel(pipe3).setForce(true))
+        Target pipeBars3 = targets.pixelTape(colourBarsPipe3);
+        Target pipeFlash3 = targets.chain()
+                .add(targets.cancel(pipeBars3).setForce(true))
                 .add(targets.pixelTape(flashFadePipe3))
             .build();
 
-        Target pipe4 = targets.pixelTape(colourBarsPipe4);
-        Target flash4 = targets.chain()
-                .add(targets.cancel(pipe4).setForce(true))
+        Target pipeBars4 = targets.pixelTape(colourBarsPipe4);
+        Target pipeFlash4 = targets.chain()
+                .add(targets.cancel(pipeBars4).setForce(true))
                 .add(targets.pixelTape(flashFadePipe4))
             .build();
 
         activationScene =
             targets.chain()
+                .add(2000,  fadeOutPixelTape)
                 .add(0,     stopPixelTape)
-                .add(0,     pipe1)
+                .add(0,     pipeBars1)
                 .add(5000,  targets.pixelTape(colourSpinDome1))
-                .add(0,     pipe2)
+                .add(0,     pipeBars2)
                 .add(5000,  targets.pixelTape(colourSpinDome2))
-                .add(0,     pipe3)
+                .add(0,     pipeBars3)
                 .add(5000,  targets.pixelTape(colourSpinDome3))
-                .add(0,     pipe4)
+                .add(0,     pipeBars4)
                 .add(15000, targets.pixelTape(colourSpinDome4))
-                .add(5000,  flash1)
-                .add(5000,  flash2)
-                .add(5000,  flash3)
-                .add(5000,  flash4)
-                .add(2000,  backgroundScene)
+                .add(0,     domeFlash1)
+                .add(5000,  pipeFlash1)
+                .add(0,     domeFlash2)
+                .add(5000,  pipeFlash2)
+                .add(0,     domeFlash3)
+                .add(5000,  pipeFlash3)
+                .add(0,     domeFlash4)
+                .add(6000,  pipeFlash4)
+                .add(3000,  fadeOutPixelTape)
+                .add(1000,  stopPixelTape)
+                .add(0,     backgroundScene)
             .build().oneShot(true);
 
         sendOscCommand = targets.osc(new OscCommand(MEDIA_SERVER_IP, MEDIA_SERVER_OSC_PORT, "helloben", 255));
