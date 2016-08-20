@@ -1,9 +1,12 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
+import net.amarantha.gpiomofo.Main;
 import net.amarantha.gpiomofo.factory.LinkFactory;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
+
+import static net.amarantha.gpiomofo.Main.BAR;
 
 public abstract class Scenario {
 
@@ -12,6 +15,7 @@ public abstract class Scenario {
     @Inject protected LinkFactory links;
 
     public void setup() {
+        System.out.println(BAR+"\n LOADING SCENARIO: " + getClass().getSimpleName());
         System.out.println(BAR+"\n TRIGGERS \n"+BAR);
         setupTriggers();
         System.out.println(BAR+"\n TARGETS \n"+BAR);
@@ -28,7 +32,5 @@ public abstract class Scenario {
     public abstract void setupTargets();
 
     public abstract void setupLinks();
-
-    public static final String BAR = "--------------------------------------------------";
 
 }

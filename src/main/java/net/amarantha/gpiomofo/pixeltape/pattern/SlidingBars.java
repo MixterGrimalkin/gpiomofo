@@ -2,9 +2,10 @@ package net.amarantha.gpiomofo.pixeltape.pattern;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.RGB;
+import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.gpiomofo.utility.Now;
 
-public class SlidingBars extends PixelTapePattern {
+public class SlidingBars extends PixelTapeTarget {
 
     @Inject private Now now;
     private int barSize = 10;

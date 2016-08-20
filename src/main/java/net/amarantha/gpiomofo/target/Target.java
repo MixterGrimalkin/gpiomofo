@@ -64,7 +64,7 @@ public abstract class Target implements HasName {
 
     protected final void deactivate(boolean force) {
         if ( active || force ) {
-            System.out.println("  --  [" + getName() + "]");
+            System.out.println(" -//- [" + getName() + "]");
             tasks.removeTask(this);
             active = false;
             onDeactivate();

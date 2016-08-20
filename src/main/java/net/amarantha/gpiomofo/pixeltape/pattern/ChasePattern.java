@@ -2,10 +2,11 @@ package net.amarantha.gpiomofo.pixeltape.pattern;
 
 
 import net.amarantha.gpiomofo.pixeltape.RGB;
+import net.amarantha.gpiomofo.target.PixelTapeTarget;
 
 import static java.lang.Math.round;
 
-public class ChasePattern extends PixelTapePattern {
+public class ChasePattern extends PixelTapeTarget {
 
     private int currentPixel = 0;
     private int dir = 1;

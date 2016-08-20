@@ -53,9 +53,9 @@ public class TaskService {
     }
 
     public void stop() {
+        System.out.println("Stopping Task Service...");
         run = false;
         taskThread = null;
-        System.out.println("Stopped Task Service");
     }
 
     public synchronized void scanTasks() {

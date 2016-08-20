@@ -3,7 +3,7 @@ package net.amarantha.gpiomofo.pixeltape;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.module.TapeRefresh;
-import net.amarantha.gpiomofo.pixeltape.pattern.PixelTapePattern;
+import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.gpiomofo.service.task.TaskService;
 
 import java.util.LinkedList;
@@ -13,27 +13,28 @@ import java.util.List;
 public class PixelTapeController {
 
     private TaskService tasks;
-    private PixelTape pixelTape;
+    private NeoPixel neoPixel;
     private int tapeRefresh;
 
-    private List<PixelTapePattern> patterns = new LinkedList<>();
+    private List<PixelTapeTarget> patterns = new LinkedList<>();
     private int totalPixels;
 
     @Inject
-    public PixelTapeController(PixelTape pixelTape, @TapeRefresh int tapeRefresh, TaskService tasks) {
-        this.pixelTape = pixelTape;
+    public PixelTapeController(NeoPixel neoPixel, @TapeRefresh int tapeRefresh, TaskService tasks) {
+        this.neoPixel = neoPixel;
         this.tapeRefresh = tapeRefresh;
         this.tasks = tasks;
     }
 
-    public PixelTapeController addPattern(PixelTapePattern pattern) {
+    public PixelTapeController addPattern(PixelTapeTarget pattern) {
         patterns.add(pattern);
         return this;
     }
 
-    public void init(int totalPixels) {
+    public PixelTapeController init(int totalPixels) {
         this.totalPixels = totalPixels;
-        pixelTape.init(totalPixels);
+        neoPixel.init(totalPixels);
+        return this;
     }
 
     public void start() {
@@ -42,24 +43,24 @@ public class PixelTapeController {
     }
 
     public void stop() {
-        pixelTape.close();
+        neoPixel.close();
         System.out.println("Shutting down pixel tape");
     }
 
     public void render() {
-        for ( PixelTapePattern pattern : patterns ) {
-            if ( pattern.isActive() ) {
+        for ( PixelTapeTarget pattern : patterns ) {
+            if ( pattern.isRunning() ) {
                 int start = pattern.getStartPixel();
                 RGB[] patternContents = pattern.render();
                 for (int i = 0; i < patternContents.length; i++) {
                     RGB rgb = patternContents[i];
                     if (rgb != null) {
-                        pixelTape.setPixelColourRGB(start + i, rgb, pattern.isForceRGB());
+                        neoPixel.setPixelColourRGB(start + i, rgb, pattern.isForceRGB());
                     }
                 }
             }
         }
-        pixelTape.render();
+        neoPixel.render();
     }
 
     public void stopAll() {
@@ -67,20 +68,20 @@ public class PixelTapeController {
     }
 
     public void stopAll(boolean clearPixels) {
-        patterns.forEach(PixelTapePattern::stop);
+        patterns.forEach(PixelTapeTarget::stop);
         if ( clearPixels ) {
-            pixelTape.allOff();
+            neoPixel.allOff();
         }
     }
 
     public void setAll(RGB colour) {
         for ( int i=0; i<totalPixels; i++ ) {
-            pixelTape.setPixelColourRGB(i, colour);
+            neoPixel.setPixelColourRGB(i, colour);
         }
     }
 
     public RGB getPixel(int pixel) {
-        return pixelTape.getPixelRGB(pixel);
+        return neoPixel.getPixelRGB(pixel);
     }
 
 }

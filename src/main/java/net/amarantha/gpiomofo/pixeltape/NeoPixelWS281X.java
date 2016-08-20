@@ -2,7 +2,7 @@ package net.amarantha.gpiomofo.pixeltape;
 
 import com.diozero.ws281xj.WS281x;
 
-public class PixelTapeWS281x implements PixelTape {
+public class NeoPixelWS281X implements NeoPixel {
 
     public static final int PWM_GPIO = 18;
 

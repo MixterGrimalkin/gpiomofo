@@ -2,8 +2,8 @@ package net.amarantha.gpiomofo.module;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
-import net.amarantha.gpiomofo.pixeltape.PixelTape;
-import net.amarantha.gpiomofo.pixeltape.PixelTapeWS281x;
+import net.amarantha.gpiomofo.pixeltape.NeoPixel;
+import net.amarantha.gpiomofo.pixeltape.NeoPixelWS281X;
 import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.RaspberryPi3;
@@ -43,7 +43,7 @@ public class LiveModule extends AbstractModule {
 
     protected void configureAdditional() {
         bind(GpioService.class).to(RaspberryPi3.class).in(Scopes.SINGLETON);
-        bind(PixelTape.class).to(PixelTapeWS281x.class).in(Scopes.SINGLETON);
+        bind(NeoPixel.class).to(NeoPixelWS281X.class).in(Scopes.SINGLETON);
         bindConstant().annotatedWith(TapeRefresh.class).to(pixelTapeRefresh);
     }
 

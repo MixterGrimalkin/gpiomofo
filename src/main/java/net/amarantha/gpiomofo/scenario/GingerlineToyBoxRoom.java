@@ -68,7 +68,7 @@ public class GingerlineToyBoxRoom extends Scenario {
     @Override
     public void setupTargets() {
 
-        panicTarget = targets.pixelTape(small1Red);
+        panicTarget = small1Red;
 
     }
 
@@ -77,15 +77,15 @@ public class GingerlineToyBoxRoom extends Scenario {
 
         links.link(testTrigger,   panicTarget);
 
-        Target on1 = targets.pixelTape(small1Red);
-        Target on2 = targets.pixelTape(small2Red);
-        Target on3 = targets.pixelTape(small3Red);
-        Target on4 = targets.pixelTape(big1Red);
+        Target on1 = small1Red;
+        Target on2 = small2Red;
+        Target on3 = small3Red;
+        Target on4 = big1Red;
 
-        Target off1 = targets.pixelTape(small1Off);
-        Target off2 = targets.pixelTape(small2Off);
-        Target off3 = targets.pixelTape(small3Off);
-        Target off4 = targets.pixelTape(big1Off);
+        Target off1 = small1Off;
+        Target off2 = small2Off;
+        Target off3 = small3Off;
+        Target off4 = big1Off;
 
         Target one = targets.chain()
             .add(1000, on1)

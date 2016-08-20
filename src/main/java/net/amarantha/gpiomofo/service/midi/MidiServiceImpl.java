@@ -1,20 +1,23 @@
 package net.amarantha.gpiomofo.service.midi;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.amarantha.gpiomofo.utility.PropertyManager;
 
 import javax.sound.midi.*;
 
 @Singleton
 public class MidiServiceImpl implements MidiService {
 
+    @Inject
+    private PropertyManager props;
+
     private MidiDevice midiOutDevice;
     private MidiDevice midiInDevice;
 
     @Override
     public void openDevice() {
-//        System.out.println("MIDI="+System.getenv("MIDIDEVICE"));
-        openDevice("USB Uno MIDI Interface");
-//        openDevice(System.getenv("MIDIDEVICE"));
+        openDevice(props.getString("MidiDevice", "USB Uno MIDI Interface"));
     }
 
     @Override
@@ -27,13 +30,14 @@ public class MidiServiceImpl implements MidiService {
 //            midiInDevice.close();
 //            midiInDevice.open();
         } catch (MidiUnavailableException e) {
-            System.err.println("Could not startup MIDI device '" + name + "': " + e.getMessage());
+            System.out.println("Could not start MIDI device '" + name + "'");
         }
     }
 
     @Override
     public void closeDevice() {
         if ( midiOutDevice !=null ) {
+            System.out.println("Closing MIDI Device...");
             midiOutDevice.close();
         }
     }

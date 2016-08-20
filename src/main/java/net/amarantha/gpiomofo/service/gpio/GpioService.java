@@ -161,7 +161,7 @@ public abstract class GpioService {
     }
 
     public void startInputMonitor(long period) {
-        System.out.println("Starting GPIO Monitor...");
+        System.out.println("Starting GPIO Service...");
         stopInputMonitor();
         monitorTimer = new Timer();
         monitorTimer.schedule(new TimerTask() {
@@ -179,6 +179,7 @@ public abstract class GpioService {
     }
 
     public void shutdown() {
+        System.out.println("Stopping GPIO Service...");
         stopInputMonitor();
         for ( Integer pinNumber : digitalOutputs ) {
             write(pinNumber, false);

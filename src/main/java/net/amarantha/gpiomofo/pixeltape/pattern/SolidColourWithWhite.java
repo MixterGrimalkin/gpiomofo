@@ -2,18 +2,20 @@ package net.amarantha.gpiomofo.pixeltape.pattern;
 
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.RGBW;
+import net.amarantha.gpiomofo.target.PixelTapeTarget;
 
-public class SolidColourWithWhite extends PixelTapePattern {
+public class SolidColourWithWhite extends PixelTapeTarget {
 
     private RGBW colour;
 
     private int realPixelCount;
 
     @Override
-    public void init(int startPixel, int pixelCount) {
+    public SolidColourWithWhite init(int startPixel, int pixelCount) {
         super.init(startPixel, ((pixelCount/3)*4));
         realPixelCount = pixelCount;
         setForceRGB(true);
+        return this;
     }
 
     public SolidColourWithWhite setColour(RGBW rgbw) {

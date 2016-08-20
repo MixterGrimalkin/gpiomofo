@@ -2,9 +2,10 @@ package net.amarantha.gpiomofo.pixeltape.pattern;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.RGB;
+import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.gpiomofo.utility.Now;
 
-public class FlashAndFade extends PixelTapePattern {
+public class FlashAndFade extends PixelTapeTarget {
 
     private RGB flashColour = new RGB(255,255,255);
     private RGB darkColour = new RGB(0,0,0);

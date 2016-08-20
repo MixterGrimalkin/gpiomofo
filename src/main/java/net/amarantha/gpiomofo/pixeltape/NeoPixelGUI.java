@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -14,7 +13,7 @@ import net.amarantha.gpiomofo.utility.Now;
 import static javafx.scene.paint.Color.color;
 import static net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom.*;
 
-public class PixelTapeGUI implements PixelTape {
+public class NeoPixelGUI implements NeoPixel {
 
     private int pixelCount;
 
@@ -80,11 +79,8 @@ public class PixelTapeGUI implements PixelTape {
 
         // Shut down application when window is closed
         stage.setOnCloseRequest(event -> {
-            System.out.println("Exit");
             main.stop();
         });
-
-        System.out.println("Board Ready");
 
     }
 

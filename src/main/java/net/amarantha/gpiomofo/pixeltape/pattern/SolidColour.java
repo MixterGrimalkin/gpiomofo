@@ -1,8 +1,9 @@
 package net.amarantha.gpiomofo.pixeltape.pattern;
 
 import net.amarantha.gpiomofo.pixeltape.RGB;
+import net.amarantha.gpiomofo.target.PixelTapeTarget;
 
-public class SolidColour extends PixelTapePattern {
+public class SolidColour extends PixelTapeTarget {
 
     private RGB colour;
 

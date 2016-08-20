@@ -1,13 +1,13 @@
 package net.amarantha.gpiomofo.pixeltape.pattern;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.pixeltape.PixelTape;
+import net.amarantha.gpiomofo.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
-import net.amarantha.gpiomofo.pixeltape.RGB;
+import net.amarantha.gpiomofo.target.PixelTapeTarget;
 
-public class FadeToBlack extends PixelTapePattern {
+public class FadeToBlack extends PixelTapeTarget {
 
-    @Inject private PixelTape pixelTape;
+    @Inject private NeoPixel neoPixel;
     @Inject private PixelTapeController pixelTapeController;
 
     private double intensity;
@@ -24,7 +24,7 @@ public class FadeToBlack extends PixelTapePattern {
     @Override
     public void stop() {
         super.stop();
-        pixelTape.setMasterBrightness(1.0);
+        neoPixel.setMasterBrightness(1.0);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class FadeToBlack extends PixelTapePattern {
 //                }
 //                setPixel(i, colour.withBrightness(intensity));
 //            }
-            pixelTape.setMasterBrightness(intensity);
+            neoPixel.setMasterBrightness(intensity);
             intensity -= intensityDelta;
         }
     }

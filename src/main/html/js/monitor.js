@@ -1,4 +1,5 @@
-var url="http://192.168.42.105:8001/gpiomofo/monitor";
+var url="http://127.0.0.1:8001/gpiomofo/monitor";
+//var url="http://192.168.42.105:8001/gpiomofo/monitor";
 var chambers = 6;
 var panicActive = {};
 
@@ -89,6 +90,7 @@ function offline() {
         $("#chamber"+i)
             .removeClass("monitorOn")
             .removeClass("monitorOff")
+            .removeClass("flash")
             .addClass("offline");
     }
 }

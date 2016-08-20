@@ -1,6 +1,6 @@
 package net.amarantha.gpiomofo.pixeltape;
 
-public interface PixelTape {
+public interface NeoPixel {
 
     void init(int pixelCount);
     void setPixelColourRGB(int pixel, RGB rgb);
