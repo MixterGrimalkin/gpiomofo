@@ -36,21 +36,9 @@ public class Main {
     @Inject private PropertyManager props;
     @Inject private NeoPixel neoPixel;
 
-    public static final String LOGO =
-        "    ________       .__          _____          _____       \n" +
-        "   /  _____/______ |__| ____   /     \\   _____/ ____\\____  \n" +
-        "  /   \\  ___\\____ \\|  |/  _ \\ /  \\ /  \\ /  _ \\   __\\/  _ \\ \n" +
-        "  \\    \\_\\  \\  |_> >  (  <_> )    Y    (  <_> )  | (  <_> )\n" +
-        "   \\______  /   __/|__|\\____/\\____|__  /\\____/|__|  \\____/ \n" +
-        "          \\/|__|                     \\/                    ";
-
-    public static final String BAR =
-        "-------------------------------------------------------------";
-
     public void start() {
 
         System.out.println(BAR+"\n"+LOGO);
-
 
         scenario.setup();
 
@@ -88,5 +76,16 @@ public class Main {
         System.out.println(BAR+"\n Bye for now! \n"+BAR);
         System.exit(0);
     }
+
+    public static final String LOGO =
+            "    ________       .__          _____          _____       \n" +
+            "   /  _____/______ |__| ____   /     \\   _____/ ____\\____  \n" +
+            "  /   \\  ___\\____ \\|  |/  _ \\ /  \\ /  \\ /  _ \\   __\\/  _ \\ \n" +
+            "  \\    \\_\\  \\  |_> >  (  <_> )    Y    (  <_> )  | (  <_> )\n" +
+            "   \\______  /   __/|__|\\____/\\____|__  /\\____/|__|  \\____/ \n" +
+            "          \\/|__|                     \\/                    ";
+
+    public static final String BAR =
+            "-------------------------------------------------------------";
 
 }

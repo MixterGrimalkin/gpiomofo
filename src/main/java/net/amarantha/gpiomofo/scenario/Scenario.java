@@ -1,7 +1,6 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.Main;
 import net.amarantha.gpiomofo.factory.LinkFactory;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;

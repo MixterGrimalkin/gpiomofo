@@ -32,13 +32,6 @@ public class FadeToBlack extends PixelTapeTarget {
         if ( intensity<=0.0 ) {
             pixelTapeController.stopAll();
         } else {
-//            for (int i = 0; i < getPixelCount(); i++) {
-//                RGB colour = getPixel(i);
-//                if ( colour==null ) {
-//                    colour = new RGB(255,0,0);
-//                }
-//                setPixel(i, colour.withBrightness(intensity));
-//            }
             neoPixel.setMasterBrightness(intensity);
             intensity -= intensityDelta;
         }

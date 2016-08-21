@@ -34,7 +34,7 @@ public class TestScenario2 extends Scenario {
     @Override
     public void setupLinks() {
 
-//        chasePattern.setMinColour(255, 0, 0)
+//        chasePattern.setColour(255, 0, 0)
 //        .setBlockWidth(50)
 //        .setMovement(5)
 //            .setBounce(true)

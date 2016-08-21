@@ -10,7 +10,6 @@ import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 
 public class SimulationModule extends LiveModule {
 
-    private Class<? extends Scenario> scenarioClass;
     private Stage stage;
 
     public SimulationModule(Stage stage) {
@@ -22,7 +21,7 @@ public class SimulationModule extends LiveModule {
     protected void configureAdditional() {
         bind(GpioService.class).to(GpioServiceMock.class).in(Scopes.SINGLETON);
         bind(NeoPixel.class).to(NeoPixelGUI.class).in(Scopes.SINGLETON);
-        bindConstant().annotatedWith(TapeRefresh.class).to(50);
+        bindConstant().annotatedWith(TapeRefresh.class).to(13);
         bind(Stage.class).toInstance(stage);
     }
 }

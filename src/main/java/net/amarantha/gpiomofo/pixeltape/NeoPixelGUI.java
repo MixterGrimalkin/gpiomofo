@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import net.amarantha.gpiomofo.Main;
 import net.amarantha.gpiomofo.utility.Now;
+import net.amarantha.gpiomofo.utility.TimeGuard;
 
 import static javafx.scene.paint.Color.color;
 import static net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom.*;
@@ -106,21 +107,20 @@ public class NeoPixelGUI implements NeoPixel {
         return colours[pixel];
     }
 
-    @Inject private Now now;
-    private long lastDrawn;
+    @Inject private TimeGuard guard;
+
     private long refreshInterval = 100;
 
     @Override
     public void render() {
-        if ( now.epochMilli()-lastDrawn >= refreshInterval ) {
+        guard.every(refreshInterval, "render", ()->{
             for (int i = 0; i < pixels.length; i++) {
                 if ( colours[i]!=null ) {
                     RGB rgb = colours[i].withBrightness(masterBrightness);
                     pixels[i].setFill(color(rgb.getRed() / 255.0, rgb.getGreen() / 255.0, rgb.getBlue() / 255.0));
                 }
             }
-            lastDrawn = now.epochMilli();
-        }
+        });
     }
 
     @Override

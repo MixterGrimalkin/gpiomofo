@@ -1,11 +1,6 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.target.QueuedTarget;
-import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-
-import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
-import static net.amarantha.gpiomofo.scenario.GingerLineSetup.*;
 
 public class GingerlinePanic extends Scenario {
 
@@ -27,16 +22,7 @@ public class GingerlinePanic extends Scenario {
     @Override
     public void setupTriggers() {
 
-        panicReset =   triggers.http("reset");
-        panicReset.onFire(s->{
-            briefingRoom.fire(false);
-            gameShowRoom.fire(false);
-            underwaterRoom.fire(false);
-            bikeRoom.fire(false);
-            kitchenRoom.fire(false);
-            toyBoxRoom.fire(false);
-        });
-
+        panicReset =     triggers.http("reset");
         briefingRoom =   triggers.http(URL_PANIC_BRIEFING);
         gameShowRoom =   triggers.http(URL_PANIC_GAMESHOW);
         underwaterRoom = triggers.http(URL_PANIC_UNDERWATER);
@@ -53,6 +39,15 @@ public class GingerlinePanic extends Scenario {
 
     @Override
     public void setupLinks() {
+
+        panicReset.onFire(s->{
+            briefingRoom.fire(false);
+            gameShowRoom.fire(false);
+            underwaterRoom.fire(false);
+            bikeRoom.fire(false);
+            kitchenRoom.fire(false);
+            toyBoxRoom.fire(false);
+        });
 
     }
 

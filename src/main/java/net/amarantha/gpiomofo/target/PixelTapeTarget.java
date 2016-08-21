@@ -1,18 +1,16 @@
 package net.amarantha.gpiomofo.target;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.utility.Now;
+import net.amarantha.gpiomofo.utility.TimeGuard;
 
 public abstract class PixelTapeTarget extends Target {
 
     @Inject private PixelTapeController pixelTapeController;
 
-    @Inject private TargetFactory targets;
-
-    @Inject private Now now;
+    @Inject private TimeGuard guard;
     private boolean forceRGB;
 
     @Override
@@ -25,10 +23,6 @@ public abstract class PixelTapeTarget extends Target {
         stop();
     }
 
-    public Target cancel() {
-        return targets.cancel(this).setForce(true);
-    }
-
     private int startPixel;
 
     protected RGB[] currentPattern;
@@ -39,10 +33,7 @@ public abstract class PixelTapeTarget extends Target {
         if ( currentPattern==null ) {
             throw new IllegalStateException("Pattern not initialised");
         }
-        if ( now.epochMilli()-lastRefreshed >= refreshInterval ) {
-            update();
-            lastRefreshed = now.epochMilli();
-        }
+        guard.every(refreshInterval, "render", this::update);
         return currentPattern;
     }
 

@@ -5,7 +5,7 @@ import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
-import static net.amarantha.gpiomofo.scenario.GingerLineSetup.*;
+import static net.amarantha.gpiomofo.scenario.GingerlineSetup.*;
 
 public class GingerlineGameShowRoom extends Scenario {
 

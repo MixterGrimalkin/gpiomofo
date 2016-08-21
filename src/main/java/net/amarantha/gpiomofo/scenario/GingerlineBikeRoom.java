@@ -8,7 +8,7 @@ import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.trigger.UltrasonicSensor;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
-import static net.amarantha.gpiomofo.scenario.GingerLineSetup.*;
+import static net.amarantha.gpiomofo.scenario.GingerlineSetup.*;
 
 public class GingerlineBikeRoom extends Scenario {
 
@@ -40,7 +40,7 @@ public class GingerlineBikeRoom extends Scenario {
         pattern
             .setBlockWidth(30)
             .setMovement(10)
-            .setMinColour(30, 10, 255)
+            .setColour(30, 10, 255)
             .setMaxColour(200, 100, 10)
             .setDelayRange(10, 50)
 //            .setBounce(true)

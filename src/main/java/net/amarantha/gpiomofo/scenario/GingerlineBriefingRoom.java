@@ -7,14 +7,10 @@ import net.amarantha.gpiomofo.pixeltape.pattern.ChasePattern;
 import net.amarantha.gpiomofo.pixeltape.pattern.FadeToBlack;
 import net.amarantha.gpiomofo.pixeltape.pattern.FlashAndFade;
 import net.amarantha.gpiomofo.pixeltape.pattern.SlidingBars;
-import net.amarantha.gpiomofo.service.osc.OscCommand;
-import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
-import static net.amarantha.gpiomofo.scenario.GingerLineSetup.MEDIA_SERVER_IP;
-import static net.amarantha.gpiomofo.scenario.GingerLineSetup.MEDIA_SERVER_OSC_PORT;
 
 public class GingerlineBriefingRoom extends Scenario {
 
@@ -40,22 +36,24 @@ public class GingerlineBriefingRoom extends Scenario {
 
     public static final int WHOLE_TAPE = ALL_DOMES + PIPE_1_SIZE + PIPE_2_SIZE + PIPE_3_SIZE + PIPE_4_SIZE;
 
+    private Trigger startButton;
+    private Trigger httpBackground;
+    private Trigger httpActivate;
+    private Trigger httpStop;
+
     @Override
     public void setupTriggers() {
 
-        podiumButton =      triggers.gpio(2, PULL_UP, true);
+        startButton =       triggers.gpio(2, PULL_UP, true);
         httpBackground =    triggers.http("background");
         httpActivate =      triggers.http("active");
         httpStop =          triggers.http("stop");
-        httpSendOsc =       triggers.http("osc");
 
     }
 
-    private Trigger podiumButton;
-    private Trigger httpBackground;
-    private Trigger httpActivate;
-    private Trigger httpSendOsc;
-    private Trigger httpStop;
+    private Target stopPixelTape;
+    private Target backgroundScene;
+    private Target activationScene;
 
     @Override
     public void setupTargets() {
@@ -76,7 +74,7 @@ public class GingerlineBriefingRoom extends Scenario {
 
         Target domesChase =
             targets.pixelTape(ChasePattern.class)
-                .setMinColour(255,255,70)
+                .setColour(backColour)
                 .setBlockWidth(50)
                 .setMovement(5)
                 .setRefreshInterval(40)
@@ -135,7 +133,7 @@ public class GingerlineBriefingRoom extends Scenario {
         RGB colour3 = new RGB(50, 80, 255);
         RGB colour4 = new RGB(255, 0, 100);
 
-        PixelTapeTarget spinDome1 =
+        Target spinDome1 =
             targets.pixelTape(SlidingBars.class)
                 .setRefreshRange(400, 30, -20)
                 .setColour(colour1)
@@ -143,7 +141,7 @@ public class GingerlineBriefingRoom extends Scenario {
                 .setFadeInTime(5000)
                 .init(DOME_1_START, DOME_SIZE);
 
-        PixelTapeTarget spinDome2 =
+        Target spinDome2 =
             targets.pixelTape(SlidingBars.class)
                 .setRefreshRange(400, 30, -20)
                 .setColour(colour2)
@@ -151,7 +149,7 @@ public class GingerlineBriefingRoom extends Scenario {
                 .setFadeInTime(5000)
                 .init(DOME_2_START, DOME_SIZE);
 
-        PixelTapeTarget spinDome3 =
+        Target spinDome3 =
             targets.pixelTape(SlidingBars.class)
                 .setRefreshRange(400, 30, -20)
                 .setColour(colour3)
@@ -159,7 +157,7 @@ public class GingerlineBriefingRoom extends Scenario {
                 .setFadeInTime(5000)
                 .init(DOME_3_START, DOME_SIZE);
 
-        PixelTapeTarget spinDome4 =
+        Target spinDome4 =
             targets.pixelTape(SlidingBars.class)
                 .setRefreshRange(400, 30, -20)
                 .setColour(colour4)
@@ -171,7 +169,7 @@ public class GingerlineBriefingRoom extends Scenario {
         int pipeActiveBar = 10;
         int pipeActiveSpace = 5;
 
-        PixelTapeTarget fastPipe1 =
+        Target fastPipe1 =
             targets.pixelTape(SlidingBars.class)
                 .setBarSize(pipeActiveBar, pipeActiveSpace)
                 .setRefreshRange(400, 30, -20)
@@ -180,7 +178,7 @@ public class GingerlineBriefingRoom extends Scenario {
                 .setFadeInTime(5000)
                 .init(PIPE_1_START, PIPE_1_SIZE);
 
-        PixelTapeTarget fastPipe2 =
+        Target fastPipe2 =
             targets.pixelTape(SlidingBars.class)
                 .setBarSize(pipeActiveBar, pipeActiveSpace)
                 .setRefreshRange(400, 30, -20)
@@ -188,7 +186,7 @@ public class GingerlineBriefingRoom extends Scenario {
                 .setFadeInTime(5000)
                 .init(PIPE_2_START, PIPE_2_SIZE);
 
-        PixelTapeTarget fastPipe3 =
+        Target fastPipe3 =
             targets.pixelTape(SlidingBars.class)
                 .setBarSize(pipeActiveBar, pipeActiveSpace)
                 .setRefreshRange(400, 30, -20)
@@ -197,7 +195,7 @@ public class GingerlineBriefingRoom extends Scenario {
                 .setFadeInTime(5000)
                 .init(PIPE_3_START, PIPE_3_SIZE);
 
-        PixelTapeTarget fastPipe4 =
+        Target fastPipe4 =
             targets.pixelTape(SlidingBars.class)
                 .setBarSize(pipeActiveBar, pipeActiveSpace)
                 .setRefreshRange(400, 30, -20)
@@ -205,50 +203,50 @@ public class GingerlineBriefingRoom extends Scenario {
                 .setFadeInTime(5000)
                 .init(PIPE_4_START, PIPE_4_SIZE);
 
-        PixelTapeTarget flashPipe1 =
+        Target flashPipe1 =
             targets.pixelTape(FlashAndFade.class)
                 .setReverse(true)
                 .setSparkColour(colour1)
                 .init(PIPE_1_START, PIPE_1_SIZE);
 
-        PixelTapeTarget flashPipe2 =
+        Target flashPipe2 =
             targets.pixelTape(FlashAndFade.class)
                 .setSparkColour(colour2)
                 .init(PIPE_2_START, PIPE_2_SIZE);
 
-        PixelTapeTarget flashPipe3 =
+        Target flashPipe3 =
             targets.pixelTape(FlashAndFade.class)
                 .setReverse(true)
                 .setSparkColour(colour3)
                 .init(PIPE_3_START, PIPE_3_SIZE);
 
-        PixelTapeTarget flashPipe4 =
+        Target flashPipe4 =
             targets.pixelTape(FlashAndFade.class)
                 .setSparkColour(colour4)
                 .init(PIPE_4_START, PIPE_4_SIZE);
 
-        PixelTapeTarget flashDome1 =
+        Target flashDome1 =
             targets.pixelTape(FlashAndFade.class)
                 .setDarkColour(colour1)
                 .setUseSpark(false)
                 .setFadeOut(false)
                 .init(DOME_1_START, DOME_SIZE);
 
-        PixelTapeTarget flashDome2 =
+        Target flashDome2 =
             targets.pixelTape(FlashAndFade.class)
                 .setDarkColour(colour2)
                 .setUseSpark(false)
                 .setFadeOut(false)
                 .init(DOME_2_START, DOME_SIZE);
 
-        PixelTapeTarget flashDome3 =
+        Target flashDome3 =
             targets.pixelTape(FlashAndFade.class)
                 .setDarkColour(colour3)
                 .setUseSpark(false)
                 .setFadeOut(false)
                 .init(DOME_3_START, DOME_SIZE);
 
-        PixelTapeTarget flashDome4 =
+        Target flashDome4 =
             targets.pixelTape(FlashAndFade.class)
                 .setDarkColour(colour4)
                 .setUseSpark(false)
@@ -311,27 +309,19 @@ public class GingerlineBriefingRoom extends Scenario {
 
             .build().oneShot(true);
 
-        sendOscCommand = targets.osc(new OscCommand(MEDIA_SERVER_IP, MEDIA_SERVER_OSC_PORT, "helloben", 255));
-
     }
-
-    private Target stopPixelTape;
-    private Target backgroundScene;
-    private Target activationScene;
-    private Target sendOscCommand;
 
     @Override
     public void setupLinks() {
 
         links
-            .link(podiumButton,     activationScene)
+            .link(startButton,      activationScene)
             .link(httpActivate,     activationScene)
             .link(httpBackground,   backgroundScene)
             .link(httpStop,         stopPixelTape)
-            .link(httpSendOsc,      sendOscCommand)
         ;
 
-        links.lock(30000, activationScene);
+        links.lock(60000, activationScene);
 
         pixeltape
             .init(WHOLE_TAPE)

@@ -3,8 +3,8 @@ package net.amarantha.gpiomofo.pixeltape;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.module.TapeRefresh;
-import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.gpiomofo.target.PixelTapeTarget;
 
 import java.util.LinkedList;
 import java.util.List;

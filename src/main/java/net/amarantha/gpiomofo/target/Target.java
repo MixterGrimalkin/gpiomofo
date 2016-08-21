@@ -2,6 +2,7 @@ package net.amarantha.gpiomofo.target;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.HasName;
+import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.service.task.TaskService;
 
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import java.util.List;
 public abstract class Target implements HasName {
 
     @Inject private TaskService tasks;
+    @Inject private TargetFactory targets;
 
     private boolean active = false;
     public Target offTarget;
@@ -38,7 +40,9 @@ public abstract class Target implements HasName {
     //////////////
 
     public final void activate() {
-        if ( !locked ) {
+        if ( locked ) {
+            System.out.println(" -XX- [" + getName() + "]");
+        } else {
             System.out.println(" " + (oneShot ? "--" : "==") + ">> [" + getName() + "]");
             if ( lockTime!=null ) {
                 for ( Target target : lockTargets ) {
@@ -101,6 +105,16 @@ public abstract class Target implements HasName {
     private void unlock() {
         locked = false;
     }
+
+
+    //////////////////
+    // Cancellation //
+    //////////////////
+
+    public Target cancel() {
+        return targets.cancel(this).setForce(true);
+    }
+
 
     ///////////
     // Setup //

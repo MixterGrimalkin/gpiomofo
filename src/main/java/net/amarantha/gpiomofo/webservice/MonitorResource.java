@@ -3,7 +3,6 @@ package net.amarantha.gpiomofo.webservice;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
-import net.amarantha.gpiomofo.scenario.GingerlinePanic;
 import net.amarantha.gpiomofo.trigger.Trigger;
 
 import javax.ws.rs.GET;

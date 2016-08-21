@@ -1,4 +1,5 @@
-var url="http://127.0.0.1:8001/gpiomofo/monitor";
+//var url="http://127.0.0.1:8001/gpiomofo/monitor";
+var url="http://192.168.0.69:8001/gpiomofo/monitor";
 //var url="http://192.168.42.105:8001/gpiomofo/monitor";
 var chambers = 6;
 var panicActive = {};
@@ -17,13 +18,6 @@ function onLoad() {
         flashActiveMonitors();
     }, 500);
 
-//    $("#resetBtn").click(function() {
-//        $.ajax({
-//            url: url+"/reset",
-//            type: "POST",
-//        });
-//    });
-
     offline();
 }
 
@@ -32,7 +26,6 @@ var flashOn = false;
 function flashActiveMonitors() {
     for ( var i=0; i<chambers; i++ ) {
         if ( panicActive[i] ) {
-            console.log("sweaty knickers");
             if ( flashOn ) {
                 $("#chamber"+i)
                 .addClass("flash");
@@ -40,14 +33,14 @@ function flashActiveMonitors() {
                 $("#chamber"+i)
                 .removeClass("flash");
             }
-        }
-    }
-    flashOn = !flashOn;
-}
+           }
+       }
+       flashOn = !flashOn;
+   }
 
-function getMonitorStates() {
+   function getMonitorStates() {
 
-    $.ajax({
+       $.ajax({
         url: url,
         type: "GET",
         success: function(response) {

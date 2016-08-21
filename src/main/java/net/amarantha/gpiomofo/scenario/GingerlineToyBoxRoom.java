@@ -77,47 +77,37 @@ public class GingerlineToyBoxRoom extends Scenario {
 
         links.link(testTrigger,   panicTarget);
 
-        Target on1 = small1Red;
-        Target on2 = small2Red;
-        Target on3 = small3Red;
-        Target on4 = big1Red;
-
-        Target off1 = small1Off;
-        Target off2 = small2Off;
-        Target off3 = small3Off;
-        Target off4 = big1Off;
-
         Target one = targets.chain()
-            .add(1000, on1)
-            .add(0, targets.cancel(on1))
-            .add(800, off1)
-            .add(0, targets.cancel(off1))
+            .add(1000,  small1Red)
+            .add(0,     small1Red.cancel())
+            .add(800,   small1Off)
+            .add(0,     small1Off.cancel())
         .build().repeat(true);
 
         Target two = targets.chain()
-            .add(900, on2)
-            .add(0, targets.cancel(on2))
-            .add(800, off2)
-            .add(0, targets.cancel(off2))
+            .add(1000,  small2Red)
+            .add(0,     small2Red.cancel())
+            .add(800,   small2Off)
+            .add(0,     small2Off.cancel())
         .build().repeat(true);
 
         Target three = targets.chain()
-            .add(950, on3)
-            .add(0, targets.cancel(on3))
-            .add(800, off3)
-            .add(0, targets.cancel(off3))
+            .add(1000,  small3Red)
+            .add(0,     small3Red.cancel())
+            .add(800,   small3Off)
+            .add(0,     small3Off.cancel())
         .build().repeat(true);
 
         Target four = targets.chain()
-            .add(1050, on4)
-            .add(0, targets.cancel(on4))
-            .add(800, off4)
-            .add(0, targets.cancel(off4))
+            .add(1000,  big1Red)
+            .add(0,     big1Red.cancel())
+            .add(800,   big1Off)
+            .add(0,     big1Off.cancel())
         .build().repeat(true);
 
-        pixelTapeController.init(RGB_WIDTH+80);
-
-        pixelTapeController.start();
+        pixelTapeController
+            .init(RGB_WIDTH+80)
+            .start();
 
         one.activate();
         two.activate();

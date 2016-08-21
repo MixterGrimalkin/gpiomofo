@@ -78,7 +78,7 @@ public class ChasePattern extends PixelTapeTarget {
         return this;
     }
 
-    public ChasePattern setMinColour(int red, int green, int blue) {
+    public ChasePattern setColour(int red, int green, int blue) {
         this.redMin = red;
         this.greenMin = green;
         this.blueMin = blue;
@@ -99,6 +99,6 @@ public class ChasePattern extends PixelTapeTarget {
     }
 
     public ChasePattern setColour(RGB colour) {
-        return setMinColour(colour.getRed(), colour.getGreen(), colour.getBlue());
+        return setColour(colour.getRed(), colour.getGreen(), colour.getBlue());
     }
 }
