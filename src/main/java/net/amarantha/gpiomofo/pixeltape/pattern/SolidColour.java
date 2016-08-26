@@ -7,6 +7,14 @@ public class SolidColour extends PixelTapeTarget {
 
     private RGB colour;
 
+    private boolean done;
+
+    @Override
+    public void start() {
+        super.start();
+        done = false;
+    }
+
     public SolidColour setColour(RGB rgb) {
         colour = rgb;
         return this;
@@ -14,8 +22,12 @@ public class SolidColour extends PixelTapeTarget {
 
     @Override
     protected void update() {
-        for ( int i=0; i<getPixelCount(); i++ ) {
-            setPixel(i, colour);
+        if ( !done ) {
+            System.out.println("Updating RGB");
+            for (int i = 0; i < getPixelCount(); i++) {
+                setPixel(i, colour);
+            }
+            done = true;
         }
     }
 }

@@ -1,10 +1,15 @@
 package net.amarantha.gpiomofo.scenario;
 
+import net.amarantha.gpiomofo.service.osc.OscCommand;
+import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
+
+import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 
 public class GingerlinePanic extends Scenario {
 
     private Trigger panicReset;
+    private Trigger panicResetHold;
     private Trigger briefingRoom;
     private Trigger gameShowRoom;
     private Trigger underwaterRoom;
@@ -22,7 +27,8 @@ public class GingerlinePanic extends Scenario {
     @Override
     public void setupTriggers() {
 
-        panicReset =     triggers.http("reset");
+        panicReset =     triggers.gpio("reset", 0, PULL_UP, false);
+        panicResetHold = triggers.gpio("reset-hold", 0, PULL_UP, false).setHoldTime(5000);
         briefingRoom =   triggers.http(URL_PANIC_BRIEFING);
         gameShowRoom =   triggers.http(URL_PANIC_GAMESHOW);
         underwaterRoom = triggers.http(URL_PANIC_UNDERWATER);
@@ -32,8 +38,12 @@ public class GingerlinePanic extends Scenario {
 
     }
 
+    Target lightsOn;
+
     @Override
     public void setupTargets() {
+
+        lightsOn = targets.osc(new OscCommand("192.168.42.100", 7700, "alarm/kitchenhold", 255));
 
     }
 
@@ -48,6 +58,8 @@ public class GingerlinePanic extends Scenario {
             kitchenRoom.fire(false);
             toyBoxRoom.fire(false);
         });
+
+        links.link(panicResetHold, lightsOn);
 
     }
 

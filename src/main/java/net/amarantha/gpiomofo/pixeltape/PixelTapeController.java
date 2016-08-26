@@ -53,7 +53,7 @@ public class PixelTapeController {
                 int start = pattern.getStartPixel();
                 RGB[] patternContents = pattern.render();
                 for (int i = 0; i < patternContents.length; i++) {
-                    RGB rgb = patternContents[i];
+                    RGB rgb = patternContents[pattern.isReverse()?patternContents.length-i-1:i];
                     if (rgb != null) {
                         neoPixel.setPixelColourRGB(start + i, rgb, pattern.isForceRGB());
                     }

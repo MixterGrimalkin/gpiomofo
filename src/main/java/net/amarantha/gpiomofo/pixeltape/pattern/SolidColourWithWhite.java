@@ -10,6 +10,15 @@ public class SolidColourWithWhite extends PixelTapeTarget {
 
     private int realPixelCount;
 
+    private boolean done;
+
+    @Override
+    public void start() {
+        super.start();
+        done = false;
+    }
+
+
     @Override
     public SolidColourWithWhite init(int startPixel, int pixelCount) {
         super.init(startPixel, ((pixelCount/3)*4));
@@ -26,18 +35,22 @@ public class SolidColourWithWhite extends PixelTapeTarget {
 
     @Override
     protected void update() {
-        RGBW[] input = new RGBW[getPixelCount()];
-        for ( int i=0; i<realPixelCount; i++ ) {
-            input[i] = colour;
+        if ( !done ) {
+            System.out.println("Updating RGBW");
+            RGBW[] input = new RGBW[getPixelCount()];
+            for (int i = 0; i < realPixelCount; i++) {
+                input[i] = colour;
 //            setPixel(i, colour);
-        }
-
-        RGB[] output = RGBW.convertToRGB(input);
-        for ( int i=0; i<output.length; i++ ) {
-            if ( i<getPixelCount() ) {
-//                System.out.println(output[i]);
-                setPixel(i, output[i]);
             }
+
+            RGB[] output = RGBW.convertToRGB(input);
+            for (int i = 0; i < output.length; i++) {
+                if (i < getPixelCount()) {
+//                System.out.println(output[i]);
+                    setPixel(i, output[i]);
+                }
+            }
+            done = true;
         }
     }
 }

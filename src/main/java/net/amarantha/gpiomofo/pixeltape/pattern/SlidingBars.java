@@ -19,6 +19,11 @@ public class SlidingBars extends PixelTapeTarget {
         return this;
     }
 
+    public SlidingBars setSpaceSize(int spaceSize) {
+        this.spaceSize = spaceSize;
+        return this;
+    }
+
     private long timeStarted = -1;
     private long fadeInTime = 1000;
     private double fadeDelta;

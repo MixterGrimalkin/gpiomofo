@@ -76,6 +76,12 @@ public class TestBase {
         return trigger;
     }
 
+    Trigger given_trigger_on_pin_$1_with_hold_time_$2(int pin, int holdTime) {
+        GpioTrigger trigger = triggers.gpio(pin, OFF, true);
+        trigger.setHoldTime(holdTime);
+        return trigger;
+    }
+
     Trigger given_inverted_trigger_on_pin_$1(int pin) {
         GpioTrigger trigger = triggers.gpio(pin, OFF, false);
         assertEquals(false, trigger.getTriggerState());

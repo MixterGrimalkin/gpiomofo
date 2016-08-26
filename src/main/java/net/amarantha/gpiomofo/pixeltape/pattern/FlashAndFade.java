@@ -53,14 +53,14 @@ public class FlashAndFade extends PixelTapeTarget {
 
             if (inFlash) {
                 guard.every(flashDuration, "endFlash", ()->{
-                    System.out.println("End Flash " + this);
+//                    System.out.println("End Flash " + this);
                     setAll(darkColour);
                     inFlash = false;
                     flashCount++;
                 });
             } else {
                 if ( guard.every(darkDuration, "startFlash", ()->{
-                    System.out.println("Start Flash " + this);
+//                    System.out.println("Start Flash " + this);
                     setAll(flashColour);
                     inFlash = true;
                 })); else if ( useSpark ) {

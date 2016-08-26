@@ -3,7 +3,6 @@ package net.amarantha.gpiomofo.target;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.RGB;
-import net.amarantha.gpiomofo.utility.Now;
 import net.amarantha.gpiomofo.utility.TimeGuard;
 
 public abstract class PixelTapeTarget extends Target {
@@ -12,6 +11,15 @@ public abstract class PixelTapeTarget extends Target {
 
     @Inject private TimeGuard guard;
     private boolean forceRGB;
+    private boolean requiresRender = true;
+
+    public boolean isRequiresRender() {
+        return requiresRender;
+    }
+
+    public void setRequiresRender(boolean requiresRender) {
+        this.requiresRender = requiresRender;
+    }
 
     @Override
     protected void onActivate() {
@@ -53,7 +61,19 @@ public abstract class PixelTapeTarget extends Target {
     }
 
     protected void setPixel(int pixel, int red, int green, int blue) {
+//        int actualPixel = reverse ? currentPattern.length-pixel-1 : pixel;
         currentPattern[pixel] = new RGB(red, green, blue);
+    }
+
+    private boolean reverse;
+
+    public PixelTapeTarget setReverse(boolean reverse) {
+        this.reverse = reverse;
+        return this;
+    }
+
+    public boolean isReverse() {
+        return reverse;
     }
 
     protected RGB getPixel(int pixel) {

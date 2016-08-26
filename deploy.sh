@@ -7,7 +7,7 @@ elif [ "$1" = "local" ]
 then
     ip="127.0.0.1"
 else
-    ip="192.168.0.$1"
+    ip="192.168.42.$1"
 fi
 echo "Deploy GpioMofo to ${ip}..."
 if [ "$2" != "-skipjava" ]

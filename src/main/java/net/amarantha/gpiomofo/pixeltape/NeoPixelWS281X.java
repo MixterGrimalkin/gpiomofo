@@ -25,7 +25,8 @@ public class NeoPixelWS281X implements NeoPixel {
 
     @Override
     public void setPixelColourRGB(int pixel, RGB colour, boolean forceRGB) {
-        if ( pixel < pixelCount ) {
+        if ( pixel < pixelCount && !colour.equals(getPixelRGB(pixel))) {
+            dirty = true;
             RGB rgb = colour.withBrightness(masterBrightness);
             if (forceRGB) {
                 ws281x.setPixelColourRGB(pixel, rgb.getRed(), rgb.getGreen(), rgb.getBlue());
@@ -35,6 +36,8 @@ public class NeoPixelWS281X implements NeoPixel {
         }
     }
 
+    private boolean dirty = false;
+
     @Override
     public void setPixelColourRGB(int pixel, int red, int green, int blue) {
         setPixelColourRGB(pixel, new RGB(red, green, blue));
@@ -42,7 +45,10 @@ public class NeoPixelWS281X implements NeoPixel {
 
     @Override
     public void render() {
-        ws281x.render();
+        if ( dirty ) {
+            ws281x.render();
+        }
+        dirty = false;
     }
 
     @Override

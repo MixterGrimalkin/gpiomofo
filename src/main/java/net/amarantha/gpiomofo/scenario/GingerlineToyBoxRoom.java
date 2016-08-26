@@ -11,20 +11,16 @@ import net.amarantha.gpiomofo.trigger.Trigger;
 
 public class GingerlineToyBoxRoom extends Scenario {
 
-    private Trigger testTrigger;
-    private Target panicTarget;
+    private Trigger blueTrigger;
+    private Trigger amberTrigger;
+    private Trigger redTrigger;
 
     @Inject private PixelTapeController pixelTapeController;
 
-    @Inject private SolidColour small1Red;
-    @Inject private SolidColour small1Off;
-    @Inject private SolidColour small2Red;
-    @Inject private SolidColour small2Off;
-    @Inject private SolidColour small3Red;
-    @Inject private SolidColour small3Off;
+    private Target blueScene;
+    private Target amberScene;
+    private Target redScene;
 
-    @Inject private SolidColourWithWhite big1Red;
-    @Inject private SolidColourWithWhite big1Off;
 
     /*
         Static state for 10 minutes
@@ -39,80 +35,77 @@ public class GingerlineToyBoxRoom extends Scenario {
     @Override
     public void setupTriggers() {
 
-        testTrigger = triggers.http("test");
+        blueTrigger = triggers.osc("blue", 53000, "blue");
+        amberTrigger = triggers.osc("amber", 53000, "amber");
+        redTrigger = triggers.osc("red", 53000, "red");
 
-        small1Red.setColour(new RGB(255, 0, 0)).init(0, 24);
-        small1Off.setColour(new RGB(0,0,0)).init(0,24);
-        small2Red.setColour(new RGB(255, 0, 0)).init(24, 24);
-        small2Off.setColour(new RGB(0,0,0)).init(24,24);
-        small3Red.setColour(new RGB(255, 0, 0)).init(48, 24);
-        small3Off.setColour(new RGB(0,0,0)).init(48,24);
-
-        big1Red.setColour(new RGBW(255,0,0,0)).init(72, 60);
-        big1Off.setColour(new RGBW(0,0,0,0)).init(72, 60);
-
-
-        pixelTapeController
-            .addPattern(small1Red)
-            .addPattern(small2Red)
-            .addPattern(small3Red)
-            .addPattern(big1Red)
-            .addPattern(small1Off)
-            .addPattern(small2Off)
-            .addPattern(small3Off)
-            .addPattern(big1Off)
-        ;
 
     }
 
     @Override
     public void setupTargets() {
 
-        panicTarget = small1Red;
+        Target stop = targets.stopPixelTape();
+
+        Target blueSceneRGB =
+                targets.pixelTape(SolidColour.class)
+                        .setColour(new RGB(0, 0, 255))
+                        .init(0, 72);
+        Target blueSceneRGBW =
+                targets.pixelTape(SolidColourWithWhite.class)
+                        .setColour(new RGBW(0, 0, 255, 0))
+                        .init(72, 120);
+        blueScene = targets.chain()
+                .add(stop)
+                .add(blueSceneRGB)
+                .add(blueSceneRGBW)
+                .build().oneShot(true);
+
+        Target amberSceneRGB =
+                targets.pixelTape(SolidColour.class)
+                        .setColour(new RGB(255, 60, 0))
+                        .init(0, 72);
+        Target amberSceneRGBW =
+                targets.pixelTape(SolidColourWithWhite.class)
+                        .setColour(new RGBW(255, 60, 0, 50))
+                        .init(72, 120);
+        amberScene = targets.chain()
+                .add(stop)
+                .add(amberSceneRGB)
+                .add(amberSceneRGBW)
+                .build().oneShot(true);
+
+        Target redSceneRGB =
+                targets.pixelTape(SolidColour.class)
+                        .setColour(new RGB(255, 0, 0))
+                        .init(0, 72);
+        Target redSceneRGBW =
+                targets.pixelTape(SolidColourWithWhite.class)
+                        .setColour(new RGBW(255, 0, 0, 0))
+                        .init(72, 120);
+        redScene = targets.chain()
+                .add(stop)
+                .add(redSceneRGB)
+                .add(redSceneRGBW)
+                .build().oneShot(true);
 
     }
 
     @Override
     public void setupLinks() {
 
-        links.link(testTrigger,   panicTarget);
-
-        Target one = targets.chain()
-            .add(1000,  small1Red)
-            .add(0,     small1Red.cancel())
-            .add(800,   small1Off)
-            .add(0,     small1Off.cancel())
-        .build().repeat(true);
-
-        Target two = targets.chain()
-            .add(1000,  small2Red)
-            .add(0,     small2Red.cancel())
-            .add(800,   small2Off)
-            .add(0,     small2Off.cancel())
-        .build().repeat(true);
-
-        Target three = targets.chain()
-            .add(1000,  small3Red)
-            .add(0,     small3Red.cancel())
-            .add(800,   small3Off)
-            .add(0,     small3Off.cancel())
-        .build().repeat(true);
-
-        Target four = targets.chain()
-            .add(1000,  big1Red)
-            .add(0,     big1Red.cancel())
-            .add(800,   big1Off)
-            .add(0,     big1Off.cancel())
-        .build().repeat(true);
+        links
+            .link(blueTrigger, blueScene)
+            .link(amberTrigger, amberScene)
+            .link(redTrigger, redScene)
+        ;
 
         pixelTapeController
-            .init(RGB_WIDTH+80)
+            .init(RGB_WIDTH+160)
             .start();
 
-        one.activate();
-        two.activate();
-        three.activate();
-        four.activate();
+        amberScene.activate();
+
 
     }
 

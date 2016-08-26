@@ -4,7 +4,6 @@ import com.google.inject.Scopes;
 import javafx.stage.Stage;
 import net.amarantha.gpiomofo.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.pixeltape.NeoPixelGUI;
-import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 

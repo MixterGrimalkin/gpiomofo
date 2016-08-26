@@ -21,8 +21,10 @@ public class HttpServiceImpl implements HttpService {
     public String fire(HttpCommand command) {
         switch ( command.getMethod().toUpperCase() ) {
             case GET:
+                System.out.println("GET http://"+command.getFullHost()+"/"+command.getFullPath());
                 return get(command.getHost(), command.getPort(), command.getFullPath(), command.getParamsArray());
             case POST:
+                System.out.println("POST http://"+command.getFullHost()+"/"+command.getFullPath());
                 return post(command.getHost(), command.getPort(), command.getFullPath(), command.getPayload(), command.getParamsArray());
         }
         return null;
@@ -32,9 +34,11 @@ public class HttpServiceImpl implements HttpService {
     public void fireAsync(HttpCallback callback, HttpCommand command) {
         switch ( command.getMethod().toUpperCase() ) {
             case GET:
+                System.out.println("GET http://"+command.getFullHost()+"/"+command.getFullPath());
                 getAsync(callback, command.getHost(), command.getPort(), command.getFullPath(), command.getParamsArray());
                 break;
             case POST:
+                System.out.println("POST http://"+command.getFullHost()+"/"+command.getFullPath());
                 postAsync(callback, command.getHost(), command.getPort(), command.getFullPath(), command.getPayload(), command.getParamsArray());
                 break;
         }

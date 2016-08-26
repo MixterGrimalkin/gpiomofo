@@ -12,6 +12,33 @@ import org.junit.runner.RunWith;
 public class TriggersTest extends TestBase {
 
     @Story
+    public void test_hold_triggers() {
+
+        Trigger trigger = given_trigger_on_pin_$1_with_hold_time_$2(0, 10000);
+        Target target = given_target_on_pin_$1(1);
+        given_link_between_$1_and_$2(trigger, target);
+
+        then_pin_$1_is_$2(1, false);
+
+        when_time_is_$1("12:00:00");
+        when_set_pin_$1_to_$2(0, true);
+        when_time_is_$1("12:00:00");
+        then_pin_$1_is_$2(1, false);
+        when_time_is_$1("12:00:05");
+        when_set_pin_$1_to_$2(0, false);
+        when_time_is_$1("12:00:05");
+        then_pin_$1_is_$2(1, false);
+
+        when_time_is_$1("12:00:00");
+        when_set_pin_$1_to_$2(0, true);
+        when_time_is_$1("12:00:00");
+        then_pin_$1_is_$2(1, false);
+        when_time_is_$1("12:00:15");
+        then_pin_$1_is_$2(1, true);
+
+    }
+
+    @Story
     public void test_registrations() {
 
         then_there_are_$1_triggers(0);

@@ -8,7 +8,6 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import net.amarantha.gpiomofo.Main;
-import net.amarantha.gpiomofo.utility.Now;
 import net.amarantha.gpiomofo.utility.TimeGuard;
 
 import static javafx.scene.paint.Color.color;

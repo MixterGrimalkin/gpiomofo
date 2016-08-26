@@ -1,7 +1,9 @@
 package net.amarantha.gpiomofo.trigger;
 
 
+import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.HasName;
+import net.amarantha.gpiomofo.service.task.TaskService;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,15 +12,41 @@ public class Trigger implements HasName {
 
     private boolean lastState;
 
+    @Inject
+    private TaskService tasks;
+
     public void fire(boolean active) {
         lastState = active;
+        if ( holdTime==null ) {
+            doFire(active);
+        } else {
+            if ( active ) {
+                tasks.addTask("holdFire", holdTime, () -> doFire(true));
+            } else {
+                tasks.removeTask("holdFire");
+            }
+        }
+    }
+
+    private void doFire(boolean active) {
         System.out.println("["+getName()+"] " + (active?"==>>":" -- "));
-        for ( TriggerCallback callback : triggerCallbacks) {
+        for (TriggerCallback callback : triggerCallbacks) {
             callback.onTrigger(active);
         }
-        for ( TriggerCallback callback : compositeCallbacks) {
+        for (TriggerCallback callback : compositeCallbacks) {
             callback.onTrigger(active);
         }
+    }
+
+    private Integer holdTime;
+
+    public int getHoldTime() {
+        return holdTime;
+    }
+
+    public Trigger setHoldTime(int holdTime) {
+        this.holdTime = holdTime;
+        return this;
     }
 
     public boolean isActive() {
