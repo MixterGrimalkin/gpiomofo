@@ -20,6 +20,11 @@ public class GingerlineToyBoxRoom extends Scenario {
     private Target blueScene;
     private Target amberScene;
     private Target redScene;
+    private Target one;
+    private Target two;
+    private Target three;
+    private Target four;
+    private Target five;
 
 
     /*
@@ -39,73 +44,99 @@ public class GingerlineToyBoxRoom extends Scenario {
         amberTrigger = triggers.osc("amber", 53000, "amber");
         redTrigger = triggers.osc("red", 53000, "red");
 
-
     }
+
+    private static final int SMALL_BALL = 7;
+    private static final int BIG_BALL = 14;
+
+    private static final int BALL_1_S = 0;
+    private static final int BALL_2_B = SMALL_BALL;
+    private static final int BALL_3_S = BALL_2_B + BIG_BALL;
+    private static final int BALL_4_B = BALL_3_S + SMALL_BALL;
+    private static final int BALL_5_S = BALL_4_B + BIG_BALL;
 
     @Override
     public void setupTargets() {
 
         Target stop = targets.stopPixelTape();
 
-        Target blueSceneRGB =
-                targets.pixelTape(SolidColour.class)
-                        .setColour(new RGB(0, 0, 255))
-                        .init(0, 72);
-        Target blueSceneRGBW =
-                targets.pixelTape(SolidColourWithWhite.class)
-                        .setColour(new RGBW(0, 0, 255, 0))
-                        .init(72, 120);
-        blueScene = targets.chain()
-                .add(stop)
-                .add(blueSceneRGB)
-                .add(blueSceneRGBW)
-                .build().oneShot(true);
+        one = targets.pixelTape(SolidColour.class)
+                .setColour(new RGB(255,0,0))
+                .init(BALL_1_S, SMALL_BALL);
 
-        Target amberSceneRGB =
-                targets.pixelTape(SolidColour.class)
-                        .setColour(new RGB(255, 60, 0))
-                        .init(0, 72);
-        Target amberSceneRGBW =
-                targets.pixelTape(SolidColourWithWhite.class)
-                        .setColour(new RGBW(255, 60, 0, 50))
-                        .init(72, 120);
-        amberScene = targets.chain()
-                .add(stop)
-                .add(amberSceneRGB)
-                .add(amberSceneRGBW)
-                .build().oneShot(true);
+        two = targets.pixelTape(SolidColour.class)
+                .setColour(new RGB(0,255,0))
+                .init(BALL_2_B, BIG_BALL);
 
-        Target redSceneRGB =
-                targets.pixelTape(SolidColour.class)
-                        .setColour(new RGB(255, 0, 0))
-                        .init(0, 72);
-        Target redSceneRGBW =
-                targets.pixelTape(SolidColourWithWhite.class)
-                        .setColour(new RGBW(255, 0, 0, 0))
-                        .init(72, 120);
-        redScene = targets.chain()
-                .add(stop)
-                .add(redSceneRGB)
-                .add(redSceneRGBW)
-                .build().oneShot(true);
+        three = targets.pixelTape(SolidColour.class)
+                .setColour(new RGB(0,0,255))
+                .init(BALL_3_S, SMALL_BALL);
+
+        four = targets.pixelTape(SolidColour.class)
+                .setColour(new RGB(255,255,0))
+                .init(BALL_4_B, BIG_BALL);
+
+        five = targets.pixelTape(SolidColour.class)
+                .setColour(new RGB(255,0,255))
+                .init(BALL_5_S, SMALL_BALL);
+
+//        Target blueSceneRGB =
+//                targets.pixelTape(SolidColour.class)
+//                        .setColour(new RGB(0, 0, 255))
+//                        .init(0, 72);
+//        Target blueSceneRGBW =
+//                targets.pixelTape(SolidColourWithWhite.class)
+//                        .setColour(new RGBW(0, 0, 255, 0))
+//                        .init(72, 120);
+//        blueScene = targets.chain()
+//                .add(stop)
+//                .add(blueSceneRGB)
+//                .add(blueSceneRGBW)
+//                .build().oneShot(true);
+//
+//        Target amberSceneRGB =
+//                targets.pixelTape(SolidColour.class)
+//                        .setColour(new RGB(255, 60, 0))
+//                        .init(0, 72);
+//        Target amberSceneRGBW =
+//                targets.pixelTape(SolidColourWithWhite.class)
+//                        .setColour(new RGBW(255, 60, 0, 50))
+//                        .init(72, 120);
+//        amberScene = targets.chain()
+//                .add(stop)
+//                .add(amberSceneRGB)
+//                .add(amberSceneRGBW)
+//                .build().oneShot(true);
+//
+//        Target redSceneRGB =
+//                targets.pixelTape(SolidColour.class)
+//                        .setColour(new RGB(255, 0, 0))
+//                        .init(0, 172);
+//        Target redSceneRGBW =
+//                targets.pixelTape(SolidColourWithWhite.class)
+//                        .setColour(new RGBW(255, 0, 0, 0))
+//                        .init(72, 120);
+//        redScene = targets.chain()
+//                .add(stop)
+//                .add(redSceneRGB)
+////                .add(redSceneRGBW)
+//                .build().oneShot(true);
 
     }
 
     @Override
     public void setupLinks() {
 
-        links
-            .link(blueTrigger, blueScene)
-            .link(amberTrigger, amberScene)
-            .link(redTrigger, redScene)
-        ;
 
         pixelTapeController
-            .init(RGB_WIDTH+160)
+            .init(BALL_5_S + SMALL_BALL)
             .start();
 
-        amberScene.activate();
-
+        one.activate();
+        two.activate();
+        three.activate();
+        four.activate();
+        five.activate();
 
     }
 

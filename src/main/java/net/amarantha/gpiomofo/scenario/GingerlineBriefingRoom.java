@@ -81,6 +81,19 @@ public class GingerlineBriefingRoom extends Scenario {
     @Override
     public void setupTargets() {
 
+        String ip = props.getString("mediaServerIP", "192.168.42.100");
+        int port = props.getInt("mediaServerOscPort", 7700);
+
+        greenBR = targets.osc(new OscCommand(ip, port, "cue/1001/start", 255));
+        blueBR = targets.osc(new OscCommand(ip, port, "cue/1002/start", 255));
+        greenCap = targets.osc(new OscCommand(ip, port, "cue/1003/start", 255));
+        blueCap = targets.osc(new OscCommand(ip, port, "cue/1004/start", 255));
+
+        panicTarget = targets.osc(new OscCommand("192.168.42.100", 7700, "alarm/c0", 255));
+        panicPiTarget = targets.http(
+                new HttpCommand(POST, "192.168.42.105", 8001, "gpiomofo/trigger/panic-briefing/fire", "", "")
+        );
+
         stopPixelTape = targets.stopPixelTape();
 
         Target fadeToBlack =
@@ -98,14 +111,6 @@ public class GingerlineBriefingRoom extends Scenario {
         int backBlue = props.getInt("backBlue", 255);
 
         RGB backColour = new RGB(backRed,backGreen,backBlue);
-
-        Target domesChase =
-            targets.pixelTape(ChasePattern.class)
-                .setColour(backColour)
-                .setBlockWidth(50)
-                .setMovement(5)
-                .setRefreshInterval(40)
-                .init(DOME_1_START, ALL_DOMES);
 
         int domeRefresh = 300;
         int pipeRefresh = 500;
@@ -203,10 +208,6 @@ public class GingerlineBriefingRoom extends Scenario {
         RGB colour2 = new RGB(255, 40, 0);
         RGB colour3 = new RGB(255, 10, 0);
         RGB colour4 = new RGB(255, 40, 0);
-//        RGB colour1 = new RGB(255, 100, 0);
-//        RGB colour2 = new RGB(100, 0, 255);
-//        RGB colour3 = new RGB(50, 80, 255);
-//        RGB colour4 = new RGB(255, 0, 100);
 
         Target spinDome1 =
             targets.pixelTape(SlidingBars.class)
@@ -238,94 +239,6 @@ public class GingerlineBriefingRoom extends Scenario {
                 .setColour(colour4)
                 .setBarChange(5, 12, 2)
                 .setFadeInTime(5000)
-                .init(DOME_4_START, DOME_SIZE);
-
-
-        int pipeActiveBar = 10;
-        int pipeActiveSpace = 5;
-
-        Target fastPipe1 =
-            targets.pixelTape(SlidingBars.class)
-                .setBarSize(pipeActiveBar, pipeActiveSpace)
-                .setRefreshRange(400, 30, -10)
-                .setColour(colour1)
-                .setReverse(true)
-                .setFadeInTime(5000)
-                .init(PIPE_1_START, PIPE_1_SIZE);
-
-        Target fastPipe2 =
-            targets.pixelTape(SlidingBars.class)
-                .setBarSize(pipeActiveBar, pipeActiveSpace)
-                .setRefreshRange(400, 30, -10)
-                .setColour(colour2)
-                .setFadeInTime(5000)
-                .init(PIPE_2_START, PIPE_2_SIZE);
-
-        Target fastPipe3 =
-            targets.pixelTape(SlidingBars.class)
-                .setBarSize(pipeActiveBar, pipeActiveSpace)
-                .setRefreshRange(400, 30, -10)
-                .setColour(colour3)
-                .setReverse(true)
-                .setFadeInTime(5000)
-                .init(PIPE_3_START, PIPE_3_SIZE);
-
-        Target fastPipe4 =
-            targets.pixelTape(SlidingBars.class)
-                .setBarSize(pipeActiveBar, pipeActiveSpace)
-                .setRefreshRange(400, 30, -10)
-                .setColour(colour4)
-                .setFadeInTime(5000)
-                .init(PIPE_4_START, PIPE_4_SIZE);
-
-        Target flashPipe1 =
-            targets.pixelTape(FlashAndFade.class)
-                .setReverse(true)
-                .setSparkColour(colour1)
-                .init(PIPE_1_START, PIPE_1_SIZE);
-
-        Target flashPipe2 =
-            targets.pixelTape(FlashAndFade.class)
-                .setSparkColour(colour2)
-                .init(PIPE_2_START, PIPE_2_SIZE);
-
-        Target flashPipe3 =
-            targets.pixelTape(FlashAndFade.class)
-                .setReverse(true)
-                .setSparkColour(colour3)
-                .init(PIPE_3_START, PIPE_3_SIZE);
-
-        Target flashPipe4 =
-            targets.pixelTape(FlashAndFade.class)
-                .setSparkColour(colour4)
-                .init(PIPE_4_START, PIPE_4_SIZE);
-
-        Target flashDome1 =
-            targets.pixelTape(FlashAndFade.class)
-                .setDarkColour(colour1)
-                .setUseSpark(false)
-                .setFadeOut(false)
-                .init(DOME_1_START, DOME_SIZE);
-
-        Target flashDome2 =
-            targets.pixelTape(FlashAndFade.class)
-                .setDarkColour(colour2)
-                .setUseSpark(false)
-                .setFadeOut(false)
-                .init(DOME_2_START, DOME_SIZE);
-
-        Target flashDome3 =
-            targets.pixelTape(FlashAndFade.class)
-                .setDarkColour(colour3)
-                .setUseSpark(false)
-                .setFadeOut(false)
-                .init(DOME_3_START, DOME_SIZE);
-
-        Target flashDome4 =
-            targets.pixelTape(FlashAndFade.class)
-                .setDarkColour(colour4)
-                .setUseSpark(false)
-                .setFadeOut(false)
                 .init(DOME_4_START, DOME_SIZE);
 
         Target pipe1 =
@@ -406,19 +319,6 @@ public class GingerlineBriefingRoom extends Scenario {
             targets.pixelTape(Wipe.class)
                 .setRefreshInterval(10)
                 .init(PIPE_4_START, PIPE_4_SIZE);
-
-        String ip = props.getString("mediaServerIP", "192.168.42.100");
-        int port = props.getInt("mediaServerOscPort", 7700);
-
-        greenBR = targets.osc(new OscCommand(ip, port, "cue/1001/start", 255));
-        blueBR = targets.osc(new OscCommand(ip, port, "cue/1002/start", 255));
-        greenCap = targets.osc(new OscCommand(ip, port, "cue/1003/start", 255));
-        blueCap = targets.osc(new OscCommand(ip, port, "cue/1004/start", 255));
-
-        panicTarget = targets.osc(new OscCommand("192.168.42.100", 7700, "alarm/c0", 255));
-        panicPiTarget = targets.http(
-            new HttpCommand(POST, "192.168.42.105", 8001, "gpiomofo/trigger/panic-briefing/fire", "", "")
-        );
 
         activationScene =
             targets.chain("Activation-Scene")
