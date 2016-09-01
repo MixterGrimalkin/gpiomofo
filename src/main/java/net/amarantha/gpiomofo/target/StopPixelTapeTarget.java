@@ -9,11 +9,18 @@ public class StopPixelTapeTarget extends Target {
 
     @Override
     protected void onActivate() {
-        pixelTape.stopAll();
+        pixelTape.stopAll(clear);
     }
 
     @Override
     protected void onDeactivate() {
 
     }
+
+    public StopPixelTapeTarget setClear(boolean clear) {
+        this.clear = clear;
+        return this;
+    }
+
+    private boolean clear = true;
 }

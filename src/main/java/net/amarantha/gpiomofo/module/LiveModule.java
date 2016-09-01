@@ -13,6 +13,7 @@ import net.amarantha.gpiomofo.service.midi.MidiService;
 import net.amarantha.gpiomofo.service.midi.MidiServiceImpl;
 import net.amarantha.gpiomofo.service.osc.OscService;
 import net.amarantha.gpiomofo.service.osc.OscServiceImpl;
+import net.amarantha.gpiomofo.utility.GpioMofoProperties;
 import net.amarantha.gpiomofo.utility.PropertyManager;
 
 public class LiveModule extends AbstractModule {
@@ -34,6 +35,7 @@ public class LiveModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        bind(PropertyManager.class).to(GpioMofoProperties.class).in(Scopes.SINGLETON);
         bind(Scenario.class).to(scenarioClass).in(Scopes.SINGLETON);
         bind(MidiService.class).to(MidiServiceImpl.class).in(Scopes.SINGLETON);
         bind(HttpService.class).to(HttpServiceImpl.class).in(Scopes.SINGLETON);

@@ -4,20 +4,20 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.pattern.*;
-import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.utility.PropertyManager;
+import net.amarantha.gpiomofo.utility.GpioMofoProperties;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
-import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;
+import static net.amarantha.gpiomofo.scenario.GingerlinePanic.PANIC;
+import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_BRIEFING;
 
 public class GingerlineBriefingRoom extends Scenario {
 
     @Inject private PixelTapeController pixeltape;
 
-    @Inject private PropertyManager props;
+    @Inject private GpioMofoProperties props;
 
     public static final int DOME_SIZE = 47;
     public static final int ALL_DOMES = DOME_SIZE * 4;
@@ -39,12 +39,12 @@ public class GingerlineBriefingRoom extends Scenario {
 
     public static final int WHOLE_TAPE = ALL_DOMES + PIPE_1_SIZE + PIPE_2_SIZE + PIPE_3_SIZE + PIPE_4_SIZE;
 
-    private Trigger panicButton;
-    private Trigger panicButtonHold;
-    private Trigger blueBriefing;
-    private Trigger greenBriefing;
-    private Trigger blueCapsule;
-    private Trigger greenCapsule;
+    private Trigger buttonRed;
+    private Trigger buttonRedHold;
+    private Trigger buttonBriefingGreen;
+    private Trigger buttonBriefingBlue;
+    private Trigger buttonCapsuleGreen;
+    private Trigger buttonCapsuleBlue;
 
     private Trigger httpBackground;
     private Trigger httpActivate;
@@ -53,16 +53,17 @@ public class GingerlineBriefingRoom extends Scenario {
     @Override
     public void setupTriggers() {
 
-        panicButton =       triggers.gpio("Panic", 2, PULL_UP, false);
-        panicButtonHold =   triggers.gpio("Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);
-        blueBriefing =      triggers.gpio("Briefing-Blue", 3, PULL_UP, false);
-        greenBriefing =     triggers.gpio("Briefing-Green", 4, PULL_UP, false);
-        blueCapsule =       triggers.gpio("Capsule-Blue", 5, PULL_UP, false);
-        greenCapsule =      triggers.gpio("Capsule-Green", 6, PULL_UP, false);
+        buttonRed =             triggers.gpio("Panic",          2, PULL_UP, false);
+        buttonRedHold =         triggers.gpio("Panic-Hold",     2, PULL_UP, false).setHoldTime(1000);
 
-        httpBackground =    triggers.http("background");
-        httpActivate =      triggers.http("active");
-        httpStop =          triggers.http("stop");
+        buttonBriefingGreen =   triggers.gpio("Briefing-Green", 4, PULL_UP, false);
+        buttonBriefingBlue =    triggers.gpio("Briefing-Blue",  3, PULL_UP, false);
+        buttonCapsuleGreen =    triggers.gpio("Capsule-Green",  6, PULL_UP, false);
+        buttonCapsuleBlue =     triggers.gpio("Capsule-Blue",   5, PULL_UP, false);
+
+        httpBackground =        triggers.http("background");
+        httpActivate =          triggers.http("active");
+        httpStop =              triggers.http("stop");
 
     }
 
@@ -70,29 +71,31 @@ public class GingerlineBriefingRoom extends Scenario {
     private Target backgroundScene;
     private Target activationScene;
 
-    private Target greenCap;
-    private Target blueCap;
-    private Target greenBR;
-    private Target blueBR;
+    private Target briefingGreen;
+    private Target briefingBlue;
+    private Target capsuleGreen;
+    private Target capsuleBlue;
 
-    private Target panicTarget;
-    private Target panicPiTarget;
+    private Target panicLights;
+    private Target panicMonitor;
 
     @Override
     public void setupTargets() {
 
-        String ip = props.getString("mediaServerIP", "192.168.42.100");
-        int port = props.getInt("mediaServerOscPort", 7700);
+        String mediaIp = props.mediaIp();
+        int mediaPort = props.mediaOscPort();
 
-        greenBR = targets.osc(new OscCommand(ip, port, "cue/1001/start", 255));
-        blueBR = targets.osc(new OscCommand(ip, port, "cue/1002/start", 255));
-        greenCap = targets.osc(new OscCommand(ip, port, "cue/1003/start", 255));
-        blueCap = targets.osc(new OscCommand(ip, port, "cue/1004/start", 255));
+        briefingGreen =     targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1001/start", 255));
+        briefingBlue =      targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1002/start", 255));
+        capsuleGreen =      targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1003/start", 255));
+        capsuleBlue =       targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1004/start", 255));
 
-        panicTarget = targets.osc(new OscCommand("192.168.42.100", 7700, "alarm/c0", 255));
-        panicPiTarget = targets.http(
-                new HttpCommand(POST, "192.168.42.105", 8001, "gpiomofo/trigger/panic-briefing/fire", "", "")
-        );
+        panicLights =       targets.osc(new OscCommand(props.lightingIp(), props.lightingOscPort(), "alarm/c0", 255));
+        panicMonitor =      targets.http(PANIC.withPath(URL_PANIC_BRIEFING+"/fire"));
+
+        ////////////////
+        // Pixel Tape //
+        ////////////////
 
         stopPixelTape = targets.stopPixelTape();
 
@@ -241,27 +244,27 @@ public class GingerlineBriefingRoom extends Scenario {
                 .setFadeInTime(5000)
                 .init(DOME_4_START, DOME_SIZE);
 
-        Target pipe1 =
+        Target fastPipe1 =
                 targets.pixelTape(PipePattern.class)
                         .setOnColour(colour1)
                         .setRefreshInterval(10)
                         .setReverse(true)
                         .init(PIPE_1_START,PIPE_1_SIZE);
 
-        Target pipe2 =
+        Target fastPipe2 =
                 targets.pixelTape(PipePattern.class)
                         .setOnColour(colour2)
                         .setRefreshInterval(10)
                         .init(PIPE_2_START,PIPE_2_SIZE);
 
-        Target pipe3 =
+        Target fastPipe3 =
                 targets.pixelTape(PipePattern.class)
                         .setOnColour(colour3)
                         .setRefreshInterval(10)
                         .setReverse(true)
                         .init(PIPE_3_START,PIPE_3_SIZE);
 
-        Target pipe4 =
+        Target fastPipe4 =
                 targets.pixelTape(PipePattern.class)
                         .setOnColour(colour4)
                         .setRefreshInterval(10)
@@ -323,55 +326,52 @@ public class GingerlineBriefingRoom extends Scenario {
         activationScene =
             targets.chain("Activation-Scene")
 
-                .add(0, greenCap)
+                .add(0,     capsuleGreen)
 
-                // Fade to black
                 .add(2000,  fadeToBlack)
                 .add(0,     stopPixelTape)
 
-                .add(0, pipe1)
-                .add(0, spinDome1)
-                .add(0, pipe2)
-                .add(0, spinDome2)
-                .add(0, pipe3)
-                .add(0, spinDome3)
-                .add(0, pipe4)
+                .add(0,     fastPipe1)
+                .add(0,     spinDome1)
+                .add(0,     fastPipe2)
+                .add(0,     spinDome2)
+                .add(0,     fastPipe3)
+                .add(0,     spinDome3)
+                .add(0,     fastPipe4)
                 .add(11000, spinDome4)
 
-                .add(0, pipe1.cancel())
-                .add(0, spinDome1.cancel())
-                .add(0, domePulse1)
-                .add(1500, pipePulse1)
+                .add(0,     fastPipe1.cancel())
+                .add(0,     spinDome1.cancel())
+                .add(0,     domePulse1)
+                .add(1500,  pipePulse1)
 
-                .add(0, pipe2.cancel())
-                .add(0, spinDome2.cancel())
-                .add(0, domePulse2)
-                .add(1500, pipePulse2)
+                .add(0,     fastPipe2.cancel())
+                .add(0,     spinDome2.cancel())
+                .add(0,     domePulse2)
+                .add(1500,  pipePulse2)
 
-                .add(0, pipe3.cancel())
-                .add(0, spinDome3.cancel())
-                .add(0, domePulse3)
-                .add(1500, pipePulse3)
+                .add(0,     fastPipe3.cancel())
+                .add(0,     spinDome3.cancel())
+                .add(0,     domePulse3)
+                .add(1500,  pipePulse3)
 
-                .add(0, pipe4.cancel())
-                .add(0, spinDome4.cancel())
-                .add(0, domePulse4)
-                .add(3000, pipePulse4)
+                .add(0,     fastPipe4.cancel())
+                .add(0,     spinDome4.cancel())
+                .add(0,     domePulse4)
+                .add(3000,  pipePulse4)
 
-                .add(0, pipePulse1.cancel())
-                .add(50, pipeWipe1)
-                .add(0, pipePulse2.cancel())
-                .add(50, pipeWipe2)
-                .add(0, pipePulse3.cancel())
-                .add(50, pipeWipe3)
-                .add(0, pipePulse4.cancel())
-                .add(500, pipeWipe4)
+                .add(0,     pipePulse1.cancel())
+                .add(50,    pipeWipe1)
+                .add(0,     pipePulse2.cancel())
+                .add(50,    pipeWipe2)
+                .add(0,     pipePulse3.cancel())
+                .add(50,    pipeWipe3)
+                .add(0,     pipePulse4.cancel())
+                .add(500,   pipeWipe4)
 
-                // Fade to Black
                 .add(3000,  fadeToBlack)
                 .add(1000,  stopPixelTape)
 
-                // Restart Background
                 .add(0,     backgroundScene)
 
             .build().oneShot(true);
@@ -382,15 +382,17 @@ public class GingerlineBriefingRoom extends Scenario {
     public void setupLinks() {
 
         links
-            .link(greenCapsule, activationScene)
-            .link(blueCapsule, blueCap)
-            .link(greenBriefing, greenBR)
-            .link(blueBriefing, blueBR)
-            .link(httpActivate,     activationScene)
-            .link(httpBackground,   backgroundScene)
-            .link(httpStop,         stopPixelTape)
-            .link(panicButton,      panicTarget)
-            .link(panicButtonHold,      panicPiTarget)
+            .link(buttonRed,            panicLights)
+            .link(buttonRedHold,        panicMonitor)
+
+            .link(buttonCapsuleGreen,   activationScene)
+            .link(buttonCapsuleBlue,    capsuleBlue)
+            .link(buttonBriefingGreen,  briefingGreen)
+            .link(buttonBriefingBlue,   briefingBlue)
+
+            .link(httpActivate,         activationScene)
+            .link(httpBackground,       backgroundScene)
+            .link(httpStop,             stopPixelTape)
         ;
 
         links.lock(30000, activationScene);

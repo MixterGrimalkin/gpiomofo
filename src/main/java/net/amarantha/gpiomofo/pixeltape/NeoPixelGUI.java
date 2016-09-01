@@ -20,7 +20,8 @@ public class NeoPixelGUI implements NeoPixel {
     @Inject private Main main;
     @Inject private Stage stage;
 
-    private int[] widths = { 47, 47, 47, 47, PIPE_4_SIZE, PIPE_3_SIZE, PIPE_2_SIZE, PIPE_1_SIZE};
+    private int[] widths = { 7, 21, 7, 21, 7 };
+//    private int[] widths = { 47, 47, 47, 47, PIPE_4_SIZE, PIPE_3_SIZE, PIPE_2_SIZE, PIPE_1_SIZE};
 
     private Circle[] pixels;
     private RGB[] colours;

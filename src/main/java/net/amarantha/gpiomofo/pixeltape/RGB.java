@@ -15,7 +15,10 @@ public class RGB {
     }
 
     public RGB withBrightness(double brightness) {
-        return new RGB((int)Math.round(red*brightness), (int)Math.round(green*brightness), (int)Math.round(blue*brightness));
+        int r = (int)Math.round(Math.min(255, Math.max(0.0, red*brightness)));
+        int g = (int)Math.round(Math.min(255, Math.max(0.0, green*brightness)));
+        int b = (int)Math.round(Math.min(255, Math.max(0.0, blue*brightness)));
+        return new RGB(r, g, b);
     }
 
     public int getRed() {

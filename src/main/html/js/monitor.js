@@ -38,9 +38,9 @@ function flashActiveMonitors() {
        flashOn = !flashOn;
    }
 
-   function getMonitorStates() {
+function getMonitorStates() {
 
-       $.ajax({
+   $.ajax({
         url: url,
         type: "GET",
         success: function(response) {

@@ -1,146 +1,364 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
+import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.RGB;
-import net.amarantha.gpiomofo.pixeltape.RGBW;
+import net.amarantha.gpiomofo.pixeltape.pattern.BrightnessRipple;
+import net.amarantha.gpiomofo.pixeltape.pattern.CyclicFade;
 import net.amarantha.gpiomofo.pixeltape.pattern.SolidColour;
-import net.amarantha.gpiomofo.pixeltape.pattern.SolidColourWithWhite;
+import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.utility.GpioMofoProperties;
+
+import java.util.Random;
+
+import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
+import static net.amarantha.gpiomofo.scenario.GingerlinePanic.PANIC;
+import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_TOYBOX;
+import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_UNDERWATER;
 
 public class GingerlineToyBoxRoom extends Scenario {
 
-    private Trigger blueTrigger;
-    private Trigger amberTrigger;
-    private Trigger redTrigger;
-
     @Inject private PixelTapeController pixelTapeController;
 
-    private Target blueScene;
-    private Target amberScene;
-    private Target redScene;
-    private Target one;
-    private Target two;
-    private Target three;
-    private Target four;
-    private Target five;
-
-
-    /*
-        Static state for 10 minutes
-
-        POP GOES THE WEASEL
-
-        Colour Fades
-
-        TIMEKEEPER. BATTLE
-
-     */
-    @Override
-    public void setupTriggers() {
-
-        blueTrigger = triggers.osc("blue", 53000, "blue");
-        amberTrigger = triggers.osc("amber", 53000, "amber");
-        redTrigger = triggers.osc("red", 53000, "red");
-
-    }
+    @Inject private GpioMofoProperties props;
 
     private static final int SMALL_BALL = 7;
-    private static final int BIG_BALL = 14;
+    private static final int BIG_BALL = 21;
 
     private static final int BALL_1_S = 0;
     private static final int BALL_2_B = SMALL_BALL;
     private static final int BALL_3_S = BALL_2_B + BIG_BALL;
     private static final int BALL_4_B = BALL_3_S + SMALL_BALL;
     private static final int BALL_5_S = BALL_4_B + BIG_BALL;
+    private static final int WHOLE_TAPE = BALL_5_S + SMALL_BALL;
+
+    private Trigger button1;
+    private Trigger button2;
+    private Trigger button3;
+    private Trigger button4;
+
+    private Trigger oscStop;
+    private Trigger oscAmber;
+    private Trigger oscBlue;
+    private Trigger oscGreen;
+    private Trigger oscPurple;
+    private Trigger oscMix1;
+    private Trigger oscMix2;
+    private Trigger oscMix3;
+    private Trigger oscSlowFade;
+    private Trigger oscFastFade;
+    private Trigger oscRippleFade;
+    private Trigger oscKillFade;
+    private Trigger oscEndOfWorld;
+    private Trigger panicButton;
+    private Trigger panicButtonHold;
+    private Target brightnessRipple;
+    private Target osc1;
+    private Target osc2;
+    private Target osc3;
+    private Target osc4;
+
+    @Override
+    public void setupTriggers() {
+
+        panicButton = triggers.gpio("Panic", 2, PULL_UP, false);
+        panicButtonHold = triggers.gpio("Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);
+
+        button1 = triggers.gpio("Button1", 3, PULL_UP, false);
+        button2 = triggers.gpio("Button2", 4, PULL_UP, false);
+        button3 = triggers.gpio("Button3", 5, PULL_UP, false);
+        button4 = triggers.gpio("Button4", 6, PULL_UP, false);
+
+        oscStop =       triggers.osc("Stop",            53000, "stop");
+        oscAmber =      triggers.osc("Amber",           53000, "amber");
+        oscBlue =       triggers.osc("Blue",            53000, "blue");
+        oscGreen =      triggers.osc("Green",           53000, "green");
+        oscPurple =     triggers.osc("Purple",          53000, "purple");
+        oscMix1 =       triggers.osc("Mix-1",           53000, "mix1");
+        oscMix2 =       triggers.osc("Mix-2",           53000, "mix2");
+        oscMix3 =       triggers.osc("Mix-3",           53000, "mix3");
+        oscSlowFade =   triggers.osc("Slow-Fade",       53000, "slow-fade");
+        oscFastFade =   triggers.osc("Fast-Fade",       53000, "fast-fade");
+        oscRippleFade = triggers.osc("Ripple-Fade",     53000, "ripple-fade");
+        oscKillFade =   triggers.osc("Kill-Fade",       53000, "kill-fade");
+        oscEndOfWorld = triggers.osc("End-Of-World",    53000, "end-of-world");
+
+    }
+
+    private Target stop;
+    private Target stopAndClear;
+    private Target amberScene;
+    private Target blueScene;
+    private Target greenScene;
+    private Target purpleScene;
+    private Target mix1;
+    private Target mix2;
+    private Target mix3;
+    private Target mix4;
+    private Target mix5;
+    private Target mix6;
+    private Target slowFade;
+    private Target fastFade;
+    private Target rippleFade;
+    private Target killFade;
+    private Target endOfWorld;
+    private Target cancelEndOfWorld;
+    private Target panicLights;
+    private Target panicMonitor;
+
+    private Target buildGlobes(RGB colour) {
+        RGB[] colours = new RGB[5];
+        double variation = 0.8;
+        for ( int i=0; i<5; i++ ) {
+            int redVar = (int)Math.round(variation * Math.max(30, colour.getRed()));
+            int greenVar = (int)Math.round(variation * Math.max(30, colour.getGreen()));
+            int blueVar = (int)Math.round(variation * Math.max(30, colour.getBlue()));
+            double factor1 = (Math.random() * 2 * redVar) - redVar;
+            double factor2 = (Math.random() * 2 * greenVar) - greenVar;
+            double factor3 = (Math.random() * 2 * blueVar) - blueVar;
+            int red = (int)Math.round(Math.max(0, Math.min(255, colour.getRed()+factor1)));
+            int green = (int)Math.round(Math.max(0, Math.min(255, colour.getGreen()+factor2)));
+            int blue = (int)Math.round(Math.max(0, Math.min(255, colour.getBlue()+factor3)));
+            colours[i] = new RGB(red, green, blue);
+        }
+        return buildGlobes(colours[0], colours[1], colours[2], colours[3], colours[4]);
+    }
+
+    private Target buildGlobes(RGB colour1, RGB colour2, RGB colour3, RGB colour4, RGB colour5) {
+        return targets.chain()
+            .add(targets.pixelTape(SolidColour.class)
+                .setColour(colour1)
+                .init(BALL_1_S, SMALL_BALL))
+            .add(targets.pixelTape(SolidColour.class)
+                .setColour(colour2)
+                .init(BALL_2_B, BIG_BALL))
+            .add(targets.pixelTape(SolidColour.class)
+                .setColour(colour3)
+                .init(BALL_3_S, SMALL_BALL))
+            .add(targets.pixelTape(SolidColour.class)
+                .setColour(colour4)
+                .init(BALL_4_B, BIG_BALL))
+            .add(targets.pixelTape(SolidColour.class)
+                .setColour(colour5)
+                .init(BALL_5_S, SMALL_BALL))
+            .build().oneShot(true);
+    }
 
     @Override
     public void setupTargets() {
 
-        Target stop = targets.stopPixelTape();
+        String lightingIp = props.lightingIp();
+        int lightingPort = props.lightingOscPort();
 
-        one = targets.pixelTape(SolidColour.class)
-                .setColour(new RGB(255,0,0))
-                .init(BALL_1_S, SMALL_BALL);
+        panicLights =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c5", 255));
+        panicMonitor =  targets.http(PANIC.withPath(URL_PANIC_TOYBOX+"/fire"));
 
-        two = targets.pixelTape(SolidColour.class)
-                .setColour(new RGB(0,255,0))
-                .init(BALL_2_B, BIG_BALL);
+        stop = targets.stopPixelTape().setClear(false);
+        stopAndClear = targets.stopPixelTape().setClear(true);
 
-        three = targets.pixelTape(SolidColour.class)
-                .setColour(new RGB(0,0,255))
-                .init(BALL_3_S, SMALL_BALL);
+        String mediaIp = props.mediaIp();
+        int mediaPort = props.mediaOscPort();
 
-        four = targets.pixelTape(SolidColour.class)
-                .setColour(new RGB(255,255,0))
-                .init(BALL_4_B, BIG_BALL);
+        osc1 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1401/start", 255));
+        osc2 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1402/start", 255));
+        osc3 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1403/start", 255));
+        osc4 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1404/start", 255));
 
-        five = targets.pixelTape(SolidColour.class)
-                .setColour(new RGB(255,0,255))
-                .init(BALL_5_S, SMALL_BALL);
+        RGB white = new RGB(255,255,255);
+        RGB amber =  props.getColour("Amber");
+        RGB blue =   props.getColour("Blue");
+        RGB green =  props.getColour("Green");
+        RGB purple = props.getColour("Purple");
 
-//        Target blueSceneRGB =
-//                targets.pixelTape(SolidColour.class)
-//                        .setColour(new RGB(0, 0, 255))
-//                        .init(0, 72);
-//        Target blueSceneRGBW =
-//                targets.pixelTape(SolidColourWithWhite.class)
-//                        .setColour(new RGBW(0, 0, 255, 0))
-//                        .init(72, 120);
-//        blueScene = targets.chain()
-//                .add(stop)
-//                .add(blueSceneRGB)
-//                .add(blueSceneRGBW)
-//                .build().oneShot(true);
-//
-//        Target amberSceneRGB =
-//                targets.pixelTape(SolidColour.class)
-//                        .setColour(new RGB(255, 60, 0))
-//                        .init(0, 72);
-//        Target amberSceneRGBW =
-//                targets.pixelTape(SolidColourWithWhite.class)
-//                        .setColour(new RGBW(255, 60, 0, 50))
-//                        .init(72, 120);
-//        amberScene = targets.chain()
-//                .add(stop)
-//                .add(amberSceneRGB)
-//                .add(amberSceneRGBW)
-//                .build().oneShot(true);
-//
-//        Target redSceneRGB =
-//                targets.pixelTape(SolidColour.class)
-//                        .setColour(new RGB(255, 0, 0))
-//                        .init(0, 172);
-//        Target redSceneRGBW =
-//                targets.pixelTape(SolidColourWithWhite.class)
-//                        .setColour(new RGBW(255, 0, 0, 0))
-//                        .init(72, 120);
-//        redScene = targets.chain()
-//                .add(stop)
-//                .add(redSceneRGB)
-////                .add(redSceneRGBW)
-//                .build().oneShot(true);
+        amberScene =
+            targets.chain()
+                .add(stop)
+                .add(buildGlobes(amber))
+            .build().oneShot(true);
+        blueScene =
+            targets.chain()
+                .add(stop)
+                .add(buildGlobes(blue))
+            .build().oneShot(true);
+        greenScene =
+            targets.chain()
+                .add(stop)
+                .add(buildGlobes(green))
+            .build().oneShot(true);
+        purpleScene =
+            targets.chain()
+                .add(stop)
+                .add(buildGlobes(purple))
+            .build().oneShot(true);
+        mix1 =
+            targets.chain()
+                .add(stop)
+                .add(buildGlobes(purple, green, blue, green, amber))
+            .build().oneShot(true);
+        mix2 =
+            targets.chain()
+                .add(stop)
+                .add(buildGlobes(blue, purple, amber, blue, green))
+            .build().oneShot(true);
+        mix3 =
+            targets.chain()
+                .add(stop)
+                .add(buildGlobes(green, amber, blue, purple, amber))
+            .build().oneShot(true);
+        mix4 =
+            targets.chain()
+                .add(stop)
+                .add(buildGlobes(green, blue, white, purple, amber))
+            .build().oneShot(true);
+        mix5 =
+            targets.chain()
+                .add(stop)
+                .add(buildGlobes(purple, white, blue, white, green))
+            .build().oneShot(true);
+        mix6 =
+            targets.chain()
+                .add(stop)
+                .add(buildGlobes(white, green, purple, amber, white))
+            .build().oneShot(true);
+
+        Target slowFadeInner = targets.pixelTape(CyclicFade.class)
+                .setMin(0.5).setMax(1.0).setDelta(0.05).setRefreshInterval(50)
+        .init(0, WHOLE_TAPE);
+
+        Target fastFadeInner = targets.pixelTape(CyclicFade.class)
+                .setMin(0.3).setMax(1.0).setDelta(0.25).setRefreshInterval(50)
+        .init(0, WHOLE_TAPE);
+
+        Target rippleFadeInner = targets.pixelTape(BrightnessRipple.class)
+                .init(0, WHOLE_TAPE);
+
+        Target reallyFastFadeInner = targets.pixelTape(CyclicFade.class)
+                .setMin(0.2).setMax(1.0).setDelta(0.5).setRefreshInterval(50)
+                .init(0, WHOLE_TAPE);
+
+        slowFade = targets.chain()
+                .add(reallyFastFadeInner.cancel())
+                .add(fastFadeInner.cancel())
+                .add(rippleFadeInner.cancel())
+                .add(slowFadeInner)
+                .build().oneShot(true);
+
+        fastFade = targets.chain()
+                .add(reallyFastFadeInner.cancel())
+                .add(slowFadeInner.cancel())
+                .add(rippleFadeInner.cancel())
+                .add(fastFadeInner)
+                .build().oneShot(true);
+
+        rippleFade = targets.chain()
+                .add(reallyFastFadeInner.cancel())
+                .add(slowFadeInner.cancel())
+                .add(fastFadeInner.cancel())
+                .add(rippleFadeInner)
+                .build().oneShot(true);
+
+        Target reallyFastFade = targets.chain()
+                .add(slowFadeInner.cancel())
+                .add(fastFadeInner.cancel())
+                .add(rippleFadeInner.cancel())
+                .add(reallyFastFadeInner)
+                .build().oneShot(true);
+
+        killFade = targets.chain()
+                .add(reallyFastFadeInner.cancel())
+                .add(slowFadeInner.cancel())
+                .add(fastFadeInner.cancel())
+                .build().oneShot(true);
+
+        int delay = 75;
+
+        endOfWorld = targets.chain()
+                .add(reallyFastFade)
+                .add(delay, mix1)
+                .add(delay, amberScene)
+                .add(delay, mix2)
+                .add(delay, mix3)
+                .add(delay, mix4)
+                .add(delay, mix5)
+                .add(delay, mix6)
+                .add(delay, blueScene)
+                .add(delay, mix4)
+                .add(delay, mix5)
+                .add(delay, mix6)
+                .add(delay, blueScene)
+                .add(delay, mix2)
+                .add(delay, amberScene)
+                .add(delay, greenScene)
+                .add(delay, mix4)
+                .add(delay, mix5)
+                .add(delay, mix6)
+                .add(delay, mix4)
+                .add(delay, mix5)
+                .add(delay, mix6)
+                .add(delay, purpleScene)
+                .add(delay, mix3)
+                .add(delay, mix1)
+                .add(delay, purpleScene)
+                .build().repeat(true).oneShot(true);
+
+        cancelEndOfWorld = endOfWorld.cancel();
 
     }
 
     @Override
     public void setupLinks() {
 
+        links
+                .link(oscStop, cancelEndOfWorld, stopAndClear)
+                .link(oscAmber, amberScene)
+                .link(oscBlue, blueScene)
+                .link(oscGreen, greenScene)
+                .link(oscPurple, purpleScene)
+                .link(oscMix1, mix1)
+                .link(oscMix2, mix2)
+                .link(oscMix3, mix3)
+                .link(oscSlowFade, slowFade)
+                .link(oscFastFade, fastFade)
+                .link(oscRippleFade, rippleFade)
+                .link(oscKillFade, killFade)
+                .link(oscEndOfWorld, endOfWorld)
+
+                .link(panicButton, panicLights)
+                .link(panicButtonHold, panicMonitor)
+                .link(button1, osc1)
+                .link(button2, osc2)
+                .link(button3, osc3)
+                .link(button4, osc4)
+        ;
+
+//        targets.chain()
+//                .add(5000, amberScene)
+//                .add(5000, rippleFade)
+//                .add(5000, blueScene)
+//                .add(5000, rippleFade)
+//                .add(5000, greenScene)
+//                .add(5000, rippleFade)
+//                .add(5000, purpleScene)
+//                .add(5000, rippleFade)
+//                .add(5000, mix1)
+//                .add(5000, slowFade)
+//                .add(5000, mix2)
+//                .add(5000, fastFade)
+//                .add(5000, mix3)
+//                .add(15000, endOfWorld)
+//                .add(0, cancelEndOfWorld)
+//                .add(2000, stopAndClear)
+//                .build().repeat(true)
+////                .activate()
+//        ;
 
         pixelTapeController
             .init(BALL_5_S + SMALL_BALL)
             .start();
 
-        one.activate();
-        two.activate();
-        three.activate();
-        four.activate();
-        five.activate();
-
     }
-
-    public static final int RGB_WIDTH = 72;
-    public static final int RGBW_WIDTH = 120;
 
 }

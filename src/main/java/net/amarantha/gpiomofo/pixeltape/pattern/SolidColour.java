@@ -23,7 +23,6 @@ public class SolidColour extends PixelTapeTarget {
     @Override
     protected void update() {
         if ( !done ) {
-            System.out.println("Updating RGB");
             for (int i = 0; i < getPixelCount(); i++) {
                 setPixel(i, colour);
             }

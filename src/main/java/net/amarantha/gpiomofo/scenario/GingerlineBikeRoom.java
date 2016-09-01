@@ -10,69 +10,102 @@ import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.utility.GpioMofoProperties;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
+import static net.amarantha.gpiomofo.scenario.GingerlinePanic.*;
 import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;
 
 public class GingerlineBikeRoom extends Scenario {
 
-    private Trigger underwaterButton;
-    private Trigger panicUnderwater;
-    private Trigger panicUnderwaterHold;
-    private Trigger panicBikes;
-    private Trigger panicBikesHold;
-    private Trigger panicKitchen;
-    private Trigger panicKitchenHold;
-    private Trigger interrupt;
-    private Trigger lightButton1;
-    private Trigger lightButton2;
-    private Trigger lightButton3;
-    private Trigger lightButton4;
+    @Inject private GpioMofoProperties props;
+    @Inject private PixelTapeController pixeltape;
 
-    private Target underwaterControl;
-    private Target panicUnderwaterLights;
-    private Target panicUnderwaterPi;
-    private Target panicBikesLights;
-    private Target panicBikesPi;
-    private Target panicKitchenLights;
-    private Target panicKitchenPi;
-    private Target lightScene1;
-    private Target lightScene2;
-    private Target lightScene3;
-    private Target lightScene4;
+    private Trigger panicChamber2;
+    private Trigger panicChamber2Hold;
+    private Trigger panicChamber3;
+    private Trigger panicChamber3Hold;
+    private Trigger panicChamber4;
+    private Trigger panicChamber4Hold;
 
-    @Inject
-    private PixelTapeController pixeltape;
-    private Target stop;
-    private Trigger lightButton0;
-    private Trigger lightButtonExit;
-    private Target exitScene;
+    private Trigger buttonChamber2Green;
+
+    private Trigger oscPixelTape0;
+    private Trigger oscPixelTape1;
+    private Trigger oscPixelTape2;
+    private Trigger oscPixelTape3;
+    private Trigger oscPixelTape4;
+    private Trigger oscPixelTapeExit;
+
+    private Trigger buttonChamber3a;
+    private Trigger buttonChamber3b;
+    private Trigger buttonChamber3c;
+    private Trigger buttonChamber3d;
+    private Trigger buttonChamber3e;
 
     @Override
     public void setupTriggers() {
 
-        interrupt = triggers.gpio("INT", 0, PULL_UP, true);
+        panicChamber2 =       triggers.gpio("C2-Panic",         2, PULL_UP, false);
+        panicChamber2Hold =   triggers.gpio("C2-Panic-Hold",    2, PULL_UP, false).setHoldTime(1000);
+        panicChamber3 =       triggers.gpio("C3-Panic",         3, PULL_UP, false);
+        panicChamber3Hold =   triggers.gpio("C3-Panic-Hold",    3, PULL_UP, false).setHoldTime(1000);
+        panicChamber4 =       triggers.gpio("C4-Panic",         4, PULL_UP, false);
+        panicChamber4Hold =   triggers.gpio("C4-Panic-Hold",    4, PULL_UP, false).setHoldTime(1000);
 
-        underwaterButton =      triggers.gpio("Underwater-Button", 5, PULL_UP, false);
-        panicUnderwater =       triggers.gpio("Panic-2", 2, PULL_UP, false);
-        panicUnderwaterHold =   triggers.gpio("Panic-2-Hold", 2, PULL_UP, false).setHoldTime(1000);
-        panicBikes =            triggers.gpio("Panic-3", 3, PULL_UP, false);
-        panicBikesHold =        triggers.gpio("Panic-3-Hold", 3, PULL_UP, false).setHoldTime(1000);
-        panicKitchen =          triggers.gpio("Panic-4", 4, PULL_UP, false);
-        panicKitchenHold =      triggers.gpio("Panic-4-Hold", 4, PULL_UP, false).setHoldTime(1000);
+        buttonChamber2Green = triggers.gpio("C2-Button-Green",  5, PULL_UP, false);
 
-        lightButton0 = triggers.osc("0", 53000, "bike-lights-0");
-        lightButton1 = triggers.osc("1", 53000, "bike-lights-1");
-        lightButton2 = triggers.osc("2", 53000, "bike-lights-2");
-        lightButton3 = triggers.osc("3", 53000, "bike-lights-3");
-        lightButton4 = triggers.osc("4", 53000, "bike-lights-4");
+        oscPixelTape0 =     triggers.osc("Tape-0", 53000, "bike-lights-0");
+        oscPixelTape1 =     triggers.osc("Tape-1", 53000, "bike-lights-1");
+        oscPixelTape2 =     triggers.osc("Tape-2", 53000, "bike-lights-2");
+        oscPixelTape3 =     triggers.osc("Tape-3", 53000, "bike-lights-3");
+        oscPixelTape4 =     triggers.osc("Tape-4", 53000, "bike-lights-4");
+        oscPixelTapeExit =  triggers.osc("Tape-5", 53000, "bike-exit");
 
-        lightButtonExit = triggers.osc("5", 53000, "bike-exit");
+        buttonChamber3a =   triggers.gpio("C3-Button-A", 6,  PULL_UP, false);
+        buttonChamber3b =   triggers.gpio("C3-Button-B", 7,  PULL_UP, false);
+        buttonChamber3c =   triggers.gpio("C3-Button-C", 12, PULL_UP, false);
+        buttonChamber3d =   triggers.gpio("C3-Button-D", 13, PULL_UP, false);
+        buttonChamber3e =   triggers.gpio("C3-Button-E", 14, PULL_UP, false);
 
     }
 
+    private Target panicLightsChamber2;
+    private Target panicMonitorChamber2;
+    private Target panicLightsChamber3;
+    private Target panicMonitorChamber3;
+    private Target panicLightsChamber4;
+    private Target panicMonitorChamber4;
+
+    private Target underwaterControl;
+
+    private Target lightStop;
+    private Target lightScene1;
+    private Target lightScene2;
+    private Target lightScene3;
+    private Target lightScene4;
+    private Target lightSceneExit;
+
     @Override
     public void setupTargets() {
+
+        String lightingIp = props.lightingIp();
+        int lightingPort = props.lightingOscPort();
+
+        panicLightsChamber2 =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2", 255));
+        panicMonitorChamber2 =  targets.http(PANIC.withPath(URL_PANIC_UNDERWATER+"/fire"));
+
+        panicLightsChamber3 =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c3", 255));
+        panicMonitorChamber3 =  targets.http(PANIC.withPath(URL_PANIC_BIKES+"/fire"));
+
+        panicLightsChamber4 =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c4", 255));
+        panicMonitorChamber4 =  targets.http(PANIC.withPath(URL_PANIC_KITCHEN+"/fire"));
+
+        underwaterControl = targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2slide", 255));
+
+        ////////////////
+        // Pixel Tape //
+        ////////////////
 
         Target bars1 = targets
                 .pixelTape(SlidingBars.class)
@@ -85,7 +118,6 @@ public class GingerlineBikeRoom extends Scenario {
                 .setMin(0.1)
                 .setMax(0.4)
                 .setMinPause(100)
-//                .setMaxPause(20)
                 .setIntensityDelta(0.7)
                 .init(0,150);
 
@@ -141,56 +173,36 @@ public class GingerlineBikeRoom extends Scenario {
                 .init(0, 150);
 
 
-        stop = targets.stopPixelTape();
+        lightStop = targets.stopPixelTape();
 
         lightScene1 = targets.chain("One")
-                .add(stop)
+                .add(lightStop)
                 .add(fade1)
                 .add(bars1)
                 .build().oneShot(true);
 
         lightScene2 = targets.chain("Two")
-                .add(stop)
+                .add(lightStop)
                 .add(fade2)
                 .add(bars2)
                 .build().oneShot(true);
 
         lightScene3 = targets.chain("Three")
-                .add(stop)
+                .add(lightStop)
                 .add(fade3)
                 .add(bars3)
                 .build().oneShot(true);
 
         lightScene4 = targets.chain("Four")
-                .add(stop)
+                .add(lightStop)
                 .add(fade4)
                 .add(bars4)
                 .build().oneShot(true);
 
-        exitScene = targets.chain("Exit")
-                .add(stop)
+        lightSceneExit = targets.chain("Exit")
+                .add(lightStop)
                 .add(exit)
                 .build().oneShot(true);
-
-        String ipBen = "192.168.42.100";
-        int portBen = 7700;
-
-        underwaterControl = targets.osc(new OscCommand(ipBen, portBen, "alarm/c2slide", 255));
-
-        panicUnderwaterLights = targets.osc(new OscCommand(ipBen, portBen, "alarm/c2", 255));
-        panicUnderwaterPi = targets.http(
-                new HttpCommand(POST, "192.168.42.105", 8001, "gpiomofo/trigger/panic-underwater/fire", "", "")
-        );
-
-        panicBikesLights = targets.osc(new OscCommand(ipBen, portBen, "alarm/c3", 255));
-        panicBikesPi = targets.http(
-                new HttpCommand(POST, "192.168.42.105", 8001, "gpiomofo/trigger/panic-bikes/fire", "", "")
-        );
-
-        panicKitchenLights = targets.osc(new OscCommand(ipBen, portBen, "alarm/c4"));
-        panicKitchenPi = targets.http(
-                new HttpCommand(POST, "192.168.42.105", 8001, "gpiomofo/trigger/panic-kitchen/fire", "", "")
-        );
 
     }
 
@@ -199,43 +211,32 @@ public class GingerlineBikeRoom extends Scenario {
 
 
         links
-                .link(lightButtonExit, exitScene)
-                .link(lightButton0, stop)
-                .link(lightButton1, lightScene1)
-                .link(lightButton2, lightScene2)
-                .link(lightButton3, lightScene3)
-                .link(lightButton4, lightScene4)
-                .link(underwaterButton,     underwaterControl)
-                .link(panicUnderwater,      panicUnderwaterLights)
-                .link(panicUnderwaterHold,  panicUnderwaterPi)
-                .link(panicBikes,           panicBikesLights)
-                .link(panicBikesHold,       panicBikesPi)
-                .link(panicKitchen,         panicKitchenLights)
-                .link(panicKitchenHold,     panicKitchenPi)
+                .link(oscPixelTape0,        lightStop)
+                .link(oscPixelTape1,        lightScene1)
+                .link(oscPixelTape2,        lightScene2)
+                .link(oscPixelTape3,        lightScene3)
+                .link(oscPixelTape4,        lightScene4)
+                .link(oscPixelTapeExit,     lightSceneExit)
+
+                .link(buttonChamber3a,      lightScene1)
+                .link(buttonChamber3b,      lightScene2)
+                .link(buttonChamber3c,      lightScene3)
+                .link(buttonChamber3d,      lightScene4)
+                .link(buttonChamber3e,      lightSceneExit)
+
+                .link(panicChamber2,        panicLightsChamber2)
+                .link(panicChamber2Hold,    panicMonitorChamber2)
+                .link(panicChamber3,        panicLightsChamber3)
+                .link(panicChamber3Hold,    panicMonitorChamber3)
+                .link(panicChamber4,        panicLightsChamber4)
+                .link(panicChamber4Hold,    panicMonitorChamber4)
+
+                .link(buttonChamber2Green,  underwaterControl)
         ;
 
-        pixeltape.init(150).start();
-
-//        try {
-//            I2CBus bus = I2CFactory.getInstance(1);
-//            final I2CDevice device = bus.getDevice(0x70);
-//            new Timer().schedule(new TimerTask() {
-//                @Override
-//                public void run() {
-//                    while ( true ) {
-//                        try {
-//                            System.out.println("Read: " + device.read());
-//                            System.out.println("Read6: " + device.read(6));
-//                            Thread.sleep(1000);
-//                        } catch (IOException | InterruptedException e) {
-//                            System.out.println("Fucked");
-//                        }
-//                    }
-//                }
-//            }, 1000);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        pixeltape
+                .init(150)
+                .start();
 
     }
 

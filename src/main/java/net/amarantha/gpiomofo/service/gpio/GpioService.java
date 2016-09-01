@@ -69,6 +69,10 @@ public abstract class GpioService {
         }
     }
 
+    public void setInputTimeout(int pin, long timeout) {
+        inputTimeouts.put(pin, timeout);
+    }
+
     ////////////////////
     // Digital Output //
     ////////////////////
