@@ -1,10 +1,9 @@
 package net.amarantha.gpiomofo.scenario;
 
-import com.google.inject.Inject;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.utility.GpioMofoProperties;
+import net.amarantha.gpiomofo.utility.Property;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.PANIC;
@@ -12,7 +11,11 @@ import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_GAMESHOW
 
 public class GingerlineGameShowRoom extends Scenario {
 
-    @Inject private GpioMofoProperties props;
+    @Property("ButtonHoldTime")         private int     holdTime;
+    @Property("LightingServerIP")       private String  lightingIp;
+    @Property("LightingServerOscPort")  private int     lightingPort;
+    @Property("MediaServerIP")          private String  mediaIp;
+    @Property("MediaServerOscPort")     private int     mediaPort;
 
     private Trigger panicButton;
     private Trigger panicButtonHold;
@@ -32,18 +35,16 @@ public class GingerlineGameShowRoom extends Scenario {
         panicButton =       triggers.gpio("Panic",      0, PULL_UP, false);
         panicButtonHold =   triggers.gpio("Panic-Hold", 0, PULL_UP, false).setHoldTime(1000);
 
-        int podiumHoldTime = props.getInt("podiumHoldTime", 100);
+        podiumButton1 =     triggers.gpio("Podium-1",   2, PULL_UP, true).setHoldTime(holdTime);
+        podiumButton2 =     triggers.gpio("Podium-2",   3, PULL_UP, true).setHoldTime(holdTime);
+        podiumButton3 =     triggers.gpio("Podium-3",   4, PULL_UP, true).setHoldTime(holdTime);
+        podiumButton4 =     triggers.gpio("Podium-4",   5, PULL_UP, true).setHoldTime(holdTime);
 
-        podiumButton1 =     triggers.gpio("Podium-1",   2, PULL_UP, true).setHoldTime(podiumHoldTime);
-        podiumButton2 =     triggers.gpio("Podium-2",   3, PULL_UP, true).setHoldTime(podiumHoldTime);
-        podiumButton3 =     triggers.gpio("Podium-3",   4, PULL_UP, true).setHoldTime(podiumHoldTime);
-        podiumButton4 =     triggers.gpio("Podium-4",   5, PULL_UP, true).setHoldTime(podiumHoldTime);
-
-        effectButton01 =    triggers.gpio("FX01", 6, PULL_UP, false).setHoldTime(podiumHoldTime);
-        effectButton02 =    triggers.gpio("FX02", 7, PULL_UP, false).setHoldTime(podiumHoldTime);
-        effectButton03 =    triggers.gpio("FX03", 8, PULL_UP, false).setHoldTime(podiumHoldTime);
-        effectButton04 =    triggers.gpio("FX04", 9, PULL_UP, false).setHoldTime(podiumHoldTime);
-        effectButton05 =    triggers.gpio("FX05", 10, PULL_UP, false).setHoldTime(podiumHoldTime);
+        effectButton01 =    triggers.gpio("FX01",       6, PULL_UP, false).setHoldTime(holdTime);
+        effectButton02 =    triggers.gpio("FX02",       7, PULL_UP, false).setHoldTime(holdTime);
+        effectButton03 =    triggers.gpio("FX03",       8, PULL_UP, false).setHoldTime(holdTime);
+        effectButton04 =    triggers.gpio("FX04",       9, PULL_UP, false).setHoldTime(holdTime);
+        effectButton05 =    triggers.gpio("FX05",       10, PULL_UP, false).setHoldTime(holdTime);
 
     }
 
@@ -62,11 +63,8 @@ public class GingerlineGameShowRoom extends Scenario {
     @Override
     public void setupTargets() {
 
-        panicTarget =       targets.osc(new OscCommand(props.lightingIp(), props.lightingOscPort(), "alarm/c1", 255));
+        panicTarget =       targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c1", 255));
         panicHoldTarget =   targets.http(PANIC.withPath(URL_PANIC_GAMESHOW+"/fire"));
-
-        String mediaIp = props.mediaIp();
-        int mediaPort = props.mediaOscPort();
 
         podiumTarget1 =     targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1101/start", 255));
         podiumTarget2 =     targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1102/start", 255));

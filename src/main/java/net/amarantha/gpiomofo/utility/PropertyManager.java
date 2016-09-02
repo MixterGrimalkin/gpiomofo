@@ -1,33 +1,42 @@
 package net.amarantha.gpiomofo.utility;
 
+import net.amarantha.gpiomofo.pixeltape.RGB;
+
 import javax.inject.Singleton;
 import java.io.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.*;
 
 @Singleton
 public class PropertyManager {
 
     public static final String PROPS_FILENAME = "application.properties";
+    public static final String DEFAULT_FILENAME = "default.properties";
 
     private static boolean simulationMode;
 
     protected Properties props;
+    private Properties defProps;
 
     public PropertyManager() {
-        props = new Properties();
-        loadProperties();
+        defProps = loadProperties(DEFAULT_FILENAME, false);
+        props = loadProperties(PROPS_FILENAME, true);
     }
 
-    protected void loadProperties() {
+    /////////////////
+    // Persistence //
+    /////////////////
+
+    protected Properties loadProperties(String filename, boolean create) {
+        Properties properties = new Properties();
         try {
-            File propsFile = new File(PROPS_FILENAME);
+            File propsFile = new File(filename);
             if ( propsFile.exists()) {
                 FileInputStream in = new FileInputStream(propsFile);
-                props.load(new FileInputStream(propsFile));
+                properties.load(new FileInputStream(propsFile));
                 in.close();
-            } else {
+            } else if ( create ) {
                 FileWriter writer = new FileWriter(propsFile);
                 writer.write("# Application Properties");
                 writer.close();
@@ -35,6 +44,7 @@ public class PropertyManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return properties;
     }
 
     protected void saveProperties() {
@@ -46,56 +56,92 @@ public class PropertyManager {
         }
     }
 
-    public void setProperty(String propName, int value) {
-        setProperty(propName, ""+value);
-    }
+    /////////////////////
+    // Basic Set & Get //
+    /////////////////////
 
     public void setProperty(String propName, String value) {
+        if ( PLACEHOLDER.equals(value) ) {
+            throw new IllegalArgumentException("That value is the placeholder, sorry!");
+        }
         props.setProperty(propName, value);
         saveProperties();
     }
 
-    public String getString(String propName, String defaultValue) {
+    private static final String PLACEHOLDER = "*** Please Set This Value ***";
+
+    public String getString(String propName) throws PropertyNotFoundException {
         String propStr = props.getProperty(propName);
-        if ( propStr==null ) {
-            propStr = defaultValue;
-            setProperty(propName, defaultValue);
+        if ( propStr==null || PLACEHOLDER.equals(propStr) ) {
+            propStr = defProps.getProperty(propName);
+            if ( propStr==null ) {
+                props.setProperty(propName, PLACEHOLDER);
+                saveProperties();
+                throw new PropertyNotFoundException("Property '" + propName + "' not found in " + PROPS_FILENAME);
+            } else {
+                setProperty(propName, propStr);
+            }
         }
         return propStr;
     }
 
-    public Long getLong(String propName, Long defaultValue) {
-        String propStr = props.getProperty(propName);
-        if ( propStr==null ) {
-            propStr = defaultValue.toString();
-            setProperty(propName, propStr);
-        }
+    public String getString(String propName, String defaultValue) {
         try {
-            return Long.parseLong(propStr);
-        } catch ( NumberFormatException e ) {
+            return getString(propName);
+        } catch (PropertyNotFoundException e) {
+            setProperty(propName, defaultValue);
             return defaultValue;
         }
     }
 
-    public Integer getInt(String propName, Integer defaultValue) {
-        String propStr = props.getProperty(propName);
-        if ( propStr==null ) {
-            propStr = defaultValue.toString();
-            setProperty(propName, propStr);
-        }
+    /////////////
+    // Integer //
+    /////////////
+
+    public Integer getInt(String propName) throws PropertyNotFoundException {
         try {
-            return Integer.parseInt(propStr);
+            return Integer.parseInt(getString(propName));
         } catch ( NumberFormatException e ) {
+            throw new PropertyNotFoundException("Property '" + propName + "' in " + PROPS_FILENAME + " should be a number");
+        }
+    }
+
+    public Integer getInt(String propName, Integer defaultValue) {
+        try {
+            return getInt(propName);
+        } catch (PropertyNotFoundException e) {
+            setProperty(propName, defaultValue.toString());
+            saveProperties();
             return defaultValue;
         }
     }
+
+    /////////
+    // RGB //
+    /////////
+
+    public RGB getRGB(String propName) throws PropertyNotFoundException {
+        String[] rgb = getString(propName).split(",");
+        if ( rgb.length==3 ) {
+            try {
+                int r = Integer.parseInt(rgb[0].trim());
+                int g = Integer.parseInt(rgb[1].trim());
+                int b = Integer.parseInt(rgb[2].trim());
+                return new RGB(r, g, b);
+            } catch ( NumberFormatException ignored ) {}
+        }
+        throw new PropertyNotFoundException("Property '" + propName + "' is not a valid RGB colour");
+    }
+
+    ////////////////
+    // IP Address //
+    ////////////////
 
     private String ip;
 
     public String getIp() {
         if ( ip==null ) {
             StringBuilder output = new StringBuilder();
-
             Process p;
             try {
                 p = Runtime.getRuntime().exec("sh ip.sh");
@@ -114,6 +160,10 @@ public class PropertyManager {
         return ip;
     }
 
+    ////////////////////////////
+    // Command Line Arguments //
+    ////////////////////////////
+
     private static boolean withServer = true;
 
     public boolean isWithServer() {
@@ -128,6 +178,49 @@ public class PropertyManager {
         List<String> arguments = Arrays.asList(args);
         withServer = arguments.contains("-withserver");
         simulationMode = arguments.contains("-simulation");
+    }
+
+    ////////////////////////
+    // Property Injection //
+    ////////////////////////
+
+    public Map<String, String> injectProperties(Object object) throws PropertyNotFoundException {
+
+        Map<String, String> result = new HashMap<>();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Field f : object.getClass().getDeclaredFields() ) {
+            Annotation a = f.getAnnotation(Property.class);
+            if ( a!=null ) {
+                String propName = ((Property)a).value();
+                try {
+                    f.setAccessible(true);
+                    if ( f.getType()==String.class ) {
+                        if ( propName.equals("IP") ) {
+                            f.set(object, getIp());
+                        } else {
+                            f.set(object, getString(propName));
+                        }
+                    } else if (f.getType() == int.class || f.getType() == Integer.class) {
+                        f.set(object, getInt(propName));
+                    } else if (f.getType() == RGB.class ) {
+                        f.set(object, getRGB(propName));
+                    } else {
+                        getString(propName);
+                    }
+                    result.put(propName, f.get(object).toString());
+                } catch (IllegalAccessException | PropertyNotFoundException e) {
+                    sb.append(propName).append("\n");
+                }
+            }
+        }
+
+        if ( !sb.toString().isEmpty() ) {
+            throw new PropertyNotFoundException("The following properties could not be loaded from " + PROPS_FILENAME + "\n" + sb.toString());
+        }
+
+        return result;
     }
 
 }

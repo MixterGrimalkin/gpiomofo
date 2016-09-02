@@ -1,6 +1,5 @@
 package net.amarantha.gpiomofo.scenario;
 
-import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.pattern.ChasePattern;
 import net.amarantha.gpiomofo.pixeltape.pattern.IntensityFade;
@@ -8,14 +7,19 @@ import net.amarantha.gpiomofo.pixeltape.pattern.SlidingBars;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.utility.GpioMofoProperties;
+import net.amarantha.gpiomofo.utility.Property;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.*;
 
 public class GingerlineBikeRoom extends Scenario {
 
-    @Inject private GpioMofoProperties props;
+    @Property("ButtonHoldTime")         private int     holdTime;
+    @Property("LightingServerIP")       private String  lightingIp;
+    @Property("LightingServerOscPort")  private int     lightingPort;
+    @Property("MediaServerIP")          private String  mediaIp;
+    @Property("MediaServerOscPort")     private int     mediaPort;
+    @Property("C3-Colour")              private RGB     pixelColour;
 
     private Trigger panicChamber2;
     private Trigger panicChamber2Hold;
@@ -49,7 +53,7 @@ public class GingerlineBikeRoom extends Scenario {
         panicChamber4 =       triggers.gpio("C4-Panic",         4, PULL_UP, false);
         panicChamber4Hold =   triggers.gpio("C4-Panic-Hold",    4, PULL_UP, false).setHoldTime(1000);
 
-        buttonChamber2Green = triggers.gpio("C2-Button-Green",  5, PULL_UP, false);
+        buttonChamber2Green = triggers.gpio("C2-Button-Green",  5, PULL_UP, false).setHoldTime(holdTime);
 
         oscPixelTape0 =     triggers.osc("Tape-0", 53000, "bike-lights-0");
         oscPixelTape1 =     triggers.osc("Tape-1", 53000, "bike-lights-1");
@@ -58,11 +62,11 @@ public class GingerlineBikeRoom extends Scenario {
         oscPixelTape4 =     triggers.osc("Tape-4", 53000, "bike-lights-4");
         oscPixelTapeExit =  triggers.osc("Tape-5", 53000, "bike-exit");
 
-        buttonChamber3a =   triggers.gpio("C3-Button-A", 6,  PULL_UP, false);
-        buttonChamber3b =   triggers.gpio("C3-Button-B", 7,  PULL_UP, false);
-        buttonChamber3c =   triggers.gpio("C3-Button-C", 12, PULL_UP, false);
-        buttonChamber3d =   triggers.gpio("C3-Button-D", 13, PULL_UP, false);
-        buttonChamber3e =   triggers.gpio("C3-Button-E", 14, PULL_UP, false);
+        buttonChamber3a =   triggers.gpio("C3-Button-A", 6,  PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3b =   triggers.gpio("C3-Button-B", 7,  PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3c =   triggers.gpio("C3-Button-C", 12, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3d =   triggers.gpio("C3-Button-D", 13, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3e =   triggers.gpio("C3-Button-E", 14, PULL_UP, false).setHoldTime(holdTime);
 
     }
 
@@ -91,9 +95,6 @@ public class GingerlineBikeRoom extends Scenario {
     @Override
     public void setupTargets() {
 
-        String lightingIp = props.lightingIp();
-        int lightingPort = props.lightingOscPort();
-
         panicLightsChamber2 =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2", 255));
         panicMonitorChamber2 =  targets.http(PANIC.withPath(URL_PANIC_UNDERWATER+"/fire"));
 
@@ -104,9 +105,6 @@ public class GingerlineBikeRoom extends Scenario {
         panicMonitorChamber4 =  targets.http(PANIC.withPath(URL_PANIC_KITCHEN+"/fire"));
 
         underwaterControl =     targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2slide", 255));
-
-        String mediaIp = props.mediaIp();
-        int mediaPort = props.mediaOscPort();
 
         bikeControl1 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1301/start", 255));
         bikeControl2 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1302/start", 255));
@@ -121,7 +119,7 @@ public class GingerlineBikeRoom extends Scenario {
         Target bars1 = targets
                 .pixelTape(SlidingBars.class)
                 .setBarSize(3, 3)
-                .setColour(new RGB(65,255,0))
+                .setColour(pixelColour)
                 .setRefreshInterval(150)
                 .init(0, 150);
         Target fade1 = targets
@@ -135,7 +133,7 @@ public class GingerlineBikeRoom extends Scenario {
         Target bars2 = targets
             .pixelTape(SlidingBars.class)
                 .setBarSize(3, 3)
-                .setColour(new RGB(65,255,0))
+                .setColour(pixelColour)
                 .setRefreshInterval(150)
                 .init(0, 150);
         Target fade2 = targets
@@ -150,7 +148,7 @@ public class GingerlineBikeRoom extends Scenario {
         Target bars3 = targets
             .pixelTape(SlidingBars.class)
                 .setBarSize(3, 3)
-                .setColour(new RGB(65,255,0))
+                .setColour(pixelColour)
                 .setRefreshInterval(90)
                 .init(0, 150);
         Target fade3 = targets
@@ -164,7 +162,7 @@ public class GingerlineBikeRoom extends Scenario {
         Target bars4 = targets
             .pixelTape(SlidingBars.class)
                 .setBarSize(4, 3)
-                .setColour(new RGB(65,255,0))
+                .setColour(pixelColour)
                 .setRefreshInterval(50)
                 .init(0, 150);
         Target fade4 = targets
@@ -177,7 +175,7 @@ public class GingerlineBikeRoom extends Scenario {
 
         Target exit = targets
             .pixelTape(ChasePattern.class)
-                .setColour(new RGB(65,255,0).withBrightness(0.8))
+                .setColour(pixelColour.withBrightness(0.8))
                 .setBlockWidth(30)
                 .setMovement(10)
                 .setRefreshInterval(50)
@@ -219,7 +217,6 @@ public class GingerlineBikeRoom extends Scenario {
 
     @Override
     public void setupLinks() {
-
 
         links
                 .link(oscPixelTape0,        lightStop)

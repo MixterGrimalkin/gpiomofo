@@ -1,12 +1,11 @@
 package net.amarantha.gpiomofo.scenario;
 
-import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.pattern.*;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.utility.GpioMofoProperties;
+import net.amarantha.gpiomofo.utility.Property;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.PANIC;
@@ -14,27 +13,16 @@ import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_BRIEFING
 
 public class GingerlineBriefingRoom extends Scenario {
 
-    @Inject private GpioMofoProperties props;
-
-    public static final int DOME_SIZE = 47;
-    public static final int ALL_DOMES = DOME_SIZE * 4;
-
-    public static final int DOME_1_START = 0;
-    public static final int DOME_2_START = DOME_SIZE;
-    public static final int DOME_3_START = 2 * DOME_SIZE;
-    public static final int DOME_4_START = 3 * DOME_SIZE;
-
-    public static final int PIPE_1_SIZE = 23 + 63;
-    public static final int PIPE_2_SIZE = 60 + 27;
-    public static final int PIPE_3_SIZE = 26 + 59;
-    public static final int PIPE_4_SIZE = 63 + 29;
-
-    public static final int PIPE_4_START = ALL_DOMES;
-    public static final int PIPE_3_START = PIPE_4_START + PIPE_4_SIZE;
-    public static final int PIPE_2_START = PIPE_3_START + PIPE_3_SIZE;
-    public static final int PIPE_1_START = PIPE_2_START + PIPE_2_SIZE;
-
-    public static final int WHOLE_TAPE = ALL_DOMES + PIPE_1_SIZE + PIPE_2_SIZE + PIPE_3_SIZE + PIPE_4_SIZE;
+    @Property("ButtonHoldTime")         private int     holdTime;
+    @Property("LightingServerIP")       private String  lightingIp;
+    @Property("LightingServerOscPort")  private int     lightingPort;
+    @Property("MediaServerIP")          private String  mediaIp;
+    @Property("MediaServerOscPort")     private int     mediaPort;
+    @Property("C0-BackgroundColour")    private RGB     backColour;
+    @Property("C0-Colour1")             private RGB     colour1;
+    @Property("C0-Colour2")             private RGB     colour2;
+    @Property("C0-Colour3")             private RGB     colour3;
+    @Property("C0-Colour4")             private RGB     colour4;
 
     private Trigger buttonRed;
     private Trigger buttonRedHold;
@@ -53,10 +41,10 @@ public class GingerlineBriefingRoom extends Scenario {
         buttonRed =             triggers.gpio("Panic",          2, PULL_UP, false);
         buttonRedHold =         triggers.gpio("Panic-Hold",     2, PULL_UP, false).setHoldTime(1000);
 
-        buttonBriefingGreen =   triggers.gpio("Briefing-Green", 4, PULL_UP, false);
-        buttonBriefingBlue =    triggers.gpio("Briefing-Blue",  3, PULL_UP, false);
-        buttonCapsuleGreen =    triggers.gpio("Capsule-Green",  6, PULL_UP, false);
-        buttonCapsuleBlue =     triggers.gpio("Capsule-Blue",   5, PULL_UP, false);
+        buttonBriefingGreen =   triggers.gpio("Briefing-Green", 4, PULL_UP, false).setHoldTime(holdTime);
+        buttonBriefingBlue =    triggers.gpio("Briefing-Blue",  3, PULL_UP, false).setHoldTime(holdTime);
+        buttonCapsuleGreen =    triggers.gpio("Capsule-Green",  6, PULL_UP, false).setHoldTime(holdTime);
+        buttonCapsuleBlue =     triggers.gpio("Capsule-Blue",   5, PULL_UP, false).setHoldTime(holdTime);
 
         httpBackground =        triggers.http("background");
         httpActivate =          triggers.http("active");
@@ -79,15 +67,12 @@ public class GingerlineBriefingRoom extends Scenario {
     @Override
     public void setupTargets() {
 
-        String mediaIp = props.mediaIp();
-        int mediaPort = props.mediaOscPort();
-
         briefingGreen =     targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1001/start", 255));
         briefingBlue =      targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1002/start", 255));
         capsuleGreen =      targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1003/start", 255));
         capsuleBlue =       targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1004/start", 255));
 
-        panicLights =       targets.osc(new OscCommand(props.lightingIp(), props.lightingOscPort(), "alarm/c0", 255));
+        panicLights =       targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c0", 255));
         panicMonitor =      targets.http(PANIC.withPath(URL_PANIC_BRIEFING+"/fire"));
 
         ////////////////
@@ -105,12 +90,6 @@ public class GingerlineBriefingRoom extends Scenario {
         ////////////////
         // Background //
         ////////////////
-
-        int backRed = props.getInt("backRed", 255);
-        int backGreen = props.getInt("backGreen", 255);
-        int backBlue = props.getInt("backBlue", 255);
-
-        RGB backColour = new RGB(backRed,backGreen,backBlue);
 
         int domeRefresh = 300;
         int pipeRefresh = 500;
@@ -153,7 +132,7 @@ public class GingerlineBriefingRoom extends Scenario {
             targets.pixelTape(SlidingBars.class)
                 .setColour(backColour)
                 .setFadeInTime(2000)
-                    .setSpaceSize(barSpace)
+                .setSpaceSize(barSpace)
                 .setReverse(true)
                 .setBarChange(6, 13, 2)
                 .setRefreshInterval(pipeRefresh)
@@ -163,7 +142,7 @@ public class GingerlineBriefingRoom extends Scenario {
             targets.pixelTape(SlidingBars.class)
                 .setColour(backColour)
                 .setFadeInTime(2000)
-                    .setSpaceSize(barSpace)
+                .setSpaceSize(barSpace)
                 .setBarChange(5, 12, 2)
                 .setRefreshInterval(pipeRefresh)
                 .init(PIPE_2_START, PIPE_2_SIZE);
@@ -172,7 +151,7 @@ public class GingerlineBriefingRoom extends Scenario {
             targets.pixelTape(SlidingBars.class)
                 .setColour(backColour)
                 .setFadeInTime(2000)
-                    .setSpaceSize(barSpace)
+                .setSpaceSize(barSpace)
                 .setBarChange(4, 11, 2)
                 .setRefreshInterval(pipeRefresh)
                 .setReverse(true)
@@ -182,7 +161,7 @@ public class GingerlineBriefingRoom extends Scenario {
             targets.pixelTape(SlidingBars.class)
                 .setColour(backColour)
                 .setFadeInTime(2000)
-                    .setSpaceSize(barSpace)
+                .setSpaceSize(barSpace)
                 .setBarChange(7, 11, 2)
                 .setRefreshInterval(pipeRefresh)
                 .init(PIPE_4_START, PIPE_4_SIZE);
@@ -203,11 +182,6 @@ public class GingerlineBriefingRoom extends Scenario {
         //////////////
         // Activate //
         //////////////
-
-        RGB colour1 = new RGB(255, 10, 0);
-        RGB colour2 = new RGB(255, 40, 0);
-        RGB colour3 = new RGB(255, 10, 0);
-        RGB colour4 = new RGB(255, 40, 0);
 
         Target spinDome1 =
             targets.pixelTape(SlidingBars.class)
@@ -394,12 +368,33 @@ public class GingerlineBriefingRoom extends Scenario {
 
         links.lock(30000, activationScene);
 
-
     }
 
     @Override
     public void start() {
+
         backgroundScene.activate();
+
     }
+
+    public static final int DOME_SIZE = 47;
+    public static final int ALL_DOMES = DOME_SIZE * 4;
+
+    public static final int DOME_1_START = 0;
+    public static final int DOME_2_START = DOME_SIZE;
+    public static final int DOME_3_START = 2 * DOME_SIZE;
+    public static final int DOME_4_START = 3 * DOME_SIZE;
+
+    public static final int PIPE_1_SIZE = 23 + 63;
+    public static final int PIPE_2_SIZE = 60 + 27;
+    public static final int PIPE_3_SIZE = 26 + 59;
+    public static final int PIPE_4_SIZE = 63 + 29;
+
+    public static final int PIPE_4_START = ALL_DOMES;
+    public static final int PIPE_3_START = PIPE_4_START + PIPE_4_SIZE;
+    public static final int PIPE_2_START = PIPE_3_START + PIPE_3_SIZE;
+    public static final int PIPE_1_START = PIPE_2_START + PIPE_2_SIZE;
+
+    public static final int WHOLE_TAPE = ALL_DOMES + PIPE_1_SIZE + PIPE_2_SIZE + PIPE_3_SIZE + PIPE_4_SIZE;
 
 }

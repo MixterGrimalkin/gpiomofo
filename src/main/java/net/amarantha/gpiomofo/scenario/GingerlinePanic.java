@@ -1,23 +1,24 @@
 package net.amarantha.gpiomofo.scenario;
 
-import com.google.inject.Inject;
 import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.utility.GpioMofoProperties;
+import net.amarantha.gpiomofo.utility.Property;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;
 
 public class GingerlinePanic extends Scenario {
 
-    @Inject private GpioMofoProperties props;
-
     public static final String PANIC_IP = "192.168.42.105";
     public static final int PANIC_PORT = 8001;
 
     public static final HttpCommand PANIC = new HttpCommand(POST, PANIC_IP, PANIC_PORT, "gpiomofo/trigger", "", "");
+
+    @Property("ButtonHoldTime")         private int     holdTime;
+    @Property("LightingServerIP")       private String  lightingIp;
+    @Property("LightingServerOscPort")  private int     lightingPort;
 
     public static final String URL_PANIC_BRIEFING = "panic-briefing";
     public static final String URL_PANIC_GAMESHOW = "panic-gameshow";
@@ -38,7 +39,7 @@ public class GingerlinePanic extends Scenario {
     @Override
     public void setupTriggers() {
 
-        panicReset =     triggers.gpio("reset",      0, PULL_UP, false);
+        panicReset =     triggers.gpio("reset",      0, PULL_UP, false).setHoldTime(holdTime);
         panicResetHold = triggers.gpio("reset-hold", 0, PULL_UP, false).setHoldTime(5000);
 
         briefingRoom =   triggers.http(URL_PANIC_BRIEFING);
@@ -55,7 +56,7 @@ public class GingerlinePanic extends Scenario {
     @Override
     public void setupTargets() {
 
-        lightsOn = targets.osc(new OscCommand(props.lightingIp(), props.lightingOscPort(), "alarm/kitchenhold", 255));
+        lightsOn = targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/kitchenhold", 255));
 
     }
 

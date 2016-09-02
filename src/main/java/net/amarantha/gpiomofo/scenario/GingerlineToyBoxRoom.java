@@ -1,6 +1,5 @@
 package net.amarantha.gpiomofo.scenario;
 
-import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.pattern.BrightnessRipple;
 import net.amarantha.gpiomofo.pixeltape.pattern.CyclicFade;
@@ -8,7 +7,7 @@ import net.amarantha.gpiomofo.pixeltape.pattern.SolidColour;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.utility.GpioMofoProperties;
+import net.amarantha.gpiomofo.utility.Property;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.PANIC;
@@ -16,17 +15,15 @@ import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_TOYBOX;
 
 public class GingerlineToyBoxRoom extends Scenario {
 
-    @Inject private GpioMofoProperties props;
-
-    private static final int SMALL_BALL = 7;
-    private static final int BIG_BALL = 21;
-
-    private static final int BALL_1_S = 0;
-    private static final int BALL_2_B = SMALL_BALL;
-    private static final int BALL_3_S = BALL_2_B + BIG_BALL;
-    private static final int BALL_4_B = BALL_3_S + SMALL_BALL;
-    private static final int BALL_5_S = BALL_4_B + BIG_BALL;
-    private static final int WHOLE_TAPE = BALL_5_S + SMALL_BALL;
+    @Property("ButtonHoldTime")         private int     holdTime;
+    @Property("LightingServerIP")       private String  lightingIp;
+    @Property("LightingServerOscPort")  private int     lightingPort;
+    @Property("MediaServerIP")          private String  mediaIp;
+    @Property("MediaServerOscPort")     private int     mediaPort;
+    @Property("C5-Amber")               private RGB     amber;
+    @Property("C5-Green")               private RGB     green;
+    @Property("C5-Purple")              private RGB     purple;
+    @Property("C5-Blue")                private RGB     blue;
 
     private Trigger panicButton;
     private Trigger panicButtonHold;
@@ -56,10 +53,10 @@ public class GingerlineToyBoxRoom extends Scenario {
         panicButton =       triggers.gpio("Panic",      2, PULL_UP, false);
         panicButtonHold =   triggers.gpio("Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);
 
-        button1 = triggers.gpio("Button1", 3, PULL_UP, false);
-        button2 = triggers.gpio("Button2", 4, PULL_UP, false);
-        button3 = triggers.gpio("Button3", 5, PULL_UP, false);
-        button4 = triggers.gpio("Button4", 6, PULL_UP, false);
+        button1 = triggers.gpio("Button1", 3, PULL_UP, false).setHoldTime(holdTime);
+        button2 = triggers.gpio("Button2", 4, PULL_UP, false).setHoldTime(holdTime);
+        button3 = triggers.gpio("Button3", 5, PULL_UP, false).setHoldTime(holdTime);
+        button4 = triggers.gpio("Button4", 6, PULL_UP, false).setHoldTime(holdTime);
 
         oscStop =       triggers.osc("Stop",            53000, "stop");
         oscAmber =      triggers.osc("Amber",           53000, "amber");
@@ -98,11 +95,9 @@ public class GingerlineToyBoxRoom extends Scenario {
     private Target endOfWorld;
     private Target cancelEndOfWorld;
 
+
     @Override
     public void setupTargets() {
-
-        String lightingIp = props.lightingIp();
-        int lightingPort = props.lightingOscPort();
 
         panicLights =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c5", 255));
         panicMonitor =  targets.http(PANIC.withPath(URL_PANIC_TOYBOX+"/fire"));
@@ -110,19 +105,12 @@ public class GingerlineToyBoxRoom extends Scenario {
         Target stop = targets.stopPixelTape().setClear(false);
         stopAndClear = targets.stopPixelTape().setClear(true);
 
-        String mediaIp = props.mediaIp();
-        int mediaPort = props.mediaOscPort();
-
         osc1 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1401/start", 255));
         osc2 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1402/start", 255));
         osc3 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1403/start", 255));
         osc4 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1404/start", 255));
 
         RGB white = new RGB(255,255,255);
-        RGB amber =  props.getColour("Amber");
-        RGB blue =   props.getColour("Blue");
-        RGB green =  props.getColour("Green");
-        RGB purple = props.getColour("Purple");
 
         amberScene =
             targets.chain()
@@ -283,27 +271,6 @@ public class GingerlineToyBoxRoom extends Scenario {
                 .link(button4,          osc4)
         ;
 
-//        targets.chain()
-//                .add(5000, amberScene)
-//                .add(5000, rippleFade)
-//                .add(5000, blueScene)
-//                .add(5000, rippleFade)
-//                .add(5000, greenScene)
-//                .add(5000, rippleFade)
-//                .add(5000, purpleScene)
-//                .add(5000, rippleFade)
-//                .add(5000, mix1)
-//                .add(5000, slowFade)
-//                .add(5000, mix2)
-//                .add(5000, fastFade)
-//                .add(5000, mix3)
-//                .add(15000, endOfWorld)
-//                .add(0, cancelEndOfWorld)
-//                .add(2000, stopAndClear)
-//                .build().repeat(true)
-////                .activate()
-//        ;
-
     }
 
     private Target buildGlobes(RGB colour) {
@@ -343,5 +310,15 @@ public class GingerlineToyBoxRoom extends Scenario {
                         .init(BALL_5_S, SMALL_BALL))
                 .build().oneShot(true);
     }
+
+    private static final int SMALL_BALL = 7;
+    private static final int BIG_BALL = 21;
+
+    private static final int BALL_1_S = 0;
+    private static final int BALL_2_B = SMALL_BALL;
+    private static final int BALL_3_S = BALL_2_B + BIG_BALL;
+    private static final int BALL_4_B = BALL_3_S + SMALL_BALL;
+    private static final int BALL_5_S = BALL_4_B + BIG_BALL;
+    private static final int WHOLE_TAPE = BALL_5_S + SMALL_BALL;
 
 }
