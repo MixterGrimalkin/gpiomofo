@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.HasName;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.gpiomofo.utility.Now;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -13,6 +14,7 @@ public abstract class Target implements HasName {
 
     @Inject private TaskService tasks;
     @Inject private TargetFactory targets;
+    @Inject private Now now;
 
     private boolean active = false;
     public Target offTarget;
@@ -40,10 +42,11 @@ public abstract class Target implements HasName {
     //////////////
 
     public final void activate() {
+        String time = now.time().toString();
         if ( locked ) {
-            System.out.println(" -XX- [" + getName() + "]");
+            System.out.println(time + ": -XX- [" + getName() + "]");
         } else {
-            System.out.println(" " + (oneShot ? "--" : "==") + ">> [" + getName() + "]");
+            System.out.println(time + ": " + (oneShot ? "--" : "==") + ">> [" + getName() + "]");
             if ( lockTime!=null ) {
                 for ( Target target : lockTargets ) {
                     target.lockFor(lockTime);
@@ -68,7 +71,7 @@ public abstract class Target implements HasName {
 
     protected final void deactivate(boolean force) {
         if ( active || force ) {
-            System.out.println(" -//- [" + getName() + "]");
+            System.out.println(now.time().toString() + ": -//- [" + getName() + "]");
             tasks.removeTask(this);
             active = false;
             onDeactivate();

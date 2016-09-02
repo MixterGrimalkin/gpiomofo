@@ -4,6 +4,7 @@ package net.amarantha.gpiomofo.trigger;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.HasName;
 import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.gpiomofo.utility.Now;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,8 +13,8 @@ public class Trigger implements HasName {
 
     private boolean lastState;
 
-    @Inject
-    private TaskService tasks;
+    @Inject private TaskService tasks;
+    @Inject private Now now;
 
     public void fire(boolean active) {
         lastState = active;
@@ -29,7 +30,7 @@ public class Trigger implements HasName {
     }
 
     private void doFire(boolean active) {
-        System.out.println("["+getName()+"] " + (active?"==>>":" -- "));
+        System.out.println(now.time().toString() + ": ["+getName()+"] " + (active?"==>>":" -- "));
         for (TriggerCallback callback : triggerCallbacks) {
             callback.onTrigger(active);
         }

@@ -1,7 +1,6 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
-import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.pattern.BrightnessRipple;
@@ -12,12 +11,9 @@ import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.utility.GpioMofoProperties;
 
-import java.util.Random;
-
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.PANIC;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_TOYBOX;
-import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_UNDERWATER;
 
 public class GingerlineToyBoxRoom extends Scenario {
 
@@ -34,6 +30,9 @@ public class GingerlineToyBoxRoom extends Scenario {
     private static final int BALL_4_B = BALL_3_S + SMALL_BALL;
     private static final int BALL_5_S = BALL_4_B + BIG_BALL;
     private static final int WHOLE_TAPE = BALL_5_S + SMALL_BALL;
+
+    private Trigger panicButton;
+    private Trigger panicButtonHold;
 
     private Trigger button1;
     private Trigger button2;
@@ -53,19 +52,12 @@ public class GingerlineToyBoxRoom extends Scenario {
     private Trigger oscRippleFade;
     private Trigger oscKillFade;
     private Trigger oscEndOfWorld;
-    private Trigger panicButton;
-    private Trigger panicButtonHold;
-    private Target brightnessRipple;
-    private Target osc1;
-    private Target osc2;
-    private Target osc3;
-    private Target osc4;
 
     @Override
     public void setupTriggers() {
 
-        panicButton = triggers.gpio("Panic", 2, PULL_UP, false);
-        panicButtonHold = triggers.gpio("Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);
+        panicButton =       triggers.gpio("Panic",      2, PULL_UP, false);
+        panicButtonHold =   triggers.gpio("Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);
 
         button1 = triggers.gpio("Button1", 3, PULL_UP, false);
         button2 = triggers.gpio("Button2", 4, PULL_UP, false);
@@ -88,8 +80,13 @@ public class GingerlineToyBoxRoom extends Scenario {
 
     }
 
-    private Target stop;
+    private Target panicLights;
+    private Target panicMonitor;
     private Target stopAndClear;
+    private Target osc1;
+    private Target osc2;
+    private Target osc3;
+    private Target osc4;
     private Target amberScene;
     private Target blueScene;
     private Target greenScene;
@@ -97,55 +94,12 @@ public class GingerlineToyBoxRoom extends Scenario {
     private Target mix1;
     private Target mix2;
     private Target mix3;
-    private Target mix4;
-    private Target mix5;
-    private Target mix6;
     private Target slowFade;
     private Target fastFade;
     private Target rippleFade;
     private Target killFade;
     private Target endOfWorld;
     private Target cancelEndOfWorld;
-    private Target panicLights;
-    private Target panicMonitor;
-
-    private Target buildGlobes(RGB colour) {
-        RGB[] colours = new RGB[5];
-        double variation = 0.8;
-        for ( int i=0; i<5; i++ ) {
-            int redVar = (int)Math.round(variation * Math.max(30, colour.getRed()));
-            int greenVar = (int)Math.round(variation * Math.max(30, colour.getGreen()));
-            int blueVar = (int)Math.round(variation * Math.max(30, colour.getBlue()));
-            double factor1 = (Math.random() * 2 * redVar) - redVar;
-            double factor2 = (Math.random() * 2 * greenVar) - greenVar;
-            double factor3 = (Math.random() * 2 * blueVar) - blueVar;
-            int red = (int)Math.round(Math.max(0, Math.min(255, colour.getRed()+factor1)));
-            int green = (int)Math.round(Math.max(0, Math.min(255, colour.getGreen()+factor2)));
-            int blue = (int)Math.round(Math.max(0, Math.min(255, colour.getBlue()+factor3)));
-            colours[i] = new RGB(red, green, blue);
-        }
-        return buildGlobes(colours[0], colours[1], colours[2], colours[3], colours[4]);
-    }
-
-    private Target buildGlobes(RGB colour1, RGB colour2, RGB colour3, RGB colour4, RGB colour5) {
-        return targets.chain()
-            .add(targets.pixelTape(SolidColour.class)
-                .setColour(colour1)
-                .init(BALL_1_S, SMALL_BALL))
-            .add(targets.pixelTape(SolidColour.class)
-                .setColour(colour2)
-                .init(BALL_2_B, BIG_BALL))
-            .add(targets.pixelTape(SolidColour.class)
-                .setColour(colour3)
-                .init(BALL_3_S, SMALL_BALL))
-            .add(targets.pixelTape(SolidColour.class)
-                .setColour(colour4)
-                .init(BALL_4_B, BIG_BALL))
-            .add(targets.pixelTape(SolidColour.class)
-                .setColour(colour5)
-                .init(BALL_5_S, SMALL_BALL))
-            .build().oneShot(true);
-    }
 
     @Override
     public void setupTargets() {
@@ -156,7 +110,7 @@ public class GingerlineToyBoxRoom extends Scenario {
         panicLights =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c5", 255));
         panicMonitor =  targets.http(PANIC.withPath(URL_PANIC_TOYBOX+"/fire"));
 
-        stop = targets.stopPixelTape().setClear(false);
+        Target stop = targets.stopPixelTape().setClear(false);
         stopAndClear = targets.stopPixelTape().setClear(true);
 
         String mediaIp = props.mediaIp();
@@ -208,21 +162,18 @@ public class GingerlineToyBoxRoom extends Scenario {
                 .add(stop)
                 .add(buildGlobes(green, amber, blue, purple, amber))
             .build().oneShot(true);
-        mix4 =
-            targets.chain()
+        Target mix4 = targets.chain()
                 .add(stop)
                 .add(buildGlobes(green, blue, white, purple, amber))
-            .build().oneShot(true);
-        mix5 =
-            targets.chain()
+                .build().oneShot(true);
+        Target mix5 = targets.chain()
                 .add(stop)
                 .add(buildGlobes(purple, white, blue, white, green))
-            .build().oneShot(true);
-        mix6 =
-            targets.chain()
+                .build().oneShot(true);
+        Target mix6 = targets.chain()
                 .add(stop)
                 .add(buildGlobes(white, green, purple, amber, white))
-            .build().oneShot(true);
+                .build().oneShot(true);
 
         Target slowFadeInner = targets.pixelTape(CyclicFade.class)
                 .setMin(0.5).setMax(1.0).setDelta(0.05).setRefreshInterval(50)
@@ -271,6 +222,7 @@ public class GingerlineToyBoxRoom extends Scenario {
                 .add(reallyFastFadeInner.cancel())
                 .add(slowFadeInner.cancel())
                 .add(fastFadeInner.cancel())
+                .add(rippleFadeInner.cancel())
                 .build().oneShot(true);
 
         int delay = 75;
@@ -312,26 +264,26 @@ public class GingerlineToyBoxRoom extends Scenario {
     public void setupLinks() {
 
         links
-                .link(oscStop, cancelEndOfWorld, stopAndClear)
-                .link(oscAmber, amberScene)
-                .link(oscBlue, blueScene)
-                .link(oscGreen, greenScene)
-                .link(oscPurple, purpleScene)
-                .link(oscMix1, mix1)
-                .link(oscMix2, mix2)
-                .link(oscMix3, mix3)
-                .link(oscSlowFade, slowFade)
-                .link(oscFastFade, fastFade)
-                .link(oscRippleFade, rippleFade)
-                .link(oscKillFade, killFade)
-                .link(oscEndOfWorld, endOfWorld)
+                .link(oscStop,          cancelEndOfWorld, stopAndClear)
+                .link(oscAmber,         amberScene)
+                .link(oscBlue,          blueScene)
+                .link(oscGreen,         greenScene)
+                .link(oscPurple,        purpleScene)
+                .link(oscMix1,          mix1)
+                .link(oscMix2,          mix2)
+                .link(oscMix3,          mix3)
+                .link(oscSlowFade,      slowFade)
+                .link(oscFastFade,      fastFade)
+                .link(oscRippleFade,    rippleFade)
+                .link(oscKillFade,      killFade)
+                .link(oscEndOfWorld,    endOfWorld)
 
-                .link(panicButton, panicLights)
-                .link(panicButtonHold, panicMonitor)
-                .link(button1, osc1)
-                .link(button2, osc2)
-                .link(button3, osc3)
-                .link(button4, osc4)
+                .link(panicButton,      panicLights)
+                .link(panicButtonHold,  panicMonitor)
+                .link(button1,          osc1)
+                .link(button2,          osc2)
+                .link(button3,          osc3)
+                .link(button4,          osc4)
         ;
 
 //        targets.chain()
@@ -356,9 +308,47 @@ public class GingerlineToyBoxRoom extends Scenario {
 //        ;
 
         pixelTapeController
-            .init(BALL_5_S + SMALL_BALL)
+            .init(WHOLE_TAPE)
             .start();
 
+    }
+
+    private Target buildGlobes(RGB colour) {
+        RGB[] colours = new RGB[5];
+        double variation = 0.8;
+        for ( int i=0; i<5; i++ ) {
+            int redVar = (int)Math.round(variation * Math.max(30, colour.getRed()));
+            int greenVar = (int)Math.round(variation * Math.max(30, colour.getGreen()));
+            int blueVar = (int)Math.round(variation * Math.max(30, colour.getBlue()));
+            double factor1 = (Math.random() * 2 * redVar) - redVar;
+            double factor2 = (Math.random() * 2 * greenVar) - greenVar;
+            double factor3 = (Math.random() * 2 * blueVar) - blueVar;
+            int red = (int)Math.round(Math.max(0, Math.min(255, colour.getRed()+factor1)));
+            int green = (int)Math.round(Math.max(0, Math.min(255, colour.getGreen()+factor2)));
+            int blue = (int)Math.round(Math.max(0, Math.min(255, colour.getBlue()+factor3)));
+            colours[i] = new RGB(red, green, blue);
+        }
+        return buildGlobes(colours[0], colours[1], colours[2], colours[3], colours[4]);
+    }
+
+    private Target buildGlobes(RGB colour1, RGB colour2, RGB colour3, RGB colour4, RGB colour5) {
+        return targets.chain()
+                .add(targets.pixelTape(SolidColour.class)
+                        .setColour(colour1)
+                        .init(BALL_1_S, SMALL_BALL))
+                .add(targets.pixelTape(SolidColour.class)
+                        .setColour(colour2)
+                        .init(BALL_2_B, BIG_BALL))
+                .add(targets.pixelTape(SolidColour.class)
+                        .setColour(colour3)
+                        .init(BALL_3_S, SMALL_BALL))
+                .add(targets.pixelTape(SolidColour.class)
+                        .setColour(colour4)
+                        .init(BALL_4_B, BIG_BALL))
+                .add(targets.pixelTape(SolidColour.class)
+                        .setColour(colour5)
+                        .init(BALL_5_S, SMALL_BALL))
+                .build().oneShot(true);
     }
 
 }

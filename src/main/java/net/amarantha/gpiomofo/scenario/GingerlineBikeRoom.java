@@ -86,6 +86,12 @@ public class GingerlineBikeRoom extends Scenario {
     private Target lightScene4;
     private Target lightSceneExit;
 
+    private Target bikeControl1;
+    private Target bikeControl2;
+    private Target bikeControl3;
+    private Target bikeControl4;
+    private Target bikeControl5;
+
     @Override
     public void setupTargets() {
 
@@ -101,7 +107,16 @@ public class GingerlineBikeRoom extends Scenario {
         panicLightsChamber4 =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c4", 255));
         panicMonitorChamber4 =  targets.http(PANIC.withPath(URL_PANIC_KITCHEN+"/fire"));
 
-        underwaterControl = targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2slide", 255));
+        underwaterControl =     targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2slide", 255));
+
+        String mediaIp = props.mediaIp();
+        int mediaPort = props.mediaOscPort();
+
+        bikeControl1 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1301/start", 255));
+        bikeControl2 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1302/start", 255));
+        bikeControl3 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1303/start", 255));
+        bikeControl4 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1304/start", 255));
+        bikeControl5 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1305/start", 255));
 
         ////////////////
         // Pixel Tape //
@@ -218,11 +233,11 @@ public class GingerlineBikeRoom extends Scenario {
                 .link(oscPixelTape4,        lightScene4)
                 .link(oscPixelTapeExit,     lightSceneExit)
 
-                .link(buttonChamber3a,      lightScene1)
-                .link(buttonChamber3b,      lightScene2)
-                .link(buttonChamber3c,      lightScene3)
-                .link(buttonChamber3d,      lightScene4)
-                .link(buttonChamber3e,      lightSceneExit)
+                .link(buttonChamber3a,      bikeControl1)
+                .link(buttonChamber3b,      bikeControl2)
+                .link(buttonChamber3c,      bikeControl3)
+                .link(buttonChamber3d,      bikeControl4)
+                .link(buttonChamber3e,      bikeControl5)
 
                 .link(panicChamber2,        panicLightsChamber2)
                 .link(panicChamber2Hold,    panicMonitorChamber2)

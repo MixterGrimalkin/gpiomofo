@@ -1,22 +1,18 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.utility.GpioMofoProperties;
 
-import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.PANIC;
-import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_BRIEFING;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_GAMESHOW;
 
 public class GingerlineGameShowRoom extends Scenario {
 
     @Inject private GpioMofoProperties props;
-    @Inject private GpioService gpio;
 
     private Trigger panicButton;
     private Trigger panicButtonHold;
@@ -29,18 +25,6 @@ public class GingerlineGameShowRoom extends Scenario {
     private Trigger effectButton03;
     private Trigger effectButton04;
     private Trigger effectButton05;
-
-    private Target panicTarget;
-    private Target panicHoldTarget;
-    private Target podiumTarget1;
-    private Target podiumTarget2;
-    private Target podiumTarget3;
-    private Target podiumTarget4;
-    private Target effectTarget01;
-    private Target effectTarget02;
-    private Target effectTarget03;
-    private Target effectTarget04;
-    private Target effectTarget05;
 
     @Override
     public void setupTriggers() {
@@ -62,6 +46,18 @@ public class GingerlineGameShowRoom extends Scenario {
         effectButton05 =    triggers.gpio("FX05", 10, PULL_UP, false).setHoldTime(podiumHoldTime);
 
     }
+
+    private Target panicTarget;
+    private Target panicHoldTarget;
+    private Target podiumTarget1;
+    private Target podiumTarget2;
+    private Target podiumTarget3;
+    private Target podiumTarget4;
+    private Target effectTarget01;
+    private Target effectTarget02;
+    private Target effectTarget03;
+    private Target effectTarget04;
+    private Target effectTarget05;
 
     @Override
     public void setupTargets() {

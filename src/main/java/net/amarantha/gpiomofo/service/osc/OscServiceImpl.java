@@ -30,7 +30,6 @@ public class OscServiceImpl implements OscService {
             OSCPortIn receiver = getInPort(port);
             receiver.addListener("/"+address, listener);
             receiver.startListening();
-            System.out.println("Listener Added");
         } catch (SocketException e) {
             e.printStackTrace();
         }
