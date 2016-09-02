@@ -4,77 +4,107 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.module.LiveModule;
-import net.amarantha.gpiomofo.pixeltape.NeoPixel;
+import net.amarantha.gpiomofo.pixeltape.PixelTapeService;
 import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.midi.MidiService;
 import net.amarantha.gpiomofo.service.task.TaskService;
-import net.amarantha.gpiomofo.utility.PropertyManager;
+import net.amarantha.gpiomofo.utility.GpioMofoProperties;
 import net.amarantha.gpiomofo.webservice.WebService;
 
 import java.util.Scanner;
 
-import static net.amarantha.gpiomofo.utility.PropertyManager.isSimulationMode;
+import static java.lang.System.out;
 import static net.amarantha.gpiomofo.utility.PropertyManager.processArgs;
 
 @Singleton
 public class Main {
 
-    public static void main(String[] args) {
-        processArgs(args);
-        Guice.createInjector(new LiveModule())
-            .getInstance(Main.class)
-                .start();
-    }
+    @Inject private GpioService gpio;
+    @Inject private MidiService midi;
+    @Inject private PixelTapeService pixel;
+    @Inject private WebService web;
+    @Inject private TaskService tasks;
+
+    @Inject private GpioMofoProperties props;
 
     @Inject private Scenario scenario;
 
-    @Inject private WebService webService;
-    @Inject private GpioService gpio;
-    @Inject private MidiService midi;
-    @Inject private TaskService tasks;
-    @Inject private PropertyManager props;
-    @Inject private NeoPixel neoPixel;
-
     public void start() {
 
-        System.out.println(BAR+"\n"+LOGO);
+        out.println(BAR+"\n"+LOGO);
 
-        scenario.setup();
+        scenario.load();
 
-        System.out.println(" STARTING UP... \n" + BAR);
+        out.println(" STARTING UP... \n" + BAR);
 
-        gpio.startInputMonitor();
-        midi.openDevice();
-        tasks.start();
-        if ( props.isWithServer() ) {
-            webService.start();
-        }
+        startServices();
 
-        System.out.println(BAR + "\n GpioMofo is Active \n" + BAR);
+        out.println(BAR + "\n GpioMofo is Active \n" + BAR);
 
-        if ( !isSimulationMode() ) {
-            System.out.println(" (Press ENTER to quit)\n" + BAR);
-            Scanner scanner = new Scanner(System.in);
-            while (!scanner.hasNextLine()) {}
-            stop();
+        scenario.start();
+
+        if ( !scenario.requiresGUI() ) {
+            waitForEnter();
         }
 
     }
 
-    public void stop() {
-        System.out.println(BAR + "\n SHUTTING DOWN...\n" + BAR);
-        tasks.stop();
-        neoPixel.close();
-        scenario.stop();
-        gpio.shutdown();
-        midi.closeDevice();
+    private void startServices() {
+
+        if ( scenario.requiresGpio() ) {
+            gpio.start();
+        }
+        if ( scenario.requiresMidi() ) {
+            midi.start();
+        }
+        if ( scenario.requiresPixelTape() ) {
+            pixel.start();
+        }
+        tasks.start();
         if ( props.isWithServer() ) {
-            webService.stop();
+            web.start();
         }
 
-        System.out.println(BAR+"\n Bye for now! \n"+BAR);
+    }
+
+    private void waitForEnter() {
+        out.println(" (Press ENTER to quit)\n" + BAR);
+        Scanner scanner = new Scanner(System.in);
+        while (!scanner.hasNextLine()) {}
+        stop();
+    }
+
+    public void stop() {
+
+        scenario.stop();
+
+        out.println(BAR + "\n SHUTTING DOWN...\n" + BAR);
+
+        stopServices();
+
+        out.println(BAR+"\n Bye for now! \n"+BAR);
+
         System.exit(0);
+
+    }
+
+    private void stopServices() {
+
+        if ( props.isWithServer() ) {
+            web.stop();
+        }
+        tasks.stop();
+        if ( scenario.requiresGpio() ) {
+            gpio.stop();
+        }
+        if ( scenario.requiresMidi() ) {
+            midi.stop();
+        }
+        if ( scenario.requiresPixelTape() ) {
+            pixel.stop();
+        }
+
     }
 
     public static final String LOGO =
@@ -87,5 +117,12 @@ public class Main {
 
     public static final String BAR =
             "-------------------------------------------------------------";
+
+    public static void main(String[] args) {
+        processArgs(args);
+        Guice.createInjector(new LiveModule())
+            .getInstance(Main.class)
+                .start();
+    }
 
 }

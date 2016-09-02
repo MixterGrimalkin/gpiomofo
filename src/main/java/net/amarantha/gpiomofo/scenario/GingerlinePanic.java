@@ -6,7 +6,6 @@ import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.utility.GpioMofoProperties;
-import net.amarantha.gpiomofo.utility.PropertyManager;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;

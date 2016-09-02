@@ -1,7 +1,6 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.pattern.BrightnessRipple;
 import net.amarantha.gpiomofo.pixeltape.pattern.CyclicFade;
@@ -16,8 +15,6 @@ import static net.amarantha.gpiomofo.scenario.GingerlinePanic.PANIC;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_TOYBOX;
 
 public class GingerlineToyBoxRoom extends Scenario {
-
-    @Inject private PixelTapeController pixelTapeController;
 
     @Inject private GpioMofoProperties props;
 
@@ -306,10 +303,6 @@ public class GingerlineToyBoxRoom extends Scenario {
 //                .build().repeat(true)
 ////                .activate()
 //        ;
-
-        pixelTapeController
-            .init(WHOLE_TAPE)
-            .start();
 
     }
 

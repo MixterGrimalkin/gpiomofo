@@ -45,6 +45,7 @@ public class WebService {
     }
 
     public void stop() {
+        System.out.println("Stopping Web Service...");
         if ( server!=null ) {
             server.shutdown();
         }

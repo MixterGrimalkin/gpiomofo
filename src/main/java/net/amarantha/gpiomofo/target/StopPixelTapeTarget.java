@@ -1,11 +1,11 @@
 package net.amarantha.gpiomofo.target;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
+import net.amarantha.gpiomofo.pixeltape.PixelTapeService;
 
 public class StopPixelTapeTarget extends Target {
 
-    @Inject private PixelTapeController pixelTape;
+    @Inject private PixelTapeService pixelTape;
 
     @Override
     protected void onActivate() {

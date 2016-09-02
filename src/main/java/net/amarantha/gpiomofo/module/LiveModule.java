@@ -35,7 +35,6 @@ public class LiveModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(PropertyManager.class).to(GpioMofoProperties.class).in(Scopes.SINGLETON);
         bind(Scenario.class).to(scenarioClass).in(Scopes.SINGLETON);
         bind(MidiService.class).to(MidiServiceImpl.class).in(Scopes.SINGLETON);
         bind(HttpService.class).to(HttpServiceImpl.class).in(Scopes.SINGLETON);

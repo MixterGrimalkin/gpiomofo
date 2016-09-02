@@ -1,7 +1,6 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.pattern.*;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
@@ -14,8 +13,6 @@ import static net.amarantha.gpiomofo.scenario.GingerlinePanic.PANIC;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_BRIEFING;
 
 public class GingerlineBriefingRoom extends Scenario {
-
-    @Inject private PixelTapeController pixeltape;
 
     @Inject private GpioMofoProperties props;
 
@@ -397,12 +394,12 @@ public class GingerlineBriefingRoom extends Scenario {
 
         links.lock(30000, activationScene);
 
-        pixeltape
-            .init(WHOLE_TAPE)
-            .start();
 
+    }
+
+    @Override
+    public void start() {
         backgroundScene.activate();
-
     }
 
 }

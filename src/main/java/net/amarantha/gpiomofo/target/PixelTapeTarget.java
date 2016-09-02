@@ -1,13 +1,13 @@
 package net.amarantha.gpiomofo.target;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
+import net.amarantha.gpiomofo.pixeltape.PixelTapeService;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.utility.TimeGuard;
 
 public abstract class PixelTapeTarget extends Target {
 
-    @Inject private PixelTapeController pixelTapeController;
+    @Inject private PixelTapeService pixelTapeService;
 
     @Inject private TimeGuard guard;
     private boolean forceRGB;
@@ -52,7 +52,7 @@ public abstract class PixelTapeTarget extends Target {
         this.startPixel = startPixel;
         this.pixelCount = pixelCount;
         currentPattern = new RGB[pixelCount];
-        pixelTapeController.addPattern(this);
+        pixelTapeService.addPattern(this);
         return this;
     }
 
@@ -77,7 +77,7 @@ public abstract class PixelTapeTarget extends Target {
     }
 
     protected RGB getPixel(int pixel) {
-        return pixelTapeController.getPixel(pixel);
+        return pixelTapeService.getPixel(pixel);
     }
 
     protected void setAll(RGB colour) {

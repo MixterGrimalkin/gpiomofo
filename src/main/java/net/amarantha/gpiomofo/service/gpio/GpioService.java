@@ -160,11 +160,11 @@ public abstract class GpioService {
 
     private Timer monitorTimer;
 
-    public void startInputMonitor() {
-        startInputMonitor(DEFAULT_SCAN_PERIOD);
+    public void start() {
+        start(DEFAULT_SCAN_PERIOD);
     }
 
-    public void startInputMonitor(long period) {
+    public void start(long period) {
         System.out.println("Starting GPIO Service...");
         stopInputMonitor();
         monitorTimer = new Timer();
@@ -182,7 +182,7 @@ public abstract class GpioService {
         }
     }
 
-    public void shutdown() {
+    public void stop() {
         System.out.println("Stopping GPIO Service...");
         stopInputMonitor();
         for ( Integer pinNumber : digitalOutputs ) {

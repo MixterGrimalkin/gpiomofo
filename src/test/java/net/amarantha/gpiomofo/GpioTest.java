@@ -160,7 +160,7 @@ public class GpioTest {
     }
 
     void when_shutdown() {
-        gpio.shutdown();
+        gpio.stop();
     }
 
     //////////

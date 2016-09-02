@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Singleton
-public class PixelTapeController {
+public class PixelTapeService {
 
     private TaskService tasks;
     private NeoPixel neoPixel;
@@ -20,31 +20,27 @@ public class PixelTapeController {
     private int totalPixels;
 
     @Inject
-    public PixelTapeController(NeoPixel neoPixel, @TapeRefresh int tapeRefresh, TaskService tasks) {
+    public PixelTapeService(NeoPixel neoPixel, @TapeRefresh int tapeRefresh, TaskService tasks) {
         this.neoPixel = neoPixel;
         this.tapeRefresh = tapeRefresh;
         this.tasks = tasks;
     }
 
-    public PixelTapeController addPattern(PixelTapeTarget pattern) {
+    public PixelTapeService addPattern(PixelTapeTarget pattern) {
         patterns.add(pattern);
-        return this;
-    }
-
-    public PixelTapeController init(int totalPixels) {
-        this.totalPixels = totalPixels;
-        neoPixel.init(totalPixels);
+        totalPixels = Math.max(totalPixels, pattern.getStartPixel()+pattern.getPixelCount());
         return this;
     }
 
     public void start() {
-        System.out.println("Starting PixelTape...");
+        System.out.println("Starting PixelTape Service...");
+        neoPixel.init(totalPixels);
         tasks.addRepeatingTask(this, tapeRefresh, this::render);
     }
 
     public void stop() {
         neoPixel.close();
-        System.out.println("Shutting down pixel tape");
+        System.out.println("Stopping PixelTape Service...");
     }
 
     public void render() {

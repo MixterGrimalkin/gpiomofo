@@ -9,17 +9,17 @@ public class MidiServiceMock implements MidiService {
     private MidiCommand lastMidiCommand = null;
 
     @Override
-    public void openDevice() {
+    public void start() {
         deviceOpen = true;
     }
 
     @Override
-    public void openDevice(String name) {
+    public void start(String name) {
         deviceOpen = true;
     }
 
     @Override
-    public void closeDevice() {
+    public void stop() {
         deviceOpen = false;
     }
 

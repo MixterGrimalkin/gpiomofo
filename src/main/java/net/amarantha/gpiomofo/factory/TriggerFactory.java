@@ -15,6 +15,12 @@ public class TriggerFactory extends Factory<Trigger> {
         super("Trigger");
     }
 
+    private boolean gpioUsed;
+
+    public boolean isGpioUsed() {
+        return gpioUsed;
+    }
+
     //////////
     // GPIO //
     //////////
@@ -24,6 +30,8 @@ public class TriggerFactory extends Factory<Trigger> {
     }
 
     public GpioTrigger gpio(String name, int pinNumber, PinPullResistance resistance, boolean triggerState) {
+
+        gpioUsed = true;
 
         GpioTrigger trigger =
             injector.getInstance(GpioTrigger.class)

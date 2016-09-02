@@ -16,13 +16,13 @@ public class MidiServiceImpl implements MidiService {
     private MidiDevice midiInDevice;
 
     @Override
-    public void openDevice() {
-        openDevice(props.getString("MidiDevice", "USB Uno MIDI Interface"));
+    public void start() {
+        start(props.getString("MidiDevice", "USB Uno MIDI Interface"));
     }
 
     @Override
-    public void openDevice(String name) {
-        System.out.println("Opening MIDI Device...");
+    public void start(String name) {
+        System.out.println("Starting MIDI Service...");
         try {
             midiOutDevice = getMidiOutDevice(name);
             midiOutDevice.open();
@@ -30,14 +30,14 @@ public class MidiServiceImpl implements MidiService {
 //            midiInDevice.close();
 //            midiInDevice.open();
         } catch (MidiUnavailableException e) {
-            System.out.println("Could not start MIDI device '" + name + "'");
+            System.out.println("Could not open MIDI device '" + name + "'");
         }
     }
 
     @Override
-    public void closeDevice() {
+    public void stop() {
+        System.out.println("Stopping MIDI Service...");
         if ( midiOutDevice !=null ) {
-            System.out.println("Closing MIDI Device...");
             midiOutDevice.close();
         }
     }

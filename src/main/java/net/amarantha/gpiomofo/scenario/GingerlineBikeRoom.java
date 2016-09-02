@@ -1,12 +1,10 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.pixeltape.PixelTapeController;
 import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.pattern.ChasePattern;
 import net.amarantha.gpiomofo.pixeltape.pattern.IntensityFade;
 import net.amarantha.gpiomofo.pixeltape.pattern.SlidingBars;
-import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
@@ -14,12 +12,10 @@ import net.amarantha.gpiomofo.utility.GpioMofoProperties;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.*;
-import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;
 
 public class GingerlineBikeRoom extends Scenario {
 
     @Inject private GpioMofoProperties props;
-    @Inject private PixelTapeController pixeltape;
 
     private Trigger panicChamber2;
     private Trigger panicChamber2Hold;
@@ -248,10 +244,6 @@ public class GingerlineBikeRoom extends Scenario {
 
                 .link(buttonChamber2Green,  underwaterControl)
         ;
-
-        pixeltape
-                .init(150)
-                .start();
 
     }
 

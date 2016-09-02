@@ -56,14 +56,14 @@ public class TestBase {
         ((HttpServiceMock)http).clearLastCommand();
         triggers.clearAll();
         targets.clearAll();
-        midi.openDevice();
+        midi.start();
         now.setOffset(0L);
     }
 
     @After
     public void shutdown() {
-        midi.closeDevice();
-        gpio.shutdown();
+        midi.stop();
+        gpio.stop();
     }
 
     ///////////

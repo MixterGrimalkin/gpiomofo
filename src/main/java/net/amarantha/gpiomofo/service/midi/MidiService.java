@@ -2,11 +2,11 @@ package net.amarantha.gpiomofo.service.midi;
 
 public interface MidiService {
 
-    void openDevice();
+    void start();
 
-    void openDevice(String name);
+    void start(String name);
 
-    void closeDevice();
+    void stop();
 
     void send(MidiCommand midiCommand);
 

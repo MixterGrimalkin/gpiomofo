@@ -20,6 +20,22 @@ public class TargetFactory extends Factory<Target> {
         super("Target");
     }
 
+    private boolean gpioUsed;
+    private boolean midiUsed;
+    private boolean pixelTapeUsed;
+
+    public boolean isGpioUsed() {
+        return gpioUsed;
+    }
+
+    public boolean isMidiUsed() {
+        return midiUsed;
+    }
+
+    public boolean isPixelTapeUsed() {
+        return pixelTapeUsed;
+    }
+
     //////////
     // GPIO //
     //////////
@@ -29,6 +45,8 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public GpioTarget gpio(String name, int outputPin, Boolean outputState) {
+
+        gpioUsed = true;
 
         GpioTarget target =
             injector.getInstance(GpioTarget.class)
@@ -88,6 +106,8 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public MidiTarget midi(String name, MidiCommand onCommand, MidiCommand offCommand) {
+
+        midiUsed = true;
 
         MidiTarget target =
             injector.getInstance(MidiTarget.class)
@@ -313,6 +333,8 @@ public class TargetFactory extends Factory<Target> {
 
     public <P extends PixelTapeTarget> P pixelTape(String name, Class<P> clazz) {
 
+        pixelTapeUsed = true;
+
         P target = injector.getInstance(clazz);
 
         target.oneShot(true);
@@ -328,6 +350,8 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public StopPixelTapeTarget stopPixelTape(String name) {
+
+        pixelTapeUsed = true;
 
         StopPixelTapeTarget target =
             injector.getInstance(StopPixelTapeTarget.class);
