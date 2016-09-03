@@ -395,6 +395,6 @@ public class GingerlineBriefingRoom extends Scenario {
     public static final int PIPE_2_START = PIPE_3_START + PIPE_3_SIZE;
     public static final int PIPE_1_START = PIPE_2_START + PIPE_2_SIZE;
 
-    public static final int WHOLE_TAPE = ALL_DOMES + PIPE_1_SIZE + PIPE_2_SIZE + PIPE_3_SIZE + PIPE_4_SIZE;
+    public static final int WHOLE_TAPE = PIPE_1_START + PIPE_1_SIZE;
 
 }

@@ -16,6 +16,7 @@ import java.util.Scanner;
 
 import static java.lang.System.out;
 import static net.amarantha.gpiomofo.utility.PropertyManager.processArgs;
+import static net.amarantha.gpiomofo.utility.PropertyManager.setHelpText;
 
 @Singleton
 public class Main {
@@ -32,15 +33,13 @@ public class Main {
 
     public void start() {
 
-        out.println(BAR+"\n"+LOGO);
-
         scenario.load();
 
-        out.println(" STARTING UP... \n" + BAR);
+        log(" STARTING UP... ", true);
 
         startServices();
 
-        out.println(BAR + "\n GpioMofo is Active \n" + BAR);
+        log(true, " GpioMofo is Active ", true);
 
         scenario.start();
 
@@ -62,14 +61,14 @@ public class Main {
             pixel.start();
         }
         tasks.start();
-        if ( props.isWithServer() ) {
+        if ( props.isArgumentPresent(WITH_SERVER) ) {
             web.start();
         }
 
     }
 
     private void waitForEnter() {
-        out.println(" (Press ENTER to quit)\n" + BAR);
+        log(true, " (Press ENTER to quit)", true);
         Scanner scanner = new Scanner(System.in);
         while (!scanner.hasNextLine()) {}
         stop();
@@ -79,11 +78,11 @@ public class Main {
 
         scenario.stop();
 
-        out.println(BAR + "\n SHUTTING DOWN...\n" + BAR);
+        log(true, " SHUTTING DOWN...", true);
 
         stopServices();
 
-        out.println(BAR+"\n Bye for now! \n"+BAR);
+        log(true, " Bye for now! ", true);
 
         System.exit(0);
 
@@ -91,7 +90,7 @@ public class Main {
 
     private void stopServices() {
 
-        if ( props.isWithServer() ) {
+        if ( props.isArgumentPresent(WITH_SERVER) ) {
             web.stop();
         }
         tasks.stop();
@@ -107,22 +106,73 @@ public class Main {
 
     }
 
+    /////////////
+    // Startup //
+    /////////////
+
     public static final String LOGO =
-            "    ________       .__          _____          _____       \n" +
+            "\n    ________       .__          _____          _____       \n" +
             "   /  _____/______ |__| ____   /     \\   _____/ ____\\____  \n" +
             "  /   \\  ___\\____ \\|  |/  _ \\ /  \\ /  \\ /  _ \\   __\\/  _ \\ \n" +
             "  \\    \\_\\  \\  |_> >  (  <_> )    Y    (  <_> )  | (  <_> )\n" +
             "   \\______  /   __/|__|\\____/\\____|__  /\\____/|__|  \\____/ \n" +
-            "          \\/|__|                     \\/                    ";
+            "          \\/|__|                     \\/                    \n";
 
     public static final String BAR =
             "-------------------------------------------------------------";
 
+    public static final String HELP_TEXT =
+        "GpioMofo\n" +
+        "  Multiple-protocol linking system for Raspberry Pi\n" +
+        "Usage:\n" +
+        "  gpiomofo.sh [OPTIONS]\n" +
+        "    -list       : List available Scenarios and exit\n" +
+        "    -scenario=S : Start Scenario S, otherwise use value from properties\n" +
+        "    -withserver : Start HTTP server\n" +
+        "    -local      : Serve on 127.0.0.1\n" +
+        "    -loghttp    : Log incoming HTTP requests\n" +
+        "\n"
+    ;
+
+    public static final String SCENARIO = "scenario";
+    public static final String WITH_SERVER = "withserver";
+    public static final String LOCAL_IP = "local";
+    public static final String LOG_HTTP = "loghttp";
+    public static final String LIST_SCENARIOS = "list";
+
     public static void main(String[] args) {
+        log(LOGO);
+        setHelpText(HELP_TEXT);
         processArgs(args);
         Guice.createInjector(new LiveModule())
             .getInstance(Main.class)
                 .start();
+    }
+
+    ////////////////////
+    // Simple Logging //
+    ////////////////////
+
+    public static void log(boolean bar) {
+        if ( bar ) {
+            out.println(BAR);
+        }
+    }
+
+    public static void log(String message) {
+        log(false, message, false);
+    }
+
+    public static void log(boolean barBefore, String message) {
+        log(barBefore, message, false);
+    }
+
+    public static void log(String message, boolean barAfter) {
+        log(false, message, barAfter);
+    }
+
+    public static void log(boolean barBefore, String message, boolean barAfter) {
+        out.println((barBefore?BAR+"\n":"")+message+(barAfter?"\n"+BAR:""));
     }
 
 }

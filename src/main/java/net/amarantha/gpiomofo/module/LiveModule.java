@@ -13,8 +13,14 @@ import net.amarantha.gpiomofo.service.midi.MidiService;
 import net.amarantha.gpiomofo.service.midi.MidiServiceImpl;
 import net.amarantha.gpiomofo.service.osc.OscService;
 import net.amarantha.gpiomofo.service.osc.OscServiceImpl;
-import net.amarantha.gpiomofo.utility.GpioMofoProperties;
 import net.amarantha.gpiomofo.utility.PropertyManager;
+import net.amarantha.gpiomofo.utility.PropertyNotFoundException;
+import org.reflections.Reflections;
+
+import java.util.Set;
+
+import static net.amarantha.gpiomofo.Main.LIST_SCENARIOS;
+import static net.amarantha.gpiomofo.Main.SCENARIO;
 
 public class LiveModule extends AbstractModule {
 
@@ -24,12 +30,40 @@ public class LiveModule extends AbstractModule {
 
     public LiveModule() {
         PropertyManager props = new PropertyManager();
-        String className = props.getString("Scenario", "TestScenario");
         pixelTapeRefresh = props.getInt("PixelTapeRefresh", 50);
+        if ( props.isArgumentPresent(LIST_SCENARIOS) ) {
+            listScenarios();
+            System.exit(0);
+        }
+        String className = "";
         try {
+            String commandLineClassName = props.getArgumentValue(SCENARIO);
+            if ( commandLineClassName==null ) {
+                className = props.getString("Scenario");
+            } else {
+                className = commandLineClassName;
+                props.getString("Scenario", className);
+            }
             scenarioClass = (Class<? extends Scenario>) Class.forName("net.amarantha.gpiomofo.scenario."+className);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("Scenario '" + className + "' not found\n\nUse: gpiomofo.sh -list\n");
+            System.exit(1);
+        } catch (PropertyNotFoundException e) {
+            System.out.println("No Scenario specified\n\nUse: gpiomofo.sh -list\n");
+            System.exit(1);
+        }
+    }
+
+    private void listScenarios() {
+        System.out.println("Scanning Scenarios...");
+        Reflections reflections = new Reflections("net.amarantha.gpiomofo.scenario");
+        Set<Class<? extends Scenario>> allClasses = reflections.getSubTypesOf(Scenario.class);
+        if ( allClasses.isEmpty() ) {
+            System.out.println("\nNo Scenarios found");
+        } else {
+            System.out.println("\nAvailable Scenarios:");
+            allClasses.forEach((v)-> System.out.println(" " + v.getSimpleName()));
+            System.out.println("\nUse: gpiomofo.sh -scenario=<name>\n");
         }
     }
 

@@ -5,11 +5,15 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import net.amarantha.gpiomofo.module.SimulationModule;
 
+import static net.amarantha.gpiomofo.Main.*;
 import static net.amarantha.gpiomofo.utility.PropertyManager.processArgs;
+import static net.amarantha.gpiomofo.utility.PropertyManager.setHelpText;
 
 public class Simulation extends Application {
 
     public static void main(String[] args) {
+        log(LOGO);
+        setHelpText(HELP_TEXT);
         processArgs(args);
         launch(args);
     }

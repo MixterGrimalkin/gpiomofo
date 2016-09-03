@@ -4,38 +4,38 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.LinkFactory;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
-import net.amarantha.gpiomofo.pixeltape.RGB;
-import net.amarantha.gpiomofo.utility.Property;
+import net.amarantha.gpiomofo.pixeltape.NeoPixel;
+import net.amarantha.gpiomofo.pixeltape.NeoPixelGUI;
 import net.amarantha.gpiomofo.utility.PropertyManager;
 import net.amarantha.gpiomofo.utility.PropertyNotFoundException;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.Map;
 
-import static java.lang.System.out;
-import static net.amarantha.gpiomofo.Main.BAR;
+import static net.amarantha.gpiomofo.Main.log;
 
 public abstract class Scenario {
 
     @Inject private PropertyManager props;
 
     public void load() {
-        out.println(BAR+"\n LOADING SCENARIO: " + getClass().getSimpleName());
+        log(true, " LOADING SCENARIO: " + getClass().getSimpleName());
         injectProperties();
-        out.println(BAR+"\n TRIGGERS \n"+BAR);
+        log(true, " TRIGGERS ", true);
         setupTriggers();
-        out.println(BAR+"\n TARGETS \n"+BAR);
+        log(true, " TARGETS ", true);
         setupTargets();
-        out.println(BAR+"\n LINKS \n"+BAR);
+        log(true, " LINKS ", true);
         setupLinks();
-        out.println(BAR);
+        log(true);
     }
 
     private void injectProperties() {
         try {
             Map<String, String> p = props.injectProperties(this);
-            p.forEach((k,v)-> System.out.println(" - " + k + " = " + v));
+            if ( !p.isEmpty() ) {
+                log(true);
+                p.forEach((k, v) -> System.out.println(k + " = " + v));
+            }
         } catch (PropertyNotFoundException e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -64,6 +64,8 @@ public abstract class Scenario {
     // Required Services //
     ///////////////////////
 
+    @Inject private NeoPixel neoPixel;
+
     public boolean requiresGpio() {
         return triggers.isGpioUsed() || targets.isGpioUsed();
     }
@@ -77,7 +79,7 @@ public abstract class Scenario {
     }
 
     public boolean requiresGUI() {
-        return requiresPixelTape();
+        return requiresPixelTape() && neoPixel instanceof NeoPixelGUI;
     }
 
 }

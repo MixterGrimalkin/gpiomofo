@@ -6,15 +6,15 @@ import javax.inject.Singleton;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 @Singleton
 public class PropertyManager {
 
     public static final String PROPS_FILENAME = "application.properties";
     public static final String DEFAULT_FILENAME = "default.properties";
-
-    private static boolean simulationMode;
 
     protected Properties props;
     private Properties defProps;
@@ -164,20 +164,40 @@ public class PropertyManager {
     // Command Line Arguments //
     ////////////////////////////
 
-    private static boolean withServer = true;
+    private static Map<String, String> commandLineArgs = new HashMap<>();
 
-    public boolean isWithServer() {
-        return withServer;
-    }
+    private static String helpText = "No help available, sorry!";
 
-    public static boolean isSimulationMode() {
-        return simulationMode;
+    public static void setHelpText(String helpText) {
+        PropertyManager.helpText = helpText;
     }
 
     public static void processArgs(String[] args) {
-        List<String> arguments = Arrays.asList(args);
-        withServer = arguments.contains("-withserver");
-        simulationMode = arguments.contains("-simulation");
+        for ( String arg : args ) {
+            if ( "-help".equals(arg) || "-h".equals(arg) ) {
+                System.out.println(helpText);
+                System.exit(0);
+            }
+            if ( arg.length()>1 && arg.charAt(0)=='-' ) {
+                String argument = arg.substring(1);
+                String[] pieces = argument.split("=");
+                commandLineArgs.put(pieces[0], pieces.length==2 ? pieces[1] : "");
+            } else {
+                System.out.println("Bad Argument: " + arg);
+            }
+        }
+    }
+
+    public static void printArgs() {
+        commandLineArgs.forEach((k,v)-> System.out.println(k+(v.isEmpty() ? " SET" : " = "+v)));
+    }
+
+    public boolean isArgumentPresent(String argName) {
+        return commandLineArgs.containsKey(argName);
+    }
+
+    public String getArgumentValue(String argName) {
+        return commandLineArgs.get(argName);
     }
 
     ////////////////////////
@@ -217,7 +237,7 @@ public class PropertyManager {
         }
 
         if ( !sb.toString().isEmpty() ) {
-            throw new PropertyNotFoundException("The following properties could not be loaded from " + PROPS_FILENAME + "\n" + sb.toString());
+            throw new PropertyNotFoundException("The following properties could not be loaded from " + PROPS_FILENAME + ":\n" + sb.toString());
         }
 
         return result;

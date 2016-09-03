@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-echo "Compiling C..."
+echo "Compiling Native Libraries..."
 # Pi2
 jniInclude="NOT FOUND"
 if [ -f /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/include/jni.h ]
@@ -22,4 +22,3 @@ else
         gcc -lwiringPi -o ${file%.*}.so ${jniInclude} ${jniLinux} ${file%.*}.c
     done
 fi
-echo

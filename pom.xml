@@ -93,6 +93,13 @@
             <version>2.6.3</version>
         </dependency>
 
+        <!-- Reflections -->
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.10</version>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>junit</groupId>
@@ -178,22 +185,22 @@
                             </resources>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>copy-c</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/gpiomofo/c</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/src/main/c</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
+                    <!--<execution>-->
+                        <!--<id>copy-c</id>-->
+                        <!--<phase>validate</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>copy-resources</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<outputDirectory>${basedir}/target/gpiomofo/c</outputDirectory>-->
+                            <!--<resources>-->
+                                <!--<resource>-->
+                                    <!--<directory>${basedir}/src/main/c</directory>-->
+                                    <!--<filtering>true</filtering>-->
+                                <!--</resource>-->
+                            <!--</resources>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
                     <!-- Include Python Scripts -->
                     <execution>
                         <id>copy-python</id>
@@ -223,6 +230,26 @@
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/main/html</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <!-- Include default.properties -->
+                    <execution>
+                        <id>copy-props</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/gpiomofo</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}</directory>
+                                    <includes>
+                                        <include>default.properties</include>
+                                    </includes>
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>

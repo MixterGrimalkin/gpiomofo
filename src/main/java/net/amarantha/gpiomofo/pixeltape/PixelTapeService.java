@@ -39,8 +39,8 @@ public class PixelTapeService {
     }
 
     public void stop() {
-        neoPixel.close();
         System.out.println("Stopping PixelTape Service...");
+        neoPixel.close();
     }
 
     public void render() {

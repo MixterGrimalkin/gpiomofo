@@ -11,6 +11,13 @@ import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;
 
 public class GingerlinePanic extends Scenario {
 
+    public static final String URL_PANIC_BRIEFING = "panic-briefing";
+    public static final String URL_PANIC_GAMESHOW = "panic-gameshow";
+    public static final String URL_PANIC_UNDERWATER = "panic-underwater";
+    public static final String URL_PANIC_BIKES = "panic-bikes";
+    public static final String URL_PANIC_KITCHEN = "panic-kitchen";
+    public static final String URL_PANIC_TOYBOX = "panic-toybox";
+
     public static final String PANIC_IP = "192.168.42.105";
     public static final int PANIC_PORT = 8001;
 
@@ -19,13 +26,6 @@ public class GingerlinePanic extends Scenario {
     @Property("ButtonHoldTime")         private int     holdTime;
     @Property("LightingServerIP")       private String  lightingIp;
     @Property("LightingServerOscPort")  private int     lightingPort;
-
-    public static final String URL_PANIC_BRIEFING = "panic-briefing";
-    public static final String URL_PANIC_GAMESHOW = "panic-gameshow";
-    public static final String URL_PANIC_UNDERWATER = "panic-underwater";
-    public static final String URL_PANIC_BIKES = "panic-bikes";
-    public static final String URL_PANIC_KITCHEN = "panic-kitchen";
-    public static final String URL_PANIC_TOYBOX = "panic-toybox";
 
     private Trigger panicReset;
     private Trigger panicResetHold;

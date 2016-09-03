@@ -26,7 +26,7 @@ public class GingerlineToyBoxRoom extends Scenario {
     @Property("C5-Blue")                private RGB     blue;
 
     private Trigger panicButton;
-    private Trigger panicButtonHold;
+    private Trigger panicHold;
 
     private Trigger button1;
     private Trigger button2;
@@ -50,13 +50,13 @@ public class GingerlineToyBoxRoom extends Scenario {
     @Override
     public void setupTriggers() {
 
-        panicButton =       triggers.gpio("Panic",      2, PULL_UP, false);
-        panicButtonHold =   triggers.gpio("Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);
+        panicButton =   triggers.gpio("Panic",      2, PULL_UP, false);
+        panicHold =     triggers.gpio("Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);
 
-        button1 = triggers.gpio("Button1", 3, PULL_UP, false).setHoldTime(holdTime);
-        button2 = triggers.gpio("Button2", 4, PULL_UP, false).setHoldTime(holdTime);
-        button3 = triggers.gpio("Button3", 5, PULL_UP, false).setHoldTime(holdTime);
-        button4 = triggers.gpio("Button4", 6, PULL_UP, false).setHoldTime(holdTime);
+        button1 =       triggers.gpio("Button1", 3, PULL_UP, false).setHoldTime(holdTime);
+        button2 =       triggers.gpio("Button2", 4, PULL_UP, false).setHoldTime(holdTime);
+        button3 =       triggers.gpio("Button3", 5, PULL_UP, false).setHoldTime(holdTime);
+        button4 =       triggers.gpio("Button4", 6, PULL_UP, false).setHoldTime(holdTime);
 
         oscStop =       triggers.osc("Stop",            53000, "stop");
         oscAmber =      triggers.osc("Amber",           53000, "amber");
@@ -264,7 +264,7 @@ public class GingerlineToyBoxRoom extends Scenario {
                 .link(oscEndOfWorld,    endOfWorld)
 
                 .link(panicButton,      panicLights)
-                .link(panicButtonHold,  panicMonitor)
+                .link(panicHold,        panicMonitor)
                 .link(button1,          osc1)
                 .link(button2,          osc2)
                 .link(button3,          osc3)
