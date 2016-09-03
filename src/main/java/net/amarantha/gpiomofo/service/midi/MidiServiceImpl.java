@@ -2,37 +2,45 @@ package net.amarantha.gpiomofo.service.midi;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.amarantha.gpiomofo.utility.Property;
 import net.amarantha.gpiomofo.utility.PropertyManager;
+import net.amarantha.gpiomofo.utility.PropertyNotFoundException;
+import net.amarantha.gpiomofo.utility.Utility;
 
 import javax.sound.midi.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 @Singleton
 public class MidiServiceImpl implements MidiService {
 
-    @Inject
-    private PropertyManager props;
+    @Property("MidiDevice") private String deviceName;
 
     private MidiDevice midiOutDevice;
-    private MidiDevice midiInDevice;
+
+    @Inject
+    public MidiServiceImpl(PropertyManager props) {
+        try {
+            props.injectProperties(this);
+        } catch (PropertyNotFoundException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+    }
 
     @Override
     public void start() {
-        start(props.getString("MidiDevice", "USB Uno MIDI Interface"));
-    }
-
-    @Override
-    public void start(String name) {
         System.out.println("Starting MIDI Service...");
         try {
-            midiOutDevice = getMidiOutDevice(name);
+            connectDevice(deviceName);
+            midiOutDevice = getMidiOutDevice(deviceName);
             midiOutDevice.open();
-//            midiInDevice = getMidiInDevice(name);
-//            midiInDevice.close();
-//            midiInDevice.open();
         } catch (MidiUnavailableException e) {
-            System.out.println("Could not open MIDI device '" + name + "'");
+            System.out.println("Could not open MIDI device '" + deviceName + "'");
         }
     }
+
 
     @Override
     public void stop() {
@@ -40,51 +48,13 @@ public class MidiServiceImpl implements MidiService {
         if ( midiOutDevice !=null ) {
             midiOutDevice.close();
         }
+        disconnectDevice(deviceName);
     }
 
     @Override
     public void send(MidiCommand midiCommand) {
         if ( midiCommand!=null ) {
             send(midiCommand.getCommand(), midiCommand.getChannel(), midiCommand.getData1(), midiCommand.getData2());
-        }
-    }
-
-    public void addListener() {
-        System.out.println("ADD LISTENER");
-        try {
-            midiInDevice.open();
-            Sequencer sequencer = MidiSystem.getSequencer();
-            sequencer.open();
-            Transmitter transmitter = midiInDevice.getTransmitter();
-            Receiver receiver = sequencer.getReceiver();
-            transmitter.setReceiver(receiver);
-            sequencer.addMetaEventListener(new MetaEventListener() {
-                @Override
-                public void meta(MetaMessage meta) {
-                    System.out.println("HellO!");
-                }
-            });
-            sequencer.addControllerEventListener(new ControllerEventListener() {
-                @Override
-                public void controlChange(ShortMessage event) {
-                    System.out.println("Boom!");
-                }
-            }, new int[]{64});
-//            Transmitter transmitter = midiInDevice.getTransmitter();
-//            transmitter.setReceiver(new Receiver() {
-//                @Override
-//                public void send(MidiMessage message, long timeStamp) {
-//                    System.out.println("MESSAGE: " + message.toString());
-//                }
-//
-//                @Override
-//                public void close() {
-//                    System.out.println("CLOSE");
-//
-//                }
-//            });
-        } catch (MidiUnavailableException e) {
-            e.printStackTrace();
         }
     }
 
@@ -104,34 +74,33 @@ public class MidiServiceImpl implements MidiService {
         }
     }
 
+    /////////////////
+    // MIDI Device //
+    /////////////////
+
     private MidiDevice getMidiOutDevice(String name) throws MidiUnavailableException {
         MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
         for (MidiDevice.Info info : infos) {
             MidiDevice device = MidiSystem.getMidiDevice(info);
             try {
-                if (device.getReceiver() != null && info.getDescription().contains(name)) {
-                    return device;
+                if (info.getDescription().contains(name)) {
+                    if ( device.getReceiver() != null ) {
+                        return device;
+                    }
                 }
-            } catch ( MidiUnavailableException e ) {
-//                e.printStackTrace();
+            } catch ( MidiUnavailableException ignored ) {
             }
         }
         throw new MidiUnavailableException("MIDI Device '" + name + "' not found");
     }
 
-    private MidiDevice getMidiInDevice(String name) throws MidiUnavailableException {
-        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-        for (MidiDevice.Info info : infos) {
-            MidiDevice device = MidiSystem.getMidiDevice(info);
-            try {
-                if (device.getTransmitter() != null && info.getDescription().contains(name)) {
-                    return device;
-                }
-            } catch ( MidiUnavailableException e ) {
-//                e.printStackTrace();
-            }
-        }
-        throw new MidiUnavailableException("MIDI Device '" + name + "' not found");
+    private void connectDevice(String name) {
+        Utility.executeCommand(new String[]{"aconnect", name, "Midi Through"});
     }
+
+    private void disconnectDevice(String name) {
+        Utility.executeCommand(new String[]{"aconnect", "-d", name, "Midi Through"});
+    }
+
 
 }

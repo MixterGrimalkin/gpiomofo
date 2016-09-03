@@ -80,7 +80,7 @@ public class NeoPixelGUI implements NeoPixel {
 
         // Shut down application when window is closed
         stage.setOnCloseRequest(event -> {
-            main.stop();
+            main.stopApplication();
         });
 
     }

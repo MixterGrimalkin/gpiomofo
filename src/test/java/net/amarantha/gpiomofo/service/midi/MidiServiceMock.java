@@ -14,11 +14,6 @@ public class MidiServiceMock implements MidiService {
     }
 
     @Override
-    public void start(String name) {
-        deviceOpen = true;
-    }
-
-    @Override
     public void stop() {
         deviceOpen = false;
     }
@@ -31,11 +26,6 @@ public class MidiServiceMock implements MidiService {
     @Override
     public void send(int command, int channel, int data1, int data2) {
         lastMidiCommand = new MidiCommand(command, channel, data1, data2);
-    }
-
-    @Override
-    public void addListener() {
-
     }
 
     public MidiCommand getLastCommand() {

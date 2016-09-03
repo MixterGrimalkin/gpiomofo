@@ -27,7 +27,7 @@ public class WebService {
 
     public HttpServer start() {
 
-        System.out.println("Starting Web Service...");
+        System.out.println("Starting HTTP Server...");
 
         String ip = props.isArgumentPresent(LOCAL_IP) ? "127.0.0.1" : props.getIp().trim();
         String fullUri = "http://" + ip + ":8001/gpiomofo/";
@@ -49,7 +49,7 @@ public class WebService {
     }
 
     public void stop() {
-        System.out.println("Stopping Web Service...");
+        System.out.println("Stopping HTTP Server...");
         if ( server!=null ) {
             server.shutdown();
         }

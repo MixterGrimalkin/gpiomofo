@@ -1,5 +1,7 @@
 package net.amarantha.gpiomofo.target;
 
+import net.amarantha.gpiomofo.utility.Utility;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -45,19 +47,7 @@ public class PythonTarget extends Target {
     }
 
     private void fireProcess() {
-        try {
-            shellProcess = Runtime.getRuntime().exec("python " + scriptFile);
-//            shellProcess.waitFor();
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(shellProcess.getInputStream()));
-            String line = "";
-            StringBuilder output = new StringBuilder();
-            while ((line = reader.readLine())!= null) {
-                System.out.println(line);
-                output.append(line).append("\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Utility.executeCommand(new String[]{"python", scriptFile});
     }
+
 }

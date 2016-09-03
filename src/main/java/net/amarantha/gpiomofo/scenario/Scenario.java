@@ -11,14 +11,15 @@ import net.amarantha.gpiomofo.utility.PropertyNotFoundException;
 
 import java.util.Map;
 
-import static net.amarantha.gpiomofo.Main.log;
+import static net.amarantha.gpiomofo.utility.Utility.bar;
+import static net.amarantha.gpiomofo.utility.Utility.log;
 
 public abstract class Scenario {
 
     @Inject private PropertyManager props;
 
     public void load() {
-        log(true, " LOADING SCENARIO: " + getClass().getSimpleName());
+        log(" LOADING SCENARIO: " + getClass().getSimpleName());
         injectProperties();
         log(true, " TRIGGERS ", true);
         setupTriggers();
@@ -26,14 +27,14 @@ public abstract class Scenario {
         setupTargets();
         log(true, " LINKS ", true);
         setupLinks();
-        log(true);
+        bar();
     }
 
     private void injectProperties() {
         try {
             Map<String, String> p = props.injectProperties(this);
             if ( !p.isEmpty() ) {
-                log(true);
+                bar();
                 p.forEach((k, v) -> System.out.println(k + " = " + v));
             }
         } catch (PropertyNotFoundException e) {

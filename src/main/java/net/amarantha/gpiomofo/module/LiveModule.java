@@ -46,10 +46,10 @@ public class LiveModule extends AbstractModule {
             }
             scenarioClass = (Class<? extends Scenario>) Class.forName("net.amarantha.gpiomofo.scenario."+className);
         } catch (ClassNotFoundException e) {
-            System.out.println("Scenario '" + className + "' not found\n\nUse: gpiomofo.sh -list\n");
+            System.out.println("Scenario '" + className + "' not found\n\nSee: gpiomofo.sh -help\n");
             System.exit(1);
         } catch (PropertyNotFoundException e) {
-            System.out.println("No Scenario specified\n\nUse: gpiomofo.sh -list\n");
+            System.out.println("No Scenario specified\n\nSee: gpiomofo.sh -help\n");
             System.exit(1);
         }
     }
