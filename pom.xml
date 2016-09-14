@@ -18,6 +18,13 @@
             <!--<type>pom</type>-->
         <!--</dependency>-->
 
+        <!-- YAML -->
+        <dependency>
+            <groupId>com.esotericsoftware.yamlbeans</groupId>
+            <artifactId>yamlbeans</artifactId>
+            <version>1.08</version>
+        </dependency>
+
         <!-- Guice -->
         <dependency>
             <groupId>com.google.inject</groupId>

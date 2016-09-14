@@ -13,7 +13,7 @@ import net.amarantha.gpiomofo.service.midi.MidiService;
 import net.amarantha.gpiomofo.service.midi.MidiServiceImpl;
 import net.amarantha.gpiomofo.service.osc.OscService;
 import net.amarantha.gpiomofo.service.osc.OscServiceImpl;
-import net.amarantha.gpiomofo.utility.PropertyManager;
+import net.amarantha.gpiomofo.service.PropertiesService;
 import net.amarantha.gpiomofo.utility.PropertyNotFoundException;
 import org.reflections.Reflections;
 
@@ -26,11 +26,10 @@ public class LiveModule extends AbstractModule {
 
     private Class<? extends Scenario> scenarioClass;
 
-    private int pixelTapeRefresh;
+    private PropertiesService props;
 
     public LiveModule() {
-        PropertyManager props = new PropertyManager();
-        pixelTapeRefresh = props.getInt("PixelTapeRefresh", 50);
+        props = new PropertiesService();
         if ( props.isArgumentPresent(LIST_SCENARIOS) ) {
             listScenarios();
             System.exit(0);
@@ -42,7 +41,6 @@ public class LiveModule extends AbstractModule {
                 className = props.getString("Scenario");
             } else {
                 className = commandLineClassName;
-                props.getString("Scenario", className);
             }
             scenarioClass = (Class<? extends Scenario>) Class.forName("net.amarantha.gpiomofo.scenario."+className);
         } catch (ClassNotFoundException e) {
@@ -52,6 +50,23 @@ public class LiveModule extends AbstractModule {
             System.out.println("No Scenario specified\n\nSee: gpiomofo.sh -help\n");
             System.exit(1);
         }
+        props.getString("Scenario", className);
+    }
+
+    @Override
+    protected void configure() {
+        bind(PropertiesService.class).toInstance(props);
+        bind(Scenario.class).to(scenarioClass).in(Scopes.SINGLETON);
+        bind(MidiService.class).to(MidiServiceImpl.class).in(Scopes.SINGLETON);
+        bind(HttpService.class).to(HttpServiceImpl.class).in(Scopes.SINGLETON);
+        bind(OscService.class).to(OscServiceImpl.class).in(Scopes.SINGLETON);
+        configureAdditional();
+    }
+
+    protected void configureAdditional() {
+        bind(GpioService.class).to(RaspberryPi3.class).in(Scopes.SINGLETON);
+        bind(NeoPixel.class).to(NeoPixelWS281X.class).in(Scopes.SINGLETON);
+        bindConstant().annotatedWith(TapeRefresh.class).to(props.getInt("PixelTapeRefresh", 50));
     }
 
     private void listScenarios() {
@@ -65,21 +80,6 @@ public class LiveModule extends AbstractModule {
             allClasses.forEach((v)-> System.out.println(" " + v.getSimpleName()));
             System.out.println("\nUse: gpiomofo.sh -scenario=<name>\n");
         }
-    }
-
-    @Override
-    protected void configure() {
-        bind(Scenario.class).to(scenarioClass).in(Scopes.SINGLETON);
-        bind(MidiService.class).to(MidiServiceImpl.class).in(Scopes.SINGLETON);
-        bind(HttpService.class).to(HttpServiceImpl.class).in(Scopes.SINGLETON);
-        bind(OscService.class).to(OscServiceImpl.class).in(Scopes.SINGLETON);
-        configureAdditional();
-    }
-
-    protected void configureAdditional() {
-        bind(GpioService.class).to(RaspberryPi3.class).in(Scopes.SINGLETON);
-        bind(NeoPixel.class).to(NeoPixelWS281X.class).in(Scopes.SINGLETON);
-        bindConstant().annotatedWith(TapeRefresh.class).to(pixelTapeRefresh);
     }
 
 }

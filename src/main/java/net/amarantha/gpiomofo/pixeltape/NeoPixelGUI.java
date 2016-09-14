@@ -7,7 +7,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import net.amarantha.gpiomofo.Main;
+import net.amarantha.gpiomofo.GpioMofo;
 import net.amarantha.gpiomofo.utility.TimeGuard;
 
 import static javafx.scene.paint.Color.color;
@@ -17,7 +17,7 @@ public class NeoPixelGUI implements NeoPixel {
 
     private int pixelCount;
 
-    @Inject private Main main;
+    @Inject private GpioMofo application;
     @Inject private Stage stage;
 
 //    private int[] widths = { 7, 21, 7, 21, 7 };
@@ -80,7 +80,7 @@ public class NeoPixelGUI implements NeoPixel {
 
         // Shut down application when window is closed
         stage.setOnCloseRequest(event -> {
-            main.stopApplication();
+            application.stopApplication();
         });
 
     }

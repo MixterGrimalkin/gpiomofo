@@ -3,14 +3,11 @@ package net.amarantha.gpiomofo.service.midi;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.utility.Property;
-import net.amarantha.gpiomofo.utility.PropertyManager;
+import net.amarantha.gpiomofo.service.PropertiesService;
 import net.amarantha.gpiomofo.utility.PropertyNotFoundException;
 import net.amarantha.gpiomofo.utility.Utility;
 
 import javax.sound.midi.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 @Singleton
 public class MidiServiceImpl implements MidiService {
@@ -20,7 +17,7 @@ public class MidiServiceImpl implements MidiService {
     private MidiDevice midiOutDevice;
 
     @Inject
-    public MidiServiceImpl(PropertyManager props) {
+    public MidiServiceImpl(PropertiesService props) {
         try {
             props.injectProperties(this);
         } catch (PropertyNotFoundException e) {

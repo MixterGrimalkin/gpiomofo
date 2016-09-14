@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.webservice;
 
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.utility.PropertyManager;
+import net.amarantha.gpiomofo.service.PropertiesService;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -18,7 +18,7 @@ public class WebService {
 
     private HttpServer server;
 
-    @Inject private PropertyManager props;
+    @Inject private PropertiesService props;
 
     @Inject private TriggerResource triggerResource;
     @Inject private MonitorResource monitorResource;

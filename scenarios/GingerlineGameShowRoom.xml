@@ -1,0 +1,20 @@
+<scenario>
+
+    <define name="holdTime" fromProperty="ButtonHoldTime"/>
+    <define name="mediaIp" fromProperty="MediaServerIP">DEF.AUL.TVA.LUE</define>
+    <define name="mediaPort" fromProperty="MediaServerOscPort"/>
+
+    <triggers>
+        <gpio name="Podium-1" pin="2" resistance="PULL_UP" state="HIGH" holdTime=":holdTime"/>
+    </triggers>
+
+    <targets>
+        <osc name="Cue-1101" ip=":mediaIp" port=":mediaPort" address="cue/1101/start" data="255,255"/>
+    </targets>
+
+    <links>
+        <link trigger="Podium-1" target="Cue-1101"/>
+        <lock for="2000">Cue-1101</lock>
+    </links>
+
+</scenario>

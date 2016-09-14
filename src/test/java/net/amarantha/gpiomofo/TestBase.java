@@ -6,6 +6,8 @@ import com.illposed.osc.OSCMessage;
 import net.amarantha.gpiomofo.factory.LinkFactory;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
+import net.amarantha.gpiomofo.scenario.Scenario;
+import net.amarantha.gpiomofo.service.PropertiesService;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 import net.amarantha.gpiomofo.service.http.HttpCommand;
@@ -37,6 +39,8 @@ public class TestBase {
 
     @Inject protected TriggerResource triggerResource;
 
+    @Inject protected PropertiesService props;
+
     @Inject protected GpioService gpio;
     @Inject protected MidiService midi;
     @Inject protected HttpService http;
@@ -54,6 +58,7 @@ public class TestBase {
         ((GpioServiceMock)gpio).reset();
         ((MidiServiceMock)midi).clearLastCommand();
         ((HttpServiceMock)http).clearLastCommand();
+        ((OscServiceMock)osc).clearLastCommand();
         triggers.clearAll();
         targets.clearAll();
         midi.start();
@@ -214,6 +219,14 @@ public class TestBase {
 
     void given_link_between_$1_and_$2(String trigger, String target) {
         links.link(trigger, target);
+    }
+
+    void given_property_$1_equals_$2(String key, String value) {
+        props.setProperty(key, value);
+    }
+
+    void given_scenario(Scenario scenario) {
+        scenario.load();
     }
 
     //////////

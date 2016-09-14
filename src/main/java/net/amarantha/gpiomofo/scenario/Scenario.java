@@ -6,7 +6,7 @@ import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
 import net.amarantha.gpiomofo.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.pixeltape.NeoPixelGUI;
-import net.amarantha.gpiomofo.utility.PropertyManager;
+import net.amarantha.gpiomofo.service.PropertiesService;
 import net.amarantha.gpiomofo.utility.PropertyNotFoundException;
 
 import java.util.Map;
@@ -16,7 +16,7 @@ import static net.amarantha.gpiomofo.utility.Utility.log;
 
 public abstract class Scenario {
 
-    @Inject private PropertyManager props;
+    @Inject private PropertiesService props;
 
     public void load() {
         log(" LOADING SCENARIO: " + getClass().getSimpleName());

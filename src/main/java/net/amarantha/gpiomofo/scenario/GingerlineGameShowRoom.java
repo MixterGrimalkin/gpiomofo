@@ -11,7 +11,7 @@ import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_GAMESHOW
 
 public class GingerlineGameShowRoom extends Scenario {
 
-    @Property("ButtonHoldTime")         private int     holdTime;
+    @Property("ButtonHoldTime")         public int     holdTime;
     @Property("LightingServerIP")       private String  lightingIp;
     @Property("LightingServerOscPort")  private int     lightingPort;
     @Property("MediaServerIP")          private String  mediaIp;
@@ -98,6 +98,8 @@ public class GingerlineGameShowRoom extends Scenario {
             .link(effectButton04,   effectTarget04)
             .link(effectButton05,   effectTarget05)
         ;
+
+        triggers.save("triggers.yaml");
 
     }
 

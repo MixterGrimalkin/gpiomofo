@@ -7,8 +7,8 @@ import net.amarantha.gpiomofo.module.SimulationModule;
 
 import static net.amarantha.gpiomofo.Main.HELP_TEXT;
 import static net.amarantha.gpiomofo.Main.LOGO;
-import static net.amarantha.gpiomofo.utility.PropertyManager.processArgs;
-import static net.amarantha.gpiomofo.utility.PropertyManager.setHelpText;
+import static net.amarantha.gpiomofo.service.PropertiesService.processArgs;
+import static net.amarantha.gpiomofo.service.PropertiesService.setHelpText;
 import static net.amarantha.gpiomofo.utility.Utility.log;
 
 public class Simulation extends Application {
@@ -23,7 +23,7 @@ public class Simulation extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Guice.createInjector(new SimulationModule(primaryStage))
-            .getInstance(Main.class)
+            .getInstance(GpioMofo.class)
                 .startApplication();
     }
 
