@@ -1,19 +1,10 @@
 package net.amarantha.gpiomofo.factory;
 
-import com.esotericsoftware.yamlbeans.YamlWriter;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.pi4j.io.gpio.PinPullResistance;
-import com.sun.xml.internal.xsom.impl.ListSimpleTypeImpl;
 import net.amarantha.gpiomofo.trigger.*;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 @Singleton
 public class TriggerFactory extends Factory<Trigger> {
@@ -28,34 +19,6 @@ public class TriggerFactory extends Factory<Trigger> {
 
     public boolean isGpioUsed() {
         return gpioUsed;
-    }
-
-    public void save(String filename) {
-
-
-        List<Object> list = new LinkedList<>();
-        Map<String, Object> result = new HashMap<>();
-
-        for ( Trigger trigger : getAll() ) {
-            list.add(trigger.getName());
-            result.put("Trigger", trigger.getName());
-            System.out.println(trigger.getName());
-
-
-        }
-        try (FileWriter file = new FileWriter(filename) ){
-
-
-            YamlWriter writer = new YamlWriter(file);
-            writer.write(list);
-//            writer.write(result);
-            writer.close();
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     //////////

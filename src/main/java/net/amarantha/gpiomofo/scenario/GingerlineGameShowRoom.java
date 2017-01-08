@@ -1,16 +1,19 @@
 package net.amarantha.gpiomofo.scenario;
 
+import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.utility.Property;
+import net.amarantha.utils.properties.Property;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
-import static net.amarantha.gpiomofo.scenario.GingerlinePanic.PANIC;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_GAMESHOW;
+import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;
 
 public class GingerlineGameShowRoom extends Scenario {
 
+    @Property("PanicIP")                private String  panicIp;
+    @Property("PanicPort")              private int     panicPort;
     @Property("ButtonHoldTime")         public int     holdTime;
     @Property("LightingServerIP")       private String  lightingIp;
     @Property("LightingServerOscPort")  private int     lightingPort;
@@ -64,7 +67,7 @@ public class GingerlineGameShowRoom extends Scenario {
     public void setupTargets() {
 
         panicTarget =       targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c1", 255));
-        panicHoldTarget =   targets.http(PANIC.withPath(URL_PANIC_GAMESHOW+"/fire"));
+        panicHoldTarget =   targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_GAMESHOW+"/fire", ""));
 
         podiumTarget1 =     targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1101/start", 255));
         podiumTarget2 =     targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1102/start", 255));
@@ -98,8 +101,6 @@ public class GingerlineGameShowRoom extends Scenario {
             .link(effectButton04,   effectTarget04)
             .link(effectButton05,   effectTarget05)
         ;
-
-        triggers.save("triggers.yaml");
 
     }
 

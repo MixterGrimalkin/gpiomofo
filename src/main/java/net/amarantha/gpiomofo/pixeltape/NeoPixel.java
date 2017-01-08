@@ -1,5 +1,7 @@
 package net.amarantha.gpiomofo.pixeltape;
 
+import net.amarantha.utils.colour.RGB;
+
 public interface NeoPixel {
 
     void init(int pixelCount);

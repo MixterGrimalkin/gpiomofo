@@ -2,13 +2,14 @@ package net.amarantha.gpiomofo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.amarantha.gpiomofo.factory.ScenarioBuilder;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeService;
 import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.midi.MidiService;
 import net.amarantha.gpiomofo.service.task.TaskService;
-import net.amarantha.gpiomofo.service.PropertiesService;
 import net.amarantha.gpiomofo.webservice.WebService;
+import net.amarantha.utils.properties.PropertiesService;
 
 import java.util.Scanner;
 
@@ -26,11 +27,13 @@ public class GpioMofo {
 
     @Inject private PropertiesService props;
 
-    @Inject private Scenario scenario;
+    @Inject private ScenarioBuilder scenarioBuilder;
+
+    private Scenario scenario;
 
     public void startApplication() {
 
-        scenario.load();
+        scenario = scenarioBuilder.load().get();
 
         log(" STARTING UP... ", true);
 

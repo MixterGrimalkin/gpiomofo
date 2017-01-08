@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import net.amarantha.gpiomofo.GpioMofo;
 import net.amarantha.gpiomofo.utility.TimeGuard;
+import net.amarantha.utils.colour.RGB;
 
 import static javafx.scene.paint.Color.color;
 import static net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom.*;

@@ -7,16 +7,14 @@ import net.amarantha.gpiomofo.module.SimulationModule;
 
 import static net.amarantha.gpiomofo.Main.HELP_TEXT;
 import static net.amarantha.gpiomofo.Main.LOGO;
-import static net.amarantha.gpiomofo.service.PropertiesService.processArgs;
-import static net.amarantha.gpiomofo.service.PropertiesService.setHelpText;
 import static net.amarantha.gpiomofo.utility.Utility.log;
+import static net.amarantha.utils.properties.PropertiesService.processArgs;
 
 public class Simulation extends Application {
 
     public static void main(String[] args) {
         log(LOGO);
-        setHelpText(HELP_TEXT);
-        processArgs(args);
+        processArgs(args, HELP_TEXT);
         launch(args);
     }
 

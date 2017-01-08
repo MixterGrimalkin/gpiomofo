@@ -1,6 +1,8 @@
 package net.amarantha.gpiomofo.service.http;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class HttpCommand {
@@ -28,6 +30,32 @@ public class HttpCommand {
         this.path = path;
         this.payload = payload;
         this.params = params;
+    }
+
+    public static HttpCommand fromString(String input) {
+        String[] pieces = input.split("\\|");
+        if ( pieces.length > 1 ) {
+            String method = pieces[0].toUpperCase();
+            String fullURL = pieces[1];
+            String body = pieces.length==3 ? pieces[2] : "";
+            String[] hostAndPort = fullURL.split("/")[0].split(":");
+            String host = hostAndPort[0];
+            int port = hostAndPort.length==2 ? Integer.parseInt(hostAndPort[1]) : 80;
+            String[] pathAndParams = fullURL.substring(fullURL.indexOf("/")+1).split("\\?");
+            String path = pathAndParams[0];
+            List<Param> params = new LinkedList<>();
+            if ( pathAndParams.length==2 ) {
+                String[] paramPairs = pathAndParams[1].split("&");
+                for ( String pair : paramPairs ) {
+                    String[] keyAndValue = pair.split("=");
+                    if ( keyAndValue.length==2 ) {
+                        params.add(new Param(keyAndValue[0], keyAndValue[1]));
+                    }
+                }
+            }
+            return new HttpCommand(method, host, port, path, "", body, params);
+        }
+        return null;
     }
 
     ///////////////
@@ -114,9 +142,23 @@ public class HttpCommand {
     // Object //
     ////////////
 
+    private String compileParams() {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for ( Param param : params ) {
+            sb.append(first?"":"&").append(param.getName()).append("=").append(param.getValue());
+            first = false;
+        }
+        return sb.toString();
+    }
+
     @Override
     public String toString() {
-        return method + "-http://" + getFullHost() + "/" + getFullPath();
+        String paramStr = compileParams();
+        return
+                method + "|http://" + getFullHost() + "/" + getFullPath()
+                        + (paramStr.isEmpty() ? "" : "?" + paramStr )
+                        + (payload.isEmpty()  ? "" : "|" + payload + "}" );
     }
 
     @Override

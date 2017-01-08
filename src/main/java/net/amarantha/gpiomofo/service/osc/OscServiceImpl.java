@@ -15,7 +15,7 @@ public class OscServiceImpl implements OscService {
     @Override
     public void send(OscCommand command) {
         try {
-            System.out.println(">>> OSC " + command.getHost()+":"+command.getPort()+"/"+command.getAddress());
+            System.out.println(">>> OSC " + command.toString());
             OSCPortOut sender = new OSCPortOut(InetAddress.getByName(command.getHost()), command.getPort());
             OSCMessage msg = new OSCMessage("/"+command.getAddress(), command.getArguments());
             sender.send(msg);

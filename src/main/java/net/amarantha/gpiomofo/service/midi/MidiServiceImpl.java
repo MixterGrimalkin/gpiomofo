@@ -2,10 +2,10 @@ package net.amarantha.gpiomofo.service.midi;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.utility.Property;
-import net.amarantha.gpiomofo.service.PropertiesService;
-import net.amarantha.gpiomofo.utility.PropertyNotFoundException;
 import net.amarantha.gpiomofo.utility.Utility;
+import net.amarantha.utils.properties.PropertiesService;
+import net.amarantha.utils.properties.Property;
+import net.amarantha.utils.properties.PropertyNotFoundException;
 
 import javax.sound.midi.*;
 
@@ -61,7 +61,7 @@ public class MidiServiceImpl implements MidiService {
             try {
                 Receiver receiver = midiOutDevice.getReceiver();
                 ShortMessage message = new ShortMessage();
-                message.setMessage(command, channel, data1, data2);
+                message.setMessage(command, channel-1, data1, data2);
                 receiver.send(message, -1);
             } catch (InvalidMidiDataException e) {
                 System.err.println("Invalid MIDI Data: " + e.getMessage());

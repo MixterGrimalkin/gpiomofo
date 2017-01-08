@@ -1,9 +1,9 @@
 package net.amarantha.gpiomofo.pixeltape.pattern;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.gpiomofo.utility.TimeGuard;
+import net.amarantha.utils.colour.RGB;
 
 public class Pulse extends PixelTapeTarget {
 

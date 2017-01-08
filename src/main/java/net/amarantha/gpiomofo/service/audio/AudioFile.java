@@ -10,19 +10,19 @@ import java.net.URL;
 
 public class AudioFile extends PlaybackListener implements Runnable {
 
-    private String filePath;
+    private String filename;
     private AdvancedPlayer player;
     private Thread playerThread;
 
     private boolean playing = false;
 
-    public AudioFile(String filePath) {
-        this.filePath = filePath;
+    public AudioFile(String filename) {
+        this.filename = filename;
     }
 
     public void play() {
         try {
-            String urlAsString = "file:///" + new java.io.File(".").getCanonicalPath() + "/" + this.filePath;
+            String urlAsString = "file:///" + new java.io.File(".").getCanonicalPath() + "/" + this.filename;
 
             player = new AdvancedPlayer(new URL(urlAsString).openStream(), FactoryRegistry.systemRegistry().createAudioDevice());
             player.setPlayBackListener(this);
@@ -71,5 +71,8 @@ public class AudioFile extends PlaybackListener implements Runnable {
         void onPlaybackFinished();
     }
 
+    public String getFilename() {
+        return filename;
+    }
 }
 

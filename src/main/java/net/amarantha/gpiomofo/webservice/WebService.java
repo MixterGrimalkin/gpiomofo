@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.webservice;
 
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.service.PropertiesService;
+import net.amarantha.utils.properties.PropertiesService;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;

@@ -2,9 +2,6 @@ package net.amarantha.gpiomofo.target;
 
 import net.amarantha.gpiomofo.utility.Utility;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -44,6 +41,10 @@ public class PythonTarget extends Target {
     public PythonTarget scriptFile(String scriptFile) {
         this.scriptFile = scriptFile;
         return this;
+    }
+
+    public String getScriptFile() {
+        return scriptFile;
     }
 
     private void fireProcess() {

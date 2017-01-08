@@ -1,0 +1,89 @@
+# GpioMofo Scenario definition using YAML
+
+Triggers:
+
+  NameOfTrigger:
+    type: GPIO / HTTP / OSC
+    # Optional for all trigger types:
+    holdTime: 500                             # trigger fired when held for 500ms (default 0)
+
+  AGpioTrigger:
+    type: GPIO
+    pin: 0                                    # wiringPi pin numbers
+    resistance: PULL_UP / PULL_DOWN / OFF
+    triggerState: true / false                # true = trigger fired when pin state goes HIGH
+
+  AnHttpTrigger:
+    type: HTTP                                # fired by calls to http://...:8001/gpiomofo/trigger/AnHttpTrigger/fire (or /cancel)
+
+  AnOscTrigger:
+    type: OSC
+    port: 5300
+    address: someAddress
+
+
+CompositeTriggers:
+
+  NameOfCompositeTrigger:
+    triggers:
+      - NameOfSourceTrigger1
+      - NameOfSourceTrigger2
+      - ...
+    # Optional:
+    holdTime: 500                             # trigger fired when all held for 500ms (default 0)
+
+
+Targets:
+
+  NameOfTarget:
+    type: GPIO / HTTP / OSC / MIDI / Audio / Python
+    # Optional for all target types:
+    oneShot: true / false                     # true = target will never deactivate (default=false)
+    triggerState: true / false                # true = activation matches trigger state (default=true)
+    followTrigger: true / false               # true = target will deactivate when trigger goes false (default=true)
+    clearDelay: 100                           # target will deactivate after 100ms (default none)
+
+  AGpioTarget:
+    type: GPIO
+    pin: 1                                    # wiringPi pin numbers
+    activeState: true / false / toggle        # toggle = pin output will invert when target is activated
+
+  AnHttpTarget:
+    type: HTTP
+    onCommand: method|host:port/path?params|payload
+    # Optional:
+    offCommand: e.g. POST|somehost.net:8080/resource/location?key=value&thing=thong|nicebody
+
+  AnOscTarget:
+    type: OSC
+    onCommand: host:port/address|data1|data2|...
+    # Optional:
+    offCommand: e.g. somehost.net:53000/cue/start|127|64
+
+  AMidiTarget:
+    type: MIDI
+    onCommand: type|channel|data1|data2
+    # Optional:
+    offCommand: e.g. NOTE_ON|1|64|100
+
+  AnAudioTarget:
+    type: Audio
+    filename: SomeAudioFile.mp3
+    # Optional:
+    loop: true                                  # true = restart audio when finished (default=false)
+
+  APythonTarget:
+    type: Python
+    filename: script_to_run.py
+
+
+Links:
+
+  SomeTrigger:
+    - SomeTarget1
+    - SomeTarget2
+    - ...
+
+  OtherTrigger:
+    - ...
+

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.module.TapeRefresh;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.gpiomofo.target.PixelTapeTarget;
+import net.amarantha.utils.colour.RGB;
 
 import java.util.LinkedList;
 import java.util.List;

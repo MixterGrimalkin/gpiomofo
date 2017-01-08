@@ -4,7 +4,7 @@ package net.amarantha.gpiomofo.trigger;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.HasName;
 import net.amarantha.gpiomofo.service.task.TaskService;
-import net.amarantha.gpiomofo.utility.Now;
+import net.amarantha.utils.time.Now;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class Trigger implements HasName {
     private Integer holdTime;
 
     public int getHoldTime() {
-        return holdTime;
+        return holdTime==null ? 0 : holdTime;
     }
 
     public Trigger setHoldTime(int holdTime) {

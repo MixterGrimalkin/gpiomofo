@@ -35,4 +35,11 @@ public class HttpTarget extends Target {
         return this;
     }
 
+    public HttpCommand getOnCommand() {
+        return onCommand;
+    }
+
+    public HttpCommand getOffCommand() {
+        return offCommand;
+    }
 }

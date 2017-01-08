@@ -6,48 +6,31 @@ import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
 import net.amarantha.gpiomofo.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.pixeltape.NeoPixelGUI;
-import net.amarantha.gpiomofo.service.PropertiesService;
-import net.amarantha.gpiomofo.utility.PropertyNotFoundException;
-
-import java.util.Map;
+import net.amarantha.utils.properties.PropertiesService;
 
 import static net.amarantha.gpiomofo.utility.Utility.bar;
 import static net.amarantha.gpiomofo.utility.Utility.log;
 
-public abstract class Scenario {
+public class Scenario {
 
     @Inject private PropertiesService props;
 
-    public void load() {
-        log(" LOADING SCENARIO: " + getClass().getSimpleName());
-        injectProperties();
-        log(true, " TRIGGERS ", true);
-        setupTriggers();
-        log(true, " TARGETS ", true);
-        setupTargets();
-        log(true, " LINKS ", true);
-        setupLinks();
-        bar();
+    private String name;
+
+    public String getName() {
+        return name;
     }
 
-    private void injectProperties() {
-        try {
-            Map<String, String> p = props.injectProperties(this);
-            if ( !p.isEmpty() ) {
-                bar();
-                p.forEach((k, v) -> System.out.println(k + " = " + v));
-            }
-        } catch (PropertyNotFoundException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
+    public Scenario setName(String name) {
+        this.name = name;
+        return this;
     }
 
-    public abstract void setupTriggers();
+    public void setupTriggers() {}
 
-    public abstract void setupTargets();
+    public void setupTargets() {}
 
-    public abstract void setupLinks();
+    public void setupLinks() {}
 
     public void start() {}
 

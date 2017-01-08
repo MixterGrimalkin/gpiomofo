@@ -4,8 +4,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import net.amarantha.gpiomofo.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.NeoPixelMock;
-import net.amarantha.gpiomofo.service.PropertiesMock;
-import net.amarantha.gpiomofo.service.PropertiesService;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 import net.amarantha.gpiomofo.service.http.HttpService;
@@ -14,6 +12,8 @@ import net.amarantha.gpiomofo.service.midi.MidiService;
 import net.amarantha.gpiomofo.service.midi.MidiServiceMock;
 import net.amarantha.gpiomofo.service.osc.OscService;
 import net.amarantha.gpiomofo.service.osc.OscServiceMock;
+import net.amarantha.utils.properties.PropertiesMock;
+import net.amarantha.utils.properties.PropertiesService;
 
 public class TestModule extends AbstractModule {
 

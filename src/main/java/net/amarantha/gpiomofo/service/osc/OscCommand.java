@@ -1,6 +1,7 @@
 package net.amarantha.gpiomofo.service.osc;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class OscCommand {
@@ -17,6 +18,23 @@ public class OscCommand {
         this.arguments = Arrays.asList(arguments);
     }
 
+    public static OscCommand fromString(String input) {
+        String[] pieces = input.split("\\|");
+        if ( pieces.length > 0 ) {
+            String fullPath = pieces[0];
+            String[] hostAndPort = fullPath.split("/")[0].split(":");
+            String host = hostAndPort[0];
+            int port = Integer.parseInt(hostAndPort[1]);
+            String address = fullPath.substring(fullPath.indexOf("/")+1);
+            List<Object> arguments = new LinkedList<>();
+            for ( int i=1; i<pieces.length; i++ ) {
+                arguments.add(pieces[i]);
+            }
+            return new OscCommand(host, port, address, arguments.toArray(new Object[arguments.size()]));
+        }
+        return null;
+    }
+
     public String getHost() {
         return host;
     }
@@ -31,6 +49,19 @@ public class OscCommand {
 
     public List<Object> getArguments() {
         return arguments;
+    }
+
+    private String compileArguments() {
+        StringBuilder sb = new StringBuilder();
+        for ( Object argument : arguments ) {
+            sb.append("|").append(argument.toString());
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return host + ":" + port + "/" + address + compileArguments();
     }
 
     @Override

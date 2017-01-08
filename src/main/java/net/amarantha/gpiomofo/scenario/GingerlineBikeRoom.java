@@ -1,19 +1,23 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.pattern.ChasePattern;
 import net.amarantha.gpiomofo.pixeltape.pattern.IntensityFade;
 import net.amarantha.gpiomofo.pixeltape.pattern.SlidingBars;
+import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.utility.Property;
+import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.properties.Property;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.*;
+import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;
 
 public class GingerlineBikeRoom extends Scenario {
 
+    @Property("PanicIP")                private String  panicIp;
+    @Property("PanicPort")              private int     panicPort;
     @Property("ButtonHoldTime")         private int     holdTime;
     @Property("LightingServerIP")       private String  lightingIp;
     @Property("LightingServerOscPort")  private int     lightingPort;
@@ -96,13 +100,13 @@ public class GingerlineBikeRoom extends Scenario {
     public void setupTargets() {
 
         panicLightsChamber2 =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2", 255));
-        panicMonitorChamber2 =  targets.http(PANIC.withPath(URL_PANIC_UNDERWATER+"/fire"));
+        panicMonitorChamber2 =  targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_UNDERWATER+"/fire", ""));
 
         panicLightsChamber3 =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c3", 255));
-        panicMonitorChamber3 =  targets.http(PANIC.withPath(URL_PANIC_BIKES+"/fire"));
+        panicMonitorChamber3 =  targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_BIKES+"/fire", ""));
 
         panicLightsChamber4 =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c4", 255));
-        panicMonitorChamber4 =  targets.http(PANIC.withPath(URL_PANIC_KITCHEN+"/fire"));
+        panicMonitorChamber4 =  targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_KITCHEN+"/fire", ""));
 
         underwaterControl =     targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2slide", 255));
 

@@ -2,8 +2,8 @@ package net.amarantha.gpiomofo.target;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeService;
-import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.utility.TimeGuard;
+import net.amarantha.utils.colour.RGB;
 
 public abstract class PixelTapeTarget extends Target {
 

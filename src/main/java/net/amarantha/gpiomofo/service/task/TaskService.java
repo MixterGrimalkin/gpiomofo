@@ -3,7 +3,7 @@ package net.amarantha.gpiomofo.service.task;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.service.task.Task.TaskCallback;
-import net.amarantha.gpiomofo.utility.Now;
+import net.amarantha.utils.time.Now;
 
 import java.util.HashMap;
 import java.util.LinkedList;

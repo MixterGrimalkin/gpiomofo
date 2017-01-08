@@ -1,13 +1,11 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.utility.Property;
+import net.amarantha.utils.properties.Property;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
-import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;
 
 public class GingerlinePanic extends Scenario {
 
@@ -18,10 +16,10 @@ public class GingerlinePanic extends Scenario {
     public static final String URL_PANIC_KITCHEN = "panic-kitchen";
     public static final String URL_PANIC_TOYBOX = "panic-toybox";
 
-    public static final String PANIC_IP = "192.168.42.105";
-    public static final int PANIC_PORT = 8001;
+//    public static final String PANIC_IP = "192.168.42.105";
+//    public static final int PANIC_PORT = 8001;
 
-    public static final HttpCommand PANIC = new HttpCommand(POST, PANIC_IP, PANIC_PORT, "gpiomofo/trigger", "", "");
+//    public static final HttpCommand PANIC = new HttpCommand(POST, PANIC_IP, PANIC_PORT, "gpiomofo/trigger", "", "");
 
     @Property("ButtonHoldTime")         private int     holdTime;
     @Property("LightingServerIP")       private String  lightingIp;
@@ -52,16 +50,29 @@ public class GingerlinePanic extends Scenario {
     }
 
     private Target lightsOn;
+    private Target alarm;
 
     @Override
     public void setupTargets() {
 
         lightsOn = targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/kitchenhold", 255));
 
+        alarm = targets.audio("audio/alarm.mp3", true);//.followTrigger(false);
+
     }
 
     @Override
     public void setupLinks() {
+
+        links
+            .link(briefingRoom, alarm)
+            .link(gameShowRoom, alarm)
+            .link(underwaterRoom, alarm)
+            .link(bikeRoom, alarm)
+            .link(kitchenRoom, alarm)
+            .link(toyBoxRoom, alarm)
+//            .link(panicReset, alarm.cancel())
+        ;
 
         panicReset.onFire(s->{
             briefingRoom.fire(false);

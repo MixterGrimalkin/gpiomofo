@@ -7,7 +7,6 @@ import net.amarantha.gpiomofo.factory.LinkFactory;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
 import net.amarantha.gpiomofo.scenario.Scenario;
-import net.amarantha.gpiomofo.service.PropertiesService;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 import net.amarantha.gpiomofo.service.http.HttpCommand;
@@ -24,10 +23,10 @@ import net.amarantha.gpiomofo.target.*;
 import net.amarantha.gpiomofo.trigger.GpioTrigger;
 import net.amarantha.gpiomofo.trigger.RangeTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.utility.Now;
 import net.amarantha.gpiomofo.webservice.TriggerResource;
+import net.amarantha.utils.properties.PropertiesService;
+import net.amarantha.utils.time.Now;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
 import static com.pi4j.io.gpio.PinPullResistance.OFF;
@@ -225,10 +224,6 @@ public class TestBase {
         props.setProperty(key, value);
     }
 
-    void given_scenario(Scenario scenario) {
-        scenario.load();
-    }
-
     //////////
     // When //
     //////////
@@ -305,8 +300,19 @@ public class TestBase {
     }
 
     void then_target_$1_is_one_shot_$2(Target target, boolean oneShot) {
-        Assert.assertEquals(oneShot, target.isOneShot());
+        assertEquals(oneShot, target.isOneShot());
     }
 
+    void then_target_$1_trigger_state_is_$2(Target target, boolean triggerState) {
+        assertEquals(triggerState, target.getTriggerState());
+    }
+
+    void then_target_$1_follows_trigger_$2(Target target, boolean followTrigger) {
+        assertEquals(followTrigger, target.isFollowTrigger());
+    }
+
+    void then_target_$1_clear_delay_is_$2(Target target, Long clearDelay) {
+        assertEquals(clearDelay, target.getClearDelay());
+    }
 
 }

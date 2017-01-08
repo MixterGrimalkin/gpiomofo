@@ -35,4 +35,11 @@ public class OscTarget extends Target {
         return this;
     }
 
+    public OscCommand getOnCommand() {
+        return onCommand;
+    }
+
+    public OscCommand getOffCommand() {
+        return offCommand;
+    }
 }

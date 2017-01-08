@@ -35,4 +35,11 @@ public class MidiTarget extends Target {
         return this;
     }
 
+    public MidiCommand getOnCommand() {
+        return onCommand;
+    }
+
+    public MidiCommand getOffCommand() {
+        return offCommand;
+    }
 }

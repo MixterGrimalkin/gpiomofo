@@ -1,0 +1,14 @@
+Triggers:
+  TestTrigger:
+    type: GPIO
+    pin: 0
+    resistance: PULL_DOWN
+    triggerState: true
+Targets:
+  TestTarget:
+    type: GPIO
+    pin: 1
+    activeState: true
+Links:
+  TestTrigger:
+    - TestTarget

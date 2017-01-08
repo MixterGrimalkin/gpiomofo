@@ -1,18 +1,21 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.pixeltape.RGB;
 import net.amarantha.gpiomofo.pixeltape.pattern.*;
+import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.utility.Property;
+import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.properties.Property;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
-import static net.amarantha.gpiomofo.scenario.GingerlinePanic.PANIC;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_BRIEFING;
+import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;
 
 public class GingerlineBriefingRoom extends Scenario {
 
+    @Property("PanicIP")                private String  panicIp;
+    @Property("PanicPort")              private int     panicPort;
     @Property("ButtonHoldTime")         private int     holdTime;
     @Property("LightingServerIP")       private String  lightingIp;
     @Property("LightingServerOscPort")  private int     lightingPort;
@@ -73,7 +76,7 @@ public class GingerlineBriefingRoom extends Scenario {
         capsuleBlue =       targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1004/start", 255));
 
         panicLights =       targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c0", 255));
-        panicMonitor =      targets.http(PANIC.withPath(URL_PANIC_BRIEFING+"/fire"));
+        panicMonitor =      targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_BRIEFING+"/fire", ""));
 
         ////////////////
         // Pixel Tape //

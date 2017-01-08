@@ -1,6 +1,7 @@
 package net.amarantha.gpiomofo.pixeltape;
 
 import com.diozero.ws281xj.WS281x;
+import net.amarantha.utils.colour.RGB;
 
 public class NeoPixelWS281X implements NeoPixel {
 

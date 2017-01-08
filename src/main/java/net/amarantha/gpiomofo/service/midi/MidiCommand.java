@@ -1,5 +1,8 @@
 package net.amarantha.gpiomofo.service.midi;
 
+import javax.sound.midi.ShortMessage;
+import java.lang.reflect.Field;
+
 public class MidiCommand {
 
     private int command = 0;
@@ -11,9 +14,33 @@ public class MidiCommand {
 
     public MidiCommand(int command, int channel, int data1, int data2) {
         this.command = command;
-        this.channel = channel-1;
+        this.channel = channel;
         this.data1 = data1;
         this.data2 = data2;
+    }
+
+    public static MidiCommand fromString(String input) {
+        String[] pieces = input.split("\\|");
+        if ( pieces.length==4 ) {
+            int command = parseCommandType(pieces[0]);
+            int channel = Integer.parseInt(pieces[1]);
+            int data1 = Integer.parseInt(pieces[2]);
+            int data2 = Integer.parseInt(pieces[3]);
+            return new MidiCommand(command, channel, data1, data2);
+        }
+        return null;
+    }
+
+    public static int parseCommandType(String commandType) {
+        Field[] fields = ShortMessage.class.getDeclaredFields();
+        for ( Field field : fields ) {
+            if ( field.getName().equalsIgnoreCase(commandType) ) {
+                try {
+                    return field.getInt(null);
+                } catch (IllegalAccessException ignored) {}
+            }
+        }
+        return -1;
     }
 
     public void send(MidiService midi) {

@@ -1,6 +1,7 @@
 package net.amarantha.gpiomofo.utility;
 
 import com.google.inject.Inject;
+import net.amarantha.utils.time.Now;
 
 import java.util.HashMap;
 import java.util.Map;

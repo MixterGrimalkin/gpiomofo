@@ -32,4 +32,11 @@ public class AudioTarget extends Target {
         return this;
     }
 
+    public AudioFile getAudioFile() {
+        return audioFile;
+    }
+
+    public boolean isLoop() {
+        return loop;
+    }
 }

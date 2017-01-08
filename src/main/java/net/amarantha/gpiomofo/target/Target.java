@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.HasName;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.service.task.TaskService;
-import net.amarantha.gpiomofo.utility.Now;
+import net.amarantha.utils.time.Now;
 
 import java.util.Arrays;
 import java.util.LinkedList;
