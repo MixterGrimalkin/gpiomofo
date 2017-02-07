@@ -1,10 +1,14 @@
 package net.amarantha.gpiomofo.factory;
 
+import javax.inject.Inject;
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Factory<T extends HasName> {
+
+    @Inject private PrintStream out;
 
     private boolean failQuietly;
 
@@ -34,7 +38,7 @@ public class Factory<T extends HasName> {
             throw new IllegalStateException(itemDescription + " '" + name + "' is already registered");
         }
         registrations.put(name, t);
-        System.out.println(t.getClass().getSimpleName() + ": " + name);
+        out.println(t.getClass().getSimpleName() + ": " + name);
     }
 
     public T get(String name) {

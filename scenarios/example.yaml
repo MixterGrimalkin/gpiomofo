@@ -1,5 +1,6 @@
 # GpioMofo Scenario definition using YAML
 
+# Triggers are 'fired' or 'cancelled' by external events
 Triggers:
 
   NameOfTrigger:
@@ -7,15 +8,23 @@ Triggers:
     # Optional for all trigger types:
     holdTime: 500                             # trigger fired when held for 500ms (default 0)
 
+  # GPIO triggers
+  # 'Fired' when pin state changes to match trigger state
+  # 'Cancelled' when pin state changes to the opposite state
   AGpioTrigger:
     type: GPIO
     pin: 0                                    # wiringPi pin numbers
     resistance: PULL_UP / PULL_DOWN / OFF
     triggerState: true / false                # true = trigger fired when pin state goes HIGH
 
+  # HTTP Triggers
+  # 'Fired' or 'Cancelled' by the appropriate incoming HTTP calls
   AnHttpTrigger:
     type: HTTP                                # fired by calls to http://...:8001/gpiomofo/trigger/AnHttpTrigger/fire (or /cancel)
 
+  # OSC Triggers
+  # 'Fired' by the appropriate incoming OSC command
+  # This trigger type cannot be 'cancelled'
   AnOscTrigger:
     type: OSC
     port: 5300
@@ -35,6 +44,7 @@ CompositeTriggers:
 
 Targets:
 
+  # A target can be 'activated' or 'deactivated'
   NameOfTarget:
     type: GPIO / HTTP / OSC / MIDI / Audio / Python
     # Optional for all target types:
@@ -43,6 +53,7 @@ Targets:
     followTrigger: true / false               # true = target will deactivate when trigger goes false (default=true)
     clearDelay: 100                           # target will deactivate after 100ms (default none)
 
+  # When 'activated'
   AGpioTarget:
     type: GPIO
     pin: 1                                    # wiringPi pin numbers

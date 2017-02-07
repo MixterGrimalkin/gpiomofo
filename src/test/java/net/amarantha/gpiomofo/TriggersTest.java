@@ -64,15 +64,15 @@ public class TriggersTest extends TestBase {
         Target target = given_target_on_pin_$1(1);
         given_link_between_$1_and_$2(trigger.getName(), target.getName());
 
-        then_target_$1_is_active_£2(target, false);
+        then_target_$1_is_active_$2(target, false);
         then_pin_$1_is_$2(1, false);
 
         when_set_pin_$1_to_$2(0, true);
-        then_target_$1_is_active_£2(target, true);
+        then_target_$1_is_active_$2(target, true);
         then_pin_$1_is_$2(1, true);
 
         when_set_pin_$1_to_$2(0, false);
-        then_target_$1_is_active_£2(target, false);
+        then_target_$1_is_active_$2(target, false);
         then_pin_$1_is_$2(1, false);
 
     }
@@ -146,36 +146,36 @@ public class TriggersTest extends TestBase {
     @Story
     public void test_multiple_triggers() {
 
-        Trigger trigger1 = given_trigger_on_pin_$1(0);
-        Trigger trigger2 = given_trigger_on_pin_$1(1);
-        Target target = given_target_on_pin_$1(2);
+        Trigger trigger1 = given_trigger_on_pin_$1(10);
+        Trigger trigger2 = given_trigger_on_pin_$1(11);
+        Target target = given_target_on_pin_$1(12);
         given_link_between_$1_and_$2(trigger1, target);
         given_link_between_$1_and_$2(trigger2, target);
 
-        then_target_$1_is_active_£2(target, false);
-        then_pin_$1_is_$2(2, false);
+        then_target_$1_is_active_$2(target, false);
+        then_pin_$1_is_$2(12, false);
 
-        when_set_pin_$1_to_$2(0, true);
-        then_target_$1_is_active_£2(target, true);
-        then_pin_$1_is_$2(2, true);
-        when_set_pin_$1_to_$2(0, false);
-        then_target_$1_is_active_£2(target, false);
-        then_pin_$1_is_$2(2, false);
+        when_set_pin_$1_to_$2(10, true);
+        then_target_$1_is_active_$2(target, true);
+        then_pin_$1_is_$2(12, true);
+        when_set_pin_$1_to_$2(10, false);
+        then_target_$1_is_active_$2(target, false);
+        then_pin_$1_is_$2(12, false);
 
-        when_set_pin_$1_to_$2(1, true);
-        then_target_$1_is_active_£2(target, true);
-        then_pin_$1_is_$2(2, true);
-        when_set_pin_$1_to_$2(1, false);
-        then_target_$1_is_active_£2(target, false);
-        then_pin_$1_is_$2(2, false);
+        when_set_pin_$1_to_$2(11, true);
+        then_target_$1_is_active_$2(target, true);
+        then_pin_$1_is_$2(12, true);
+        when_set_pin_$1_to_$2(11, false);
+        then_target_$1_is_active_$2(target, false);
+        then_pin_$1_is_$2(12, false);
 
-        when_set_pin_$1_to_$2(0, true);
-        when_set_pin_$1_to_$2(1, true);
-        then_target_$1_is_active_£2(target, true);
-        then_pin_$1_is_$2(2, true);
+        when_set_pin_$1_to_$2(10, true);
+        when_set_pin_$1_to_$2(11, true);
+        then_target_$1_is_active_$2(target, true);
+        then_pin_$1_is_$2(12, true);
 
-        when_set_pin_$1_to_$2(1, false);
-        then_pin_$1_is_$2(2, false);
+        when_set_pin_$1_to_$2(11, false);
+        then_pin_$1_is_$2(12, false);
 
     }
 

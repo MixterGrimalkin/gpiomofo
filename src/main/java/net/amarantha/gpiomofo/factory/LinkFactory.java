@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 
+import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,11 +14,12 @@ public class LinkFactory {
 
     @Inject private TriggerFactory triggers;
     @Inject private TargetFactory targets;
+    @Inject private PrintStream out;
 
     public LinkFactory link(Trigger trigger, Target... targets) {
         for ( Target target : targets ) {
             trigger.onFire(target::processTrigger);
-            System.out.println("[" + trigger.getName() + "]-->[" + target.getName() + "]");
+            out.println("[" + trigger.getName() + "]-->[" + target.getName() + "]");
         }
         return this;
     }

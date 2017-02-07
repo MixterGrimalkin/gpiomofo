@@ -54,6 +54,10 @@ public class Scenario {
         return triggers.isGpioUsed() || targets.isGpioUsed();
     }
 
+    public boolean requiresMpr() {
+        return triggers.isMprUsed();
+    }
+
     public boolean requiresMidi() {
         return targets.isMidiUsed();
     }

@@ -9,16 +9,22 @@ import net.amarantha.gpiomofo.trigger.*;
 @Singleton
 public class TriggerFactory extends Factory<Trigger> {
 
-    @Inject private Injector injector;
+    @Inject
+    private Injector injector;
 
     public TriggerFactory() {
         super("Trigger");
     }
 
     private boolean gpioUsed;
+    private boolean mprUsed;
 
     public boolean isGpioUsed() {
         return gpioUsed;
+    }
+
+    public boolean isMprUsed() {
+        return mprUsed;
     }
 
     //////////
@@ -26,7 +32,7 @@ public class TriggerFactory extends Factory<Trigger> {
     //////////
 
     public GpioTrigger gpio(int pinNumber, PinPullResistance resistance, boolean triggerState) {
-        return gpio(getNextName("Gpio"+pinNumber), pinNumber, resistance, triggerState);
+        return gpio(getNextName("Gpio" + pinNumber), pinNumber, resistance, triggerState);
     }
 
     public GpioTrigger gpio(String name, int pinNumber, PinPullResistance resistance, boolean triggerState) {
@@ -34,13 +40,62 @@ public class TriggerFactory extends Factory<Trigger> {
         gpioUsed = true;
 
         GpioTrigger trigger =
-            injector.getInstance(GpioTrigger.class)
-                .setTriggerPin(pinNumber, resistance, triggerState);
+                injector.getInstance(GpioTrigger.class)
+                        .setTriggerPin(pinNumber, resistance, triggerState);
 
         register(name, trigger);
 
         return trigger;
     }
+
+    ///////////
+    // Touch //
+    ///////////
+
+    public TouchTrigger touch(int pinNumber, boolean triggerState) {
+        return touch(getNextName("Touch" + pinNumber), pinNumber, triggerState);
+    }
+
+    public TouchTrigger touch(String name, int pinNumber, boolean triggerState) {
+
+        mprUsed = true;
+
+        TouchTrigger trigger =
+                injector.getInstance(TouchTrigger.class)
+                        .setPin(pinNumber, triggerState);
+
+        register(name, trigger);
+
+        return trigger;
+
+    }
+
+    public TouchTriggerSet touchSet(int leftPin, int rightPin) {
+        return touchSet(getNextName("TouchSet"), leftPin, rightPin);
+    }
+
+    public TouchTriggerSet touchSet(String name, int leftPin, int rightPin) {
+
+        mprUsed = true;
+
+        TouchTriggerSet set =
+                injector.getInstance(TouchTriggerSet.class)
+                    .setPins(leftPin, rightPin);
+
+        register(name+"/TapLeft", set.getTapLeftTrigger());
+        register(name+"/TapRight", set.getTapRightTrigger());
+        register(name+"/HoldLeft", set.getHoldLeftTrigger());
+        register(name+"/HoldRight", set.getHoldRightTrigger());
+        register(name+"/DblTapLeft", set.getDblTapLeftTrigger());
+        register(name+"/DblTapRight", set.getDblTapRightTrigger());
+        register(name+"/SwipeLeft", set.getSwipeLeftTrigger());
+        register(name+"/SwipeRight", set.getSwipeRightTrigger());
+
+        return set;
+
+    }
+
+
 
     //////////
     // HTTP //

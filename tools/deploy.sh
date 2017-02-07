@@ -29,7 +29,8 @@ if [ "$2" != "-skipjava" ]
 then
     echo "Compiling Java..."
     cd ..
-    mvn clean package
+    echo "WARNING : SKIPPING TESTS BECAUSE OF FUCKING WEIRD THING"
+    mvn -Dmaven.test.skip=true clean package
     cd tools
     if [ ! -f "../target/gpiomofo/gpiomofo.jar" ]
     then

@@ -17,6 +17,7 @@ import net.amarantha.utils.UtilityModule;
 import net.amarantha.utils.properties.PropertiesService;
 import org.reflections.Reflections;
 
+import java.io.PrintStream;
 import java.util.Set;
 
 import static net.amarantha.gpiomofo.Main.LIST_SCENARIOS;
@@ -40,6 +41,7 @@ public class LiveModule extends AbstractModule {
         bind(MidiService.class).to(MidiServiceImpl.class).in(Scopes.SINGLETON);
         bind(HttpService.class).to(HttpServiceImpl.class).in(Scopes.SINGLETON);
         bind(OscService.class).to(OscServiceImpl.class).in(Scopes.SINGLETON);
+        bind(PrintStream.class).toInstance(System.out);
         configureAdditional();
     }
 

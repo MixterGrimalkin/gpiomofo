@@ -64,7 +64,7 @@ public class TestScenario extends Scenario {
         targets.http("Greenpeace", loadScene.withPath("greenpeace-logo/load"));
         targets.http("Showers", loadScene.withPath("showers/load"));
 
-        targets.python("Python", "python/test.py");
+        targets.python("Python", "python/init.py");
         targets.audio("Sea Power", "audio/bsp.mp3");
 
         targets.osc("Osc",

@@ -6,6 +6,7 @@ import net.amarantha.gpiomofo.factory.ScenarioBuilder;
 import net.amarantha.gpiomofo.pixeltape.PixelTapeService;
 import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
+import net.amarantha.gpiomofo.service.gpio.MPR121;
 import net.amarantha.gpiomofo.service.midi.MidiService;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.gpiomofo.webservice.WebService;
@@ -20,6 +21,7 @@ import static net.amarantha.gpiomofo.utility.Utility.log;
 public class GpioMofo {
 
     @Inject private GpioService gpio;
+    @Inject private MPR121 mpr121;
     @Inject private MidiService midi;
     @Inject private PixelTapeService pixel;
     @Inject private WebService web;
@@ -53,6 +55,9 @@ public class GpioMofo {
 
         if ( scenario.requiresGpio() ) {
             gpio.start();
+        }
+        if ( scenario.requiresMpr() ) {
+            mpr121.start();
         }
         if ( scenario.requiresMidi() ) {
             midi.start();
@@ -96,6 +101,9 @@ public class GpioMofo {
         tasks.stop();
         if ( scenario.requiresGpio() ) {
             gpio.stop();
+        }
+        if ( scenario.requiresMpr() ) {
+            mpr121.stop();
         }
         if ( scenario.requiresMidi() ) {
             midi.stop();

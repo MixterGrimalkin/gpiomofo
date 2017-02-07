@@ -89,4 +89,10 @@ public class TaskService {
         return false;
     }
 
+    public void reset() {
+        tasks.clear();
+        newTasks.clear();
+        deadTaskKeys.clear();
+    }
+
 }

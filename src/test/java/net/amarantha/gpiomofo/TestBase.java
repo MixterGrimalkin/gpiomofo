@@ -27,12 +27,13 @@ import net.amarantha.gpiomofo.webservice.TriggerResource;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.time.Now;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 
 import static com.pi4j.io.gpio.PinPullResistance.OFF;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.testng.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class TestBase {
 
@@ -62,6 +63,7 @@ public class TestBase {
         targets.clearAll();
         midi.start();
         now.setOffset(0L);
+        tasks.reset();
     }
 
     @After
@@ -234,6 +236,8 @@ public class TestBase {
 
     void when_set_pin_$1_to_$2(int pin, boolean state) {
         ((GpioServiceMock)gpio).setInput(pin, state);
+        Assert.assertEquals(state, gpio.read(pin));
+        ((GpioServiceMock) gpio).scanPins();
     }
 
     void when_fire_web_service_with_path_param_$1(String path) {
@@ -257,7 +261,7 @@ public class TestBase {
         assertEquals(state, gpio.read(pin));
     }
 
-    void then_target_$1_is_active_£2(Target target, boolean active) {
+    void then_target_$1_is_active_$2(Target target, boolean active) {
         assertEquals(active, target.isActive());
     }
 

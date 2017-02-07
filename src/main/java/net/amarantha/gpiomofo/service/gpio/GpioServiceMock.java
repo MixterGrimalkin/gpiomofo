@@ -69,7 +69,7 @@ public class GpioServiceMock extends GpioService {
         outputStates.clear();
         digitalInputs.clear();
         digitalOutputs.clear();
-        inputLastChange.clear();
+        inputLastState.clear();
         inputLastChange.clear();
         inputTimeouts.clear();
         onHighCallbacks.clear();

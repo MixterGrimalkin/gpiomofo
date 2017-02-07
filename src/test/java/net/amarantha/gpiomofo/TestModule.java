@@ -15,6 +15,8 @@ import net.amarantha.gpiomofo.service.osc.OscServiceMock;
 import net.amarantha.utils.properties.PropertiesMock;
 import net.amarantha.utils.properties.PropertiesService;
 
+import java.io.PrintStream;
+
 public class TestModule extends AbstractModule {
 
     @Override
@@ -25,6 +27,7 @@ public class TestModule extends AbstractModule {
         bind(OscService.class).to(OscServiceMock.class).in(Scopes.SINGLETON);
         bind(NeoPixel.class).to(NeoPixelMock.class).in(Scopes.SINGLETON);
         bind(PropertiesService.class).to(PropertiesMock.class).in(Scopes.SINGLETON);
+        bind(PrintStream.class).toInstance(System.err);
     }
 
 }
