@@ -5,12 +5,15 @@ import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.service.osc.OscService;
 import net.amarantha.gpiomofo.trigger.UltrasonicSensor;
 import net.amarantha.utils.math.MathUtils;
+import net.amarantha.utils.properties.Property;
 
 public class Raspression extends Scenario {
 
     @Inject private UltrasonicSensor blackSensor;
     @Inject private UltrasonicSensor redSensor;
     @Inject private OscService osc;
+
+    @Property("RaspressionClientIP") private String raspressionClientIP;
 
     @Override
     public void setupTriggers() {
@@ -29,7 +32,7 @@ public class Raspression extends Scenario {
         blackSensor.onReadSensor((value) -> {
             int midiValue = MathUtils.bound(0, 255, (int)Math.round(value*255));
             if ( midiValue !=lastBlack ) {
-                osc.send(new OscCommand("192.168.0.14", 5000, "black", midiValue ));
+                osc.send(new OscCommand(raspressionClientIP, 5000, "black", midiValue ));
                 lastBlack = midiValue ;
             }
         });

@@ -44,13 +44,13 @@ long measure(int triggerPin, int echoPin) {
 
     if ( travelTime<=0 ) {
         printf("\nResetting....\n");
-        delay(1000);
+//        delay(1000);
         pinMode(triggerPin, OUTPUT);
         digitalWrite(triggerPin, LOW);
         pinMode(echoPin, OUTPUT);
         digitalWrite(echoPin, LOW);
         pinMode(echoPin, INPUT);
-        delay(1000);
+//        delay(1000);
     }
 
     return travelTime;
