@@ -54,6 +54,7 @@ public class Factory<T extends HasName> {
     }
 
     public void clearAll() {
+        nextIds.clear();
         registrations.clear();
     }
 

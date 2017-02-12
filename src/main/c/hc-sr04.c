@@ -1,76 +1,92 @@
 #include <stdio.h>
+#include <unistd.h>
 //#include <stdlib.h>
 #include <wiringPi.h>
 #include <time.h>
 #include <jni.h>
+#include <stdbool.h>
 #include "net_amarantha_gpiomofo_trigger_UltrasonicSensor.h"
-
-int TRIG = 0;
-int ECHO = 5;
 
 int TIMEOUT = 10000000;
 
-void init() {
+bool initialised = false;
+
+void init(int triggerPin, int echoPin) {
     printf("Setting up native HC-SR04...\n");
-    wiringPiSetup() ;
-    pinMode(TRIG, OUTPUT);
-    pinMode(ECHO, INPUT);
-    digitalWrite(TRIG, LOW);
+    if ( !initialised ) {
+        wiringPiSetup() ;
+        initialised = true;
+    }
+    pinMode(triggerPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+    digitalWrite(triggerPin, LOW);
     delay(1000);
 }
 
 long lastTravelTime = 0;
 
-long measure() {
+long measure(int triggerPin, int echoPin) {
 
-    digitalWrite(TRIG, HIGH);
+    digitalWrite(triggerPin, HIGH);
     delayMicroseconds(10);
-    digitalWrite(TRIG, LOW);
+    digitalWrite(triggerPin, LOW);
 
     long startTime = 0;
-    while((digitalRead(ECHO) == LOW) && (micros() - startTime) <= TIMEOUT) {
+    while((digitalRead(echoPin) == LOW)) { // && (micros() - startTime) <= TIMEOUT) {
         startTime = micros();
     }
 
     long endTime = 0;
-    while((digitalRead(ECHO) == HIGH) && (micros() - endTime) <= TIMEOUT) {
+    while((digitalRead(echoPin) == HIGH)) { // && (micros() - endTime) <= TIMEOUT) {
         endTime = micros();
     }
     long travelTime = endTime - startTime;
 
-    if ( travelTime==0 ) {
-        wiringPiSetup() ;
-        pinMode(TRIG, OUTPUT);
-        pinMode(ECHO, INPUT);
-        return lastTravelTime;
+    if ( travelTime<=0 ) {
+        printf("\nResetting....\n");
+        delay(1000);
+        pinMode(triggerPin, OUTPUT);
+        digitalWrite(triggerPin, LOW);
+        pinMode(echoPin, OUTPUT);
+        digitalWrite(echoPin, LOW);
+        pinMode(echoPin, INPUT);
+        delay(1000);
     }
-
-    lastTravelTime = travelTime;
 
     return travelTime;
 
 }
 
-int main(void) {
+int main(int argc, char **argv) {
 
-    init();
+    if ( argc==3 ) {
 
-    for ( ;; ) {
-        printf("time=");
-        printf("%d",measure());
-        printf("\n");
-        delay(100);
+        int trigger = atoi(argv[1]);
+        int echo = atoi(argv[2]);
+
+        printf("Trigger %d, Echo %d\n", trigger, echo);
+
+        init(trigger, echo);
+
+        printf("Starting sensor loop...\n");
+
+        for ( ;; ) {
+            printf("time=");
+            printf("%d", measure(trigger, echo));
+            printf("\n");
+            delay(100);
+        }
     }
 
 }
 
 JNIEXPORT void JNICALL Java_net_amarantha_gpiomofo_trigger_UltrasonicSensor_init
-  (JNIEnv * env, jobject o) {
-    init();
+  (JNIEnv * env, jobject o, jint trigger, jint echo) {
+    init(trigger, echo);
   }
 
 
 JNIEXPORT jlong JNICALL Java_net_amarantha_gpiomofo_trigger_UltrasonicSensor_measure
-  (JNIEnv * env, jobject o) {
-    return measure();
+  (JNIEnv * env, jobject o, jint trigger, jint echo) {
+    return measure(trigger, echo);
   }

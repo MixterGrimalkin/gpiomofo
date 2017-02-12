@@ -11,6 +11,14 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>javaFX</artifactId>
+            <version>2.2</version>
+            <scope>system</scope>
+            <systemPath>/usr/lib/jvm/jdk1.8.0_111/jre/lib/ext/jfxrt.jar</systemPath>
+        </dependency>
+
+        <dependency>
             <groupId>net.amarantha</groupId>
             <artifactId>amarantha-utils</artifactId>
             <version>[1]</version>

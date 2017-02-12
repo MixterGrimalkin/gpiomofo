@@ -14,20 +14,20 @@ public class UltrasonicSensor extends RangeTrigger {
 
     @Inject private TaskService tasks;
 
-    private final static int SAMPLES = 7;
+    private final static int SAMPLES = 1;
 
     private final static int MIN_VALUE = 250;
     private final static int MAX_VALUE = 2200;
 
-    public void start() {
-        init();
-        tasks.addRepeatingTask(this, 5, this::readSensor);
+    public void start(int trigger, int echo) {
+        init(trigger, echo);
+        tasks.addRepeatingTask(this, 100, ()->readSensor(trigger, echo));
     }
 
-    private void readSensor() {
+    private void readSensor(int trigger, int echo) {
         double total = 0;
         for ( int s=0; s<SAMPLES; s++ ) {
-            total += measure();
+            total += measure(trigger, echo);
         }
         double avg = total / SAMPLES;
         double norm = 1 - ((avg-MIN_VALUE) / (MAX_VALUE-MIN_VALUE));
@@ -53,8 +53,8 @@ public class UltrasonicSensor extends RangeTrigger {
         void call(double value);
     }
 
-    public native void init();
+    public native void init(int trigger, int echo);
 
-    public native long measure();
+    public native long measure(int trigger, int echo);
 
 }
