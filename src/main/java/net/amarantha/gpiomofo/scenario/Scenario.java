@@ -32,6 +32,8 @@ public class Scenario {
 
     public void setupLinks() {}
 
+    public void setup() {}
+
     public void start() {}
 
     public void stop() {}

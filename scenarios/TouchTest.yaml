@@ -1,0 +1,26 @@
+
+Targets:
+  LBTopLeft:
+    type: HTTP
+    onCommand: POST|192.168.0.14:8001/lightboard/animation/tap/0
+  LBTopRight:
+    type: HTTP
+    onCommand: POST|192.168.0.14:8001/lightboard/animation/tap/1
+  LBBottomLeft:
+    type: HTTP
+    onCommand: POST|192.168.0.14:8001/lightboard/animation/tap/2
+  LBBottomRight:
+    type: HTTP
+    onCommand: POST|192.168.0.14:8001/lightboard/animation/tap/3
+
+Links:
+  TopLeft:
+    - LBTopLeft
+  TopRight:
+    - LBTopRight
+  BottomLeft:
+    - LBBottomLeft
+  BottomRight:
+    - LBBottomRight
+
+

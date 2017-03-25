@@ -6,9 +6,8 @@ import com.illposed.osc.OSCMessage;
 import net.amarantha.gpiomofo.factory.LinkFactory;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
-import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
-import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
+import net.amarantha.gpiomofo.service.gpio.GpioServiceGUI;
 import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.http.HttpService;
 import net.amarantha.gpiomofo.service.http.HttpServiceMock;
@@ -55,7 +54,7 @@ public class TestBase {
 
     @Before
     public void given_system() {
-        ((GpioServiceMock)gpio).reset();
+        ((GpioServiceGUI)gpio).reset();
         ((MidiServiceMock)midi).clearLastCommand();
         ((HttpServiceMock)http).clearLastCommand();
         ((OscServiceMock)osc).clearLastCommand();
@@ -235,9 +234,9 @@ public class TestBase {
     }
 
     void when_set_pin_$1_to_$2(int pin, boolean state) {
-        ((GpioServiceMock)gpio).setInput(pin, state);
+        ((GpioServiceGUI)gpio).setInput(pin, state);
         Assert.assertEquals(state, gpio.read(pin));
-        ((GpioServiceMock) gpio).scanPins();
+        ((GpioServiceGUI) gpio).scanPins();
     }
 
     void when_fire_web_service_with_path_param_$1(String path) {

@@ -1,0 +1,30 @@
+Triggers:
+  Button:
+    type: GPIO
+    pin: 1
+    resistance: PULL_DOWN
+    triggerState: true
+  Button-Hold:
+    type: GPIO
+    pin: 1
+    resistance: PULL_DOWN
+    triggerState: true
+    holdTime: 1000    
+Targets:
+  Lamp1:
+    type: GPIO
+    pin: 0
+    activeState: toggle
+    oneShot: true
+  Lamp2:
+    type: GPIO
+    pin: 2
+    activeState: toggle
+    oneShot: true
+Links:
+  Button:
+    - Lamp1
+    - Lamp2
+  Button-Hold:
+    - Lamp2
+

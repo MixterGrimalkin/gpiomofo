@@ -1,0 +1,36 @@
+Parameters:
+  Width: 11
+  Height: 45
+  SpriteCount: 70
+  Colour1: 229,56,16
+  Colour2: 255,32,211
+  Colour3: 255,253,32
+  Colour4: 250,226,217
+  TailLength: 3
+
+Triggers:
+  PIR1:
+    type: GPIO
+    pin: 0
+    resistance: PULL_DOWN
+    triggerState: true
+  PIR2:
+    type: GPIO
+    pin: 1
+    resistance: PULL_DOWN
+    triggerState: true
+  PIR3:
+    type: GPIO
+    pin: 2
+    resistance: PULL_DOWN
+    triggerState: true
+  PIR4:
+    type: GPIO
+    pin: 3
+    resistance: PULL_DOWN
+    triggerState: true
+  PIR5:
+    type: GPIO
+    pin: 4
+    resistance: PULL_DOWN
+    triggerState: true

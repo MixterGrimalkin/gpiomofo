@@ -16,12 +16,12 @@ public class UltrasonicSensor extends RangeTrigger {
 
     private final static int SAMPLES = 1;
 
-    private final static int MIN_VALUE = 250;
-    private final static int MAX_VALUE = 2200;
+    private final static int MIN_VALUE = 200;
+    private final static int MAX_VALUE = 1500;
 
     public void start(int trigger, int echo) {
         init(trigger, echo);
-        tasks.addRepeatingTask(this, 100, ()->readSensor(trigger, echo));
+        tasks.addRepeatingTask(this, 10, ()->readSensor(trigger, echo));
     }
 
     private void readSensor(int trigger, int echo) {

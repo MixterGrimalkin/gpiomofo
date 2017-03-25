@@ -12,6 +12,7 @@ import net.amarantha.gpiomofo.service.midi.MidiCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.PropertyNotFoundException;
 
@@ -56,6 +57,7 @@ public class ScenarioBuilder {
         injectProperties();
         loadConfig();
         injectComponents();
+        scenario.setup();
 
         return this;
 
@@ -114,15 +116,28 @@ public class ScenarioBuilder {
         try {
             Field[] fields = scenario.getClass().getDeclaredFields();
             for ( Field field : fields ) {
-                Annotation a = field.getAnnotation(Named.class);
-                if ( a!=null ) {
-                    String name = ((Named)a).value();
+                Annotation named = field.getAnnotation(Named.class);
+                if ( named!=null ) {
+                    String name = ((Named)named).value();
                     field.setAccessible(true);
                     if ( field.getType()==Trigger.class ) {
                         field.set(scenario, triggers.get(name));
                     }
                     if ( field.getType()==Target.class ) {
                         field.set(scenario, targets.get(name));
+                    }
+                }
+                Annotation param = field.getAnnotation(Parameter.class);
+                if ( param!=null ) {
+                    String value = parameters.get(((Parameter)param).value());
+                    if ( value!=null ) {
+                        field.setAccessible(true);
+                        if ( field.getType()==Integer.class || field.getType()==int.class) {
+                            field.set(scenario, Integer.parseInt(value));
+                        }
+                        if ( field.getType()==RGB.class ) {
+                            field.set(scenario, RGB.parse(value));
+                        }
                     }
                 }
             }
@@ -159,6 +174,8 @@ public class ScenarioBuilder {
 
     private void processConfig(Map<String, Map> config) {
 
+        processParameters(config);
+
         log(true, " TRIGGERS ", true);
         processTriggers(config);
         processCompositeTriggers(config);
@@ -174,6 +191,15 @@ public class ScenarioBuilder {
 
         bar();
 
+    }
+
+    private Map<String, String> parameters;
+
+    @SuppressWarnings("unchecked")
+    private void processParameters(Map<String, Map> config) {
+        if ( config!=null ) {
+            parameters = (HashMap<String, String>) config.get("Parameters");
+        }
     }
 
     //////////////

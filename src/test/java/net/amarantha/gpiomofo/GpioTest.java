@@ -6,7 +6,7 @@ import com.googlecode.guicebehave.Modules;
 import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
-import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
+import net.amarantha.gpiomofo.service.gpio.GpioServiceGUI;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
@@ -21,7 +21,7 @@ public class GpioTest {
 
     @Before
     public void given_gpio_system() {
-        ((GpioServiceMock)gpio).reset();
+        ((GpioServiceGUI)gpio).reset();
         listenerMessage = null;
     }
 
@@ -151,8 +151,8 @@ public class GpioTest {
     //////////
 
     void when_input_$1_is_set_to_$2(int pin, boolean state) {
-        ((GpioServiceMock)gpio).setInput(pin, state);
-        ((GpioServiceMock)gpio).scanPins();
+        ((GpioServiceGUI)gpio).setInput(pin, state);
+        ((GpioServiceGUI)gpio).scanPins();
     }
 
     void when_set_output_$1_to_$2(int pin, boolean state) {
@@ -192,7 +192,7 @@ public class GpioTest {
     }
 
     void then_output_$1_is_$2(int pin, boolean state) {
-        assertEquals(state, ((GpioServiceMock)gpio).getOutput(pin));
+        assertEquals(state, ((GpioServiceGUI)gpio).getOutput(pin));
     }
 
     void then_listener_message_is_correct(String message) {
@@ -200,7 +200,7 @@ public class GpioTest {
     }
 
     void then_all_outputs_are_$1(boolean state) {
-        for ( Entry<Integer, Boolean> entry : ((GpioServiceMock)gpio).getOutputStates().entrySet() ) {
+        for ( Entry<Integer, Boolean> entry : ((GpioServiceGUI)gpio).getOutputStates().entrySet() ) {
             assertEquals(state, entry.getValue());
         }
     }

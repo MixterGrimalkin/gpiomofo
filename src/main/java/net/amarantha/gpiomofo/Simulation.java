@@ -22,7 +22,7 @@ public class Simulation extends Application {
     public void start(Stage primaryStage) throws Exception {
         Guice.createInjector(new SimulationModule(primaryStage))
             .getInstance(GpioMofo.class)
-                .startApplication();
+                .inSimulation().startApplication();
     }
 
 }

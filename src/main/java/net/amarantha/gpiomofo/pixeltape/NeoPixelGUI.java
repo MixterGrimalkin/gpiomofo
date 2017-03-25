@@ -5,9 +5,11 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import net.amarantha.gpiomofo.GpioMofo;
+import net.amarantha.gpiomofo.Gui;
 import net.amarantha.gpiomofo.utility.TimeGuard;
 import net.amarantha.utils.colour.RGB;
 
@@ -18,11 +20,13 @@ public class NeoPixelGUI implements NeoPixel {
 
     private int pixelCount;
 
+    @Inject private Gui gui;
+
     @Inject private GpioMofo application;
-    @Inject private Stage stage;
+//    @Inject private Stage stage;
 
 //    private int[] widths = { 7, 21, 7, 21, 7 };
-    private int[] widths = { 47, 47, 47, 47, PIPE_4_SIZE, PIPE_3_SIZE, PIPE_2_SIZE, PIPE_1_SIZE};
+    public int[] widths = { 11 };//47, 47, 47, 47, PIPE_4_SIZE, PIPE_3_SIZE, PIPE_2_SIZE, PIPE_1_SIZE};
 
     private Circle[] pixels;
     private RGB[] colours;
@@ -30,7 +34,7 @@ public class NeoPixelGUI implements NeoPixel {
     private double masterBrightness = 1.0;
 
     private Group tape;
-    private int defaultWidth = 50;
+    public int defaultWidth = 11;
 
     @Override
     public void init(final int pixelCount) {
@@ -71,18 +75,10 @@ public class NeoPixelGUI implements NeoPixel {
             p++;
         }
 
-        // Start UI
-        stage.setScene(new Scene(pane, (2*margin)+(r*2*maxWidth)+(s*(maxWidth-1)), (2*margin)+(r*2*(y+1))+(s*(y))));
-        stage.initStyle(StageStyle.DECORATED);
-        stage.setResizable(true);
-        stage.setAlwaysOnTop(true);
-        stage.setTitle("Pixel Tape");
-        stage.show();
 
-        // Shut down application when window is closed
-        stage.setOnCloseRequest(event -> {
-            application.stopApplication();
-        });
+        Stage stage = gui.addStage("NeoPixel");
+        stage.setScene(new Scene(pane, (2*margin)+(r*2*maxWidth)+(s*(maxWidth-1)), (2*margin)+(r*2*(y+1))+(s*(y))));
+        stage.show();
 
     }
 

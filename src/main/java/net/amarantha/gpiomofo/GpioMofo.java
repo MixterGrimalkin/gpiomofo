@@ -45,7 +45,7 @@ public class GpioMofo {
 
         scenario.start();
 
-        if ( !scenario.requiresGUI() ) {
+        if ( !simulation ) {
             waitForEnter();
         }
 
@@ -112,6 +112,13 @@ public class GpioMofo {
             pixel.stop();
         }
 
+    }
+
+    private boolean simulation = false;
+
+    public GpioMofo inSimulation() {
+        simulation = true;
+        return this;
     }
 
 }
