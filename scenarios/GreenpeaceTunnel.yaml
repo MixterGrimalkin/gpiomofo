@@ -6,7 +6,8 @@ Parameters:
   Colour2: 255,32,211
   Colour3: 255,253,32
   Colour4: 250,226,217
-  TailLength: 3
+  Colour5: 62,116,231
+  TailLength: 7
 
 Triggers:
   PIR1:

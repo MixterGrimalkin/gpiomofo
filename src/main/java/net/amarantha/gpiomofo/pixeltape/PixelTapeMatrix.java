@@ -6,8 +6,10 @@ import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.gpiomofo.utility.TimeGuard;
 import net.amarantha.gpiomofo.utility.Utility;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.math.MathUtils;
 
 import java.util.*;
+import java.util.function.BiFunction;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.random;
@@ -40,8 +42,8 @@ public class PixelTapeMatrix {
 
     }
 
-    public PixelTapeMatrix addSprite(RGB colour) {
-        sprites.add(new Sprite(colour));
+    public PixelTapeMatrix addSprite(int preferredFocus, RGB colour) {
+        sprites.add(new Sprite(preferredFocus, colour));
         return this;
     }
 
@@ -53,18 +55,19 @@ public class PixelTapeMatrix {
         }
     }
 
-    @Inject private TimeGuard guard;
+    @Inject
+    private TimeGuard guard;
 
     private long decayTime = 1000;
 
     private void refresh() {
         List<Integer> fociToRemove = new ArrayList<>();
-        cancelledFoci.forEach((id, time)->{
-            if ( System.currentTimeMillis() - time >= decayTime ) {
+        cancelledFoci.forEach((id, time) -> {
+            if (System.currentTimeMillis() - time >= decayTime) {
                 fociToRemove.add(id);
             }
         });
-        if ( !fociToRemove.isEmpty() ) {
+        if (!fociToRemove.isEmpty()) {
             fociToRemove.forEach((id) -> {
                 cancelledFoci.remove(id);
                 foci.remove(id);
@@ -74,7 +77,7 @@ public class PixelTapeMatrix {
 
         sprites.forEach(Sprite::updatePosition);
         clear();
-        if ( tailLength > 0 ) {
+        if (tailLength > 0) {
             sprites.forEach(s -> {
                 for (int i = 0; i < tailLength; i++) {
                     if (s.tailPos[i][X] >= 0 && s.tailPos[i][X] < width && s.tailPos[i][Y] >= 0 && s.tailPos[i][Y] < height) {
@@ -84,7 +87,7 @@ public class PixelTapeMatrix {
             });
         }
         sprites.forEach(s -> {
-            if ( s.real[X] >=0 && s.real[X] < width && s.real[Y] >= 0 && s.real[Y] < height ) {
+            if (s.real[X] >= 0 && s.real[X] < width && s.real[Y] >= 0 && s.real[Y] < height) {
                 pixels[s.real[X]][s.real[Y]] = s.colour;
             }
         });
@@ -98,7 +101,7 @@ public class PixelTapeMatrix {
         neoPixel.render();
     }
 
-    private int[] targetJitter = { width/2, 3 };
+    private int[] targetJitter = {width / 2, 3};
 
     public void setTailLength(int tailLength) {
         this.tailLength = tailLength;
@@ -117,7 +120,7 @@ public class PixelTapeMatrix {
     private Map<Integer, Long> cancelledFoci = new HashMap<>();
 
     public void addFocus(int id, int x, int y) {
-        foci.put(id, new Integer[] { x, y });
+        foci.put(id, new Integer[]{x, y});
         targetSprites();
     }
 
@@ -126,11 +129,11 @@ public class PixelTapeMatrix {
     }
 
     private void targetSprites() {
-        if ( foci.isEmpty() ) {
+        if (foci.isEmpty()) {
             randomize();
         } else {
             sprites.forEach((sprite) -> {
-                Integer[] target = randomFocus();
+                Integer[] target = randomFocus(sprite);
                 sprite.targetOn(
                         target[X] + randomFlip(randomBetween(0, targetJitter[X])),
                         target[Y] + randomFlip(randomBetween(0, targetJitter[Y]))
@@ -139,13 +142,24 @@ public class PixelTapeMatrix {
         }
     }
 
-    public Integer[] randomFocus() {
+    private int numberOfColours;
+
+    public void setNumberOfColours(int numberOfColours) {
+        this.numberOfColours = numberOfColours;
+    }
+
+    public Integer[] randomFocus(Sprite sprite) {
         List<Integer[]> coords = new ArrayList<>(foci.values());
-        return coords.get(randomBetween(0, coords.size()-1));
+        if (coords.size() < numberOfColours && foci.keySet().contains(sprite.preferredFocus)) {
+            return foci.get(sprite.preferredFocus);
+        } else {
+            return coords.get(randomBetween(0, coords.size() - 1));
+
+        }
     }
 
     public void randomize() {
-        sprites.forEach((s)->s.randomize(1.0));
+        sprites.forEach((s) -> s.randomize(1.0));
     }
 
     private RGB[][] pixels;
@@ -158,34 +172,36 @@ public class PixelTapeMatrix {
     private static final int Y = 1;
 
     class Sprite {
-        double[] bounds = { width, height };
+        double[] bounds = {width, height};
         int[][] tailPos = new int[tailLength][2];
         RGB[] tail = new RGB[tailLength];
-        double[] current = { 0, 0 };
-        double[] target  = { 0, 0 };
-        double[] delta = { 0, 0 };
+        double[] current = {0, 0};
+        double[] target = {0, 0};
+        double[] delta = {0, 0};
         double linearSpeed;
         double theta;
         double radius;
         double dTheta;
-        int[] real = { 0, 0 };
+        int[] real = {0, 0};
         RGB colour;
+        int preferredFocus = 0;
 
-        Sprite(RGB colour) {
+        Sprite(int preferredFocus, RGB colour) {
             this.colour = colour;
+            this.preferredFocus = preferredFocus;
             current[X] = width / 2;
             current[Y] = height / 2;
             theta = 0;
             randomize(1.0);
             updateDelta();
-            for ( int i=0; i<tailLength; i++ ) {
+            for (int i = 0; i < tailLength; i++) {
                 tail[i] = RGB.BLACK;
-                tailPos[i] = new int[]{ -1, -1 };
+                tailPos[i] = new int[]{-1, -1};
             }
         }
 
         void storeTail() {
-            if ( tailLength > 0 ) {
+            if (tailLength > 0) {
                 for (int i = tailLength - 1; i > 0; i--) {
                     tail[i] = tail[i - 1].withBrightness(0.8 - (1.0 / tailLength));
                     tailPos[i] = tailPos[i - 1];
@@ -196,18 +212,18 @@ public class PixelTapeMatrix {
         }
 
         void randomize(double probability) {
-            if ( random() < probability ) {
-                target[X] = randomBetween(0, width-1);
-                target[Y] = randomBetween(0, height-1);
-                linearSpeed = randomBetween(2, 25);
+            if (random() < probability) {
+                target[X] = randomBetween(0, width - 1);
+                target[Y] = randomBetween(0, height - 1);
+                linearSpeed = randomBetween(2.0, 25.0);
                 radius = randomBetween(0.0, 5.0);
-                dTheta = randomFlip(randomBetween(0.1, PI/8));
+                dTheta = randomFlip(randomBetween(0.1, PI / 8) * (foci.size()==0 ? 0.5 : foci.size()));
             }
         }
 
         void targetOn(int tx, int ty) {
-            target[X] = bound(0, width-1, tx);
-            target[Y] = bound(0, height-1, ty);
+            target[X] = bound(0, width - 1, tx);
+            target[Y] = bound(0, height - 1, ty);
             updateDelta();
         }
 
@@ -217,14 +233,14 @@ public class PixelTapeMatrix {
         }
 
         void updateAxis(int axis) {
-            if ( target[axis] != current[axis] ) {
+            if (target[axis] != current[axis]) {
                 current[axis] += delta[axis];
             }
-            if ( current[axis] < 0 ) {
+            if (current[axis] < 0) {
                 current[axis] = 0;
                 delta[axis] = -delta[axis];
-            } else if ( current[axis] >= bounds[axis] ) {
-                current[axis] = bounds[axis]-1;
+            } else if (current[axis] >= bounds[axis]) {
+                current[axis] = bounds[axis] - 1;
                 delta[axis] = -delta[axis];
             }
         }
@@ -241,9 +257,9 @@ public class PixelTapeMatrix {
 
         void updateAngle() {
             theta += dTheta;
-            if ( theta < 0.0 ) {
-                theta = 2*PI;
-            } else if ( theta > 2*PI ) {
+            if (theta < 0.0) {
+                theta = 2 * PI;
+            } else if (theta > 2 * PI) {
                 theta = 0.0;
             }
         }
