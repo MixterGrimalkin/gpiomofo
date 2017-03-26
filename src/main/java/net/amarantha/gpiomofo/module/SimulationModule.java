@@ -24,7 +24,6 @@ public class SimulationModule extends LiveModule {
         bind(NeoPixel.class).to(NeoPixelGUI.class).in(Scopes.SINGLETON);
         bindConstant().annotatedWith(TapeRefresh.class).to(13);
         bind(PrintStream.class).toInstance(System.out);
-//        bind(Gui.class).in(Scopes.SINGLETON);
         bind(Stage.class).toInstance(stage);
     }
 }

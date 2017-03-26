@@ -5,16 +5,13 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import net.amarantha.gpiomofo.GpioMofo;
 import net.amarantha.gpiomofo.Gui;
 import net.amarantha.gpiomofo.utility.TimeGuard;
 import net.amarantha.utils.colour.RGB;
 
 import static javafx.scene.paint.Color.color;
-import static net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom.*;
 
 public class NeoPixelGUI implements NeoPixel {
 
@@ -51,7 +48,7 @@ public class NeoPixelGUI implements NeoPixel {
 
         int margin = 5;
         int r = 5;
-        int s = 1;
+        int s = 2;
 
         int x = 0;
         int y = 0;

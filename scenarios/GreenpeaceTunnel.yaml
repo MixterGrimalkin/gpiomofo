@@ -3,10 +3,10 @@ Parameters:
   Height: 45
   SpriteCount: 70
   Colour1: 229,56,16
-  Colour2: 255,32,211
+  Colour2: 250,226,217
   Colour3: 255,253,32
   Colour4: 250,226,217
-  Colour5: 62,116,231
+  Colour5: 255,32,211
   TailLength: 7
 
 Triggers:

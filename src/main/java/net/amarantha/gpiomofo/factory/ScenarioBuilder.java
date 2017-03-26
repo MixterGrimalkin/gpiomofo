@@ -7,7 +7,6 @@ import com.google.inject.Singleton;
 import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.http.HttpCommand;
-import net.amarantha.gpiomofo.service.http.Param;
 import net.amarantha.gpiomofo.service.midi.MidiCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.target.Target;

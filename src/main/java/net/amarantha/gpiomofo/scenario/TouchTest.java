@@ -1,7 +1,5 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.trigger.TouchTriggerSet;
-
 public class TouchTest extends Scenario {
 
     @Override

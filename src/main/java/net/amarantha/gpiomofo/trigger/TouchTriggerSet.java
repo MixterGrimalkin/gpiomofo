@@ -3,7 +3,6 @@ package net.amarantha.gpiomofo.trigger;
 import net.amarantha.gpiomofo.service.gpio.MPR121;
 
 import javax.inject.Inject;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;

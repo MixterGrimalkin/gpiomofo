@@ -8,9 +8,6 @@ import net.amarantha.gpiomofo.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.pixeltape.NeoPixelGUI;
 import net.amarantha.utils.properties.PropertiesService;
 
-import static net.amarantha.gpiomofo.utility.Utility.bar;
-import static net.amarantha.gpiomofo.utility.Utility.log;
-
 public class Scenario {
 
     @Inject private PropertiesService props;
@@ -66,10 +63,6 @@ public class Scenario {
 
     public boolean requiresPixelTape() {
         return targets.isPixelTapeUsed();
-    }
-
-    public boolean requiresGUI() {
-        return requiresPixelTape() && neoPixel instanceof NeoPixelGUI;
     }
 
 }

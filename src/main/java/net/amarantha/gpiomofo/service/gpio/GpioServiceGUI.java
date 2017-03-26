@@ -6,8 +6,6 @@ import com.pi4j.io.gpio.PinState;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -15,8 +13,6 @@ import net.amarantha.gpiomofo.Gui;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static javafx.scene.input.KeyCode.*;
 
 public class GpioServiceGUI extends GpioService {
 
@@ -85,7 +81,6 @@ public class GpioServiceGUI extends GpioService {
                     fireButton(9);
                     break;
             }
-            System.out.println(event.getCode());
         });
     }
 
