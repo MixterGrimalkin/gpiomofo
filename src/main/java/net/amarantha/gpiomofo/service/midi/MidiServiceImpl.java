@@ -2,7 +2,7 @@ package net.amarantha.gpiomofo.service.midi;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.utility.Utility;
+import net.amarantha.gpiomofo.service.shell.Utility;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.Property;
 import net.amarantha.utils.properties.PropertyNotFoundException;

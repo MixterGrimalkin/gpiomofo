@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.factory.Named;
-import net.amarantha.gpiomofo.target.Target;
+import net.amarantha.gpiomofo.core.annotation.Named;
+import net.amarantha.gpiomofo.core.target.Target;
 
 public class YamlTest extends Scenario {
 

@@ -4,8 +4,8 @@ import com.googlecode.guicebehave.Modules;
 import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
 import net.amarantha.gpiomofo.service.http.HttpCommand;
-import net.amarantha.gpiomofo.target.Target;
-import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.core.target.Target;
+import net.amarantha.gpiomofo.core.trigger.Trigger;
 import org.junit.runner.RunWith;
 
 import static net.amarantha.gpiomofo.service.http.HttpCommand.GET;

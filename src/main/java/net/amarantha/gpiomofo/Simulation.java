@@ -3,11 +3,11 @@ package net.amarantha.gpiomofo;
 import com.google.inject.Guice;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import net.amarantha.gpiomofo.module.SimulationModule;
+import net.amarantha.gpiomofo.core.GpioMofoSimulationModule;
 
 import static net.amarantha.gpiomofo.Main.HELP_TEXT;
 import static net.amarantha.gpiomofo.Main.LOGO;
-import static net.amarantha.gpiomofo.utility.Utility.log;
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
 import static net.amarantha.utils.properties.PropertiesService.processArgs;
 
 public class Simulation extends Application {
@@ -20,7 +20,7 @@ public class Simulation extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Guice.createInjector(new SimulationModule(primaryStage))
+        Guice.createInjector(new GpioMofoSimulationModule(primaryStage))
             .getInstance(GpioMofo.class)
                 .inSimulation().startApplication();
     }

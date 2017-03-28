@@ -1,9 +1,9 @@
 package net.amarantha.gpiomofo;
 
 import com.google.inject.Guice;
-import net.amarantha.gpiomofo.module.LiveModule;
+import net.amarantha.gpiomofo.core.GpioMofoModule;
 
-import static net.amarantha.gpiomofo.utility.Utility.log;
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
 import static net.amarantha.utils.properties.PropertiesService.processArgs;
 
 public class Main {
@@ -46,7 +46,7 @@ public class Main {
         log(LOGO);
         processArgs(args, HELP_TEXT);
 
-        Guice.createInjector(new LiveModule())
+        Guice.createInjector(new GpioMofoModule())
             .getInstance(GpioMofo.class)
                 .startApplication();
     }

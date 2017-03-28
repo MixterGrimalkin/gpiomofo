@@ -13,7 +13,7 @@ import javafx.stage.StageStyle;
 
 import java.io.File;
 
-import static net.amarantha.gpiomofo.utility.Utility.log;
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
 
 @Singleton
 public class Gui {

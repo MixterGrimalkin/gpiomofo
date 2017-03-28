@@ -2,11 +2,11 @@ package net.amarantha.gpiomofo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.factory.ScenarioBuilder;
-import net.amarantha.gpiomofo.pixeltape.PixelTapeService;
+import net.amarantha.gpiomofo.core.factory.ScenarioBuilder;
+import net.amarantha.gpiomofo.service.pixeltape.PixelTapeService;
 import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
-import net.amarantha.gpiomofo.service.gpio.MPR121;
+import net.amarantha.gpiomofo.service.gpio.touch.MPR121;
 import net.amarantha.gpiomofo.service.midi.MidiService;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.gpiomofo.webservice.WebService;
@@ -15,7 +15,7 @@ import net.amarantha.utils.properties.PropertiesService;
 import java.util.Scanner;
 
 import static net.amarantha.gpiomofo.Main.WITH_SERVER;
-import static net.amarantha.gpiomofo.utility.Utility.log;
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
 
 @Singleton
 public class GpioMofo {

@@ -1,10 +1,10 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.factory.LinkFactory;
-import net.amarantha.gpiomofo.factory.TargetFactory;
-import net.amarantha.gpiomofo.factory.TriggerFactory;
-import net.amarantha.gpiomofo.pixeltape.NeoPixel;
+import net.amarantha.gpiomofo.core.factory.LinkFactory;
+import net.amarantha.gpiomofo.core.factory.TargetFactory;
+import net.amarantha.gpiomofo.core.factory.TriggerFactory;
+import net.amarantha.gpiomofo.service.pixeltape.NeoPixel;
 import net.amarantha.utils.properties.PropertiesService;
 
 public class Scenario {

@@ -3,14 +3,14 @@ package net.amarantha.gpiomofo.scenario;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.service.osc.OscService;
-import net.amarantha.gpiomofo.trigger.UltrasonicSensor;
+import net.amarantha.gpiomofo.service.gpio.ultrasonic.HCSR04;
 import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.properties.Property;
 
 public class Raspression extends Scenario {
 
-    @Inject private UltrasonicSensor blackSensor;
-    @Inject private UltrasonicSensor redSensor;
+    @Inject private HCSR04 blackSensor;
+    @Inject private HCSR04 redSensor;
     @Inject private OscService osc;
 
     @Property("RaspressionClientIP") private String raspressionClientIP;

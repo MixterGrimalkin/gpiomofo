@@ -3,9 +3,9 @@ package net.amarantha.gpiomofo.scenario;
 import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.midi.MidiCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
-import net.amarantha.gpiomofo.target.QueuedTarget;
-import net.amarantha.gpiomofo.target.Target;
-import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.core.target.QueuedTarget;
+import net.amarantha.gpiomofo.core.target.Target;
+import net.amarantha.gpiomofo.core.trigger.Trigger;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;

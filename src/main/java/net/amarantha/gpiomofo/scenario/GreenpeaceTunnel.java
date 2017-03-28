@@ -1,11 +1,11 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.factory.Named;
-import net.amarantha.gpiomofo.factory.Parameter;
-import net.amarantha.gpiomofo.pixeltape.matrix.Butterflies;
-import net.amarantha.gpiomofo.pixeltape.matrix.PixelTapeMatrix;
-import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.core.annotation.Named;
+import net.amarantha.gpiomofo.core.annotation.Parameter;
+import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
+import net.amarantha.gpiomofo.service.pixeltape.matrix.PixelTapeMatrix;
+import net.amarantha.gpiomofo.core.trigger.Trigger;
 import net.amarantha.utils.colour.RGB;
 
 import java.util.HashMap;

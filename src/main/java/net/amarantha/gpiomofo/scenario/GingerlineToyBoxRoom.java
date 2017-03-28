@@ -1,12 +1,12 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.pixeltape.pattern.BrightnessRipple;
-import net.amarantha.gpiomofo.pixeltape.pattern.CyclicFade;
-import net.amarantha.gpiomofo.pixeltape.pattern.SolidColour;
+import net.amarantha.gpiomofo.service.pixeltape.pattern.BrightnessRipple;
+import net.amarantha.gpiomofo.service.pixeltape.pattern.CyclicFade;
+import net.amarantha.gpiomofo.service.pixeltape.pattern.SolidColour;
 import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
-import net.amarantha.gpiomofo.target.Target;
-import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.core.target.Target;
+import net.amarantha.gpiomofo.core.trigger.Trigger;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.Property;
 

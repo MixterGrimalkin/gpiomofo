@@ -2,8 +2,8 @@ package net.amarantha.gpiomofo;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
-import net.amarantha.gpiomofo.pixeltape.NeoPixel;
-import net.amarantha.gpiomofo.service.NeoPixelMock;
+import net.amarantha.gpiomofo.service.pixeltape.NeoPixel;
+import net.amarantha.gpiomofo.service.pixeltape.NeoPixelMock;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 import net.amarantha.gpiomofo.service.http.HttpService;
