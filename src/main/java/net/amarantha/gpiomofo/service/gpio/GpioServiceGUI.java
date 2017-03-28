@@ -16,10 +16,10 @@ import java.util.Map;
 
 public class GpioServiceGUI extends GpioService {
 
-    private Map<Integer, Boolean> inputStates = new HashMap<>();
-    private Map<Integer, Boolean> outputStates = new HashMap<>();
+    protected Map<Integer, Boolean> inputStates = new HashMap<>();
+    protected Map<Integer, Boolean> outputStates = new HashMap<>();
 
-    @Inject private Gui gui;
+    private Gui gui;
 
     private Map<Integer, Button> inputButtons = new HashMap<>();
     private Map<Integer, Button> outputButtons = new HashMap<>();
@@ -27,17 +27,23 @@ public class GpioServiceGUI extends GpioService {
     private HBox inputButtonContainer = new HBox();
     private HBox outputButtonContainer = new HBox();
 
+    @Inject
+    public GpioServiceGUI(Gui gui) {
+        this.gui = gui;
+    }
+
     @Override
     public void start(long period) {
 
-        Stage inputWindow = gui.addStage("Input GPIO");
-        buildButtonContainer(inputWindow, inputButtonContainer);
-        inputWindow.show();
+        if ( gui!=null ) {
+            Stage inputWindow = gui.addStage("Input GPIO");
+            buildButtonContainer(inputWindow, inputButtonContainer);
+            inputWindow.show();
 
-
-        Stage outputWindow = gui.addStage("Output GPIO");
-        buildButtonContainer(outputWindow, outputButtonContainer);
-        outputWindow.show();
+            Stage outputWindow = gui.addStage("Output GPIO");
+            buildButtonContainer(outputWindow, outputButtonContainer);
+            outputWindow.show();
+        }
 
         super.start(period);
     }
@@ -92,55 +98,60 @@ public class GpioServiceGUI extends GpioService {
 
     }
 
-
     private void redrawGui() {
-        inputButtons.clear();
-        inputButtonContainer.getChildren().clear();
-        if ( inputStates.isEmpty() ) {
-            inputButtonContainer.getChildren().add(new Button("(none)"));
-        } else {
-            inputStates.forEach((pin, state) -> {
-                Button button = new Button("Gpio-" + pin);
-                inputButtons.put(pin, button);
-                button.setOnAction(event -> {
-                    inputStates.put(pin, !inputStates.get(pin));
-                    refreshGui();
+        if ( gui!=null ) {
+            inputButtons.clear();
+            inputButtonContainer.getChildren().clear();
+            if (inputStates.isEmpty()) {
+                inputButtonContainer.getChildren().add(new Button("(none)"));
+            } else {
+                inputStates.forEach((pin, state) -> {
+                    Button button = new Button("Gpio-" + pin);
+                    inputButtons.put(pin, button);
+                    button.setOnAction(event -> {
+                        inputStates.put(pin, !inputStates.get(pin));
+                        refreshGui();
+                    });
+                    inputButtonContainer.getChildren().add(button);
                 });
-                inputButtonContainer.getChildren().add(button);
-            });
+            }
+            outputButtons.clear();
+            outputButtonContainer.getChildren().clear();
+            if (outputStates.isEmpty()) {
+                outputButtonContainer.getChildren().add(new Button("(none)"));
+            } else {
+                outputStates.forEach((pin, state) -> {
+                    Button button = new Button("Gpio-" + pin);
+                    outputButtons.put(pin, button);
+                    outputButtonContainer.getChildren().add(button);
+                });
+            }
+            refreshGui();
         }
-        outputButtons.clear();
-        outputButtonContainer.getChildren().clear();
-        if ( outputStates.isEmpty() ) {
-            outputButtonContainer.getChildren().add(new Button("(none)"));
-        } else {
-            outputStates.forEach((pin, state) -> {
-                Button button = new Button("Gpio-" + pin);
-                outputButtons.put(pin, button);
-                outputButtonContainer.getChildren().add(button);
-            });
-        }
-        refreshGui();
     }
 
     private void refreshGui() {
-        inputButtons.forEach((pin, button)->{
-            if ( inputStates.get(pin) ) {
-                button.setStyle("-fx-background-color: red");
-            } else {
-                button.setStyle("-fx-background-color: white");
-            }
-        });
-        outputButtons.forEach((pin, button)->{
-            if ( outputStates.get(pin) ) {
-                button.setStyle("-fx-background-color: red");
-            } else {
-                button.setStyle("-fx-background-color: white");
-            }
-        });
+        if ( gui!=null ) {
+            inputButtons.forEach((pin, button) -> {
+                if (inputStates.get(pin)) {
+                    button.setStyle("-fx-background-color: red");
+                } else {
+                    button.setStyle("-fx-background-color: white");
+                }
+            });
+            outputButtons.forEach((pin, button) -> {
+                if (outputStates.get(pin)) {
+                    button.setStyle("-fx-background-color: red");
+                } else {
+                    button.setStyle("-fx-background-color: white");
+                }
+            });
+        }
     }
 
-
+    ////////////////////
+    // Simulated GPIO //
+    ////////////////////
 
     @Override
     public boolean isValidPin(int pinNumber) {
@@ -168,49 +179,6 @@ public class GpioServiceGUI extends GpioService {
     protected void provisionDigitalOutput(int pinNumber, PinState initialState) {
         outputStates.put(pinNumber, initialState==PinState.HIGH);
         redrawGui();
-    }
-
-    /////////////
-    // Testing //
-    /////////////
-
-    @Override
-    public void scanPins() {
-        super.scanPins();
-    }
-
-    public void setInput(int pinNumber, boolean state) {
-        if ( !inputStates.containsKey(pinNumber) ) {
-            throw new IllegalStateException("TESTING ERROR: Pin " + pinNumber + " is not an input");
-        }
-        inputStates.put(pinNumber, state);
-        scanPins();
-    }
-
-    public boolean getOutput(int pinNumber) {
-        if ( !outputStates.containsKey(pinNumber) ) {
-            throw new IllegalStateException("TESTING ERROR: Pin " + pinNumber + " is not an output");
-        }
-        return outputStates.get(pinNumber);
-    }
-
-    public Map<Integer, Boolean> getOutputStates() {
-        return outputStates;
-    }
-
-    public void reset() {
-        inputStates.clear();
-        outputStates.clear();
-        digitalInputs.clear();
-        digitalOutputs.clear();
-        inputLastState.clear();
-        inputLastChange.clear();
-        inputTimeouts.clear();
-        onHighCallbacks.clear();
-        onLowCallbacks.clear();
-        onChangeCallbacks.clear();
-        whenHighCallbacks.clear();
-        whenLowCallbacks.clear();
     }
 
 }

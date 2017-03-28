@@ -5,7 +5,6 @@ import net.amarantha.gpiomofo.factory.LinkFactory;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
 import net.amarantha.gpiomofo.pixeltape.NeoPixel;
-import net.amarantha.gpiomofo.pixeltape.NeoPixelGUI;
 import net.amarantha.utils.properties.PropertiesService;
 
 public class Scenario {

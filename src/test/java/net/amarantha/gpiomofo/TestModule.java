@@ -5,7 +5,7 @@ import com.google.inject.Scopes;
 import net.amarantha.gpiomofo.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.NeoPixelMock;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
-import net.amarantha.gpiomofo.service.gpio.GpioServiceGUI;
+import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 import net.amarantha.gpiomofo.service.http.HttpService;
 import net.amarantha.gpiomofo.service.http.HttpServiceMock;
 import net.amarantha.gpiomofo.service.midi.MidiService;
@@ -21,7 +21,7 @@ public class TestModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(GpioService.class).to(GpioServiceGUI.class).in(Scopes.SINGLETON);
+        bind(GpioService.class).to(GpioServiceMock.class).in(Scopes.SINGLETON);
         bind(MidiService.class).to(MidiServiceMock.class).in(Scopes.SINGLETON);
         bind(HttpService.class).to(HttpServiceMock.class).in(Scopes.SINGLETON);
         bind(OscService.class).to(OscServiceMock.class).in(Scopes.SINGLETON);
