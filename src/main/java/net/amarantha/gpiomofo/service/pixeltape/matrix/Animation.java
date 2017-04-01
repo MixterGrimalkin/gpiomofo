@@ -1,12 +1,13 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
 import com.google.inject.Inject;
+import net.amarantha.gpiomofo.display.LightSurface;
 
 import java.util.List;
 
 public abstract class Animation {
 
-    @Inject protected PixelTapeMatrix matrix;
+    @Inject protected LightSurface surface;
     @Inject protected SpriteFactory sprites;
 
     public abstract void start();

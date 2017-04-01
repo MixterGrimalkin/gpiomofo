@@ -1,6 +1,8 @@
 Parameters:
-  Width: 11
-  Height: 45
+#  Width: 11
+#  Height: 45
+  Width: 192
+  Height: 32
   SpriteCount: 70
   Colour1: 229,56,16
   Colour2: 250,226,217

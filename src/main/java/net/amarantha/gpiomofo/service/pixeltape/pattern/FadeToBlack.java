@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.service.pixeltape.pattern;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.service.pixeltape.NeoPixel;
+import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.pixeltape.PixelTapeService;
 import net.amarantha.gpiomofo.service.pixeltape.PixelTapeTarget;
 

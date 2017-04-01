@@ -1,11 +1,13 @@
-package net.amarantha.gpiomofo.service.pixeltape;
+package net.amarantha.gpiomofo.display.pixeltape;
 
-import net.amarantha.gpiomofo.service.pixeltape.ws281xj.WS281x;
+import com.google.inject.Inject;
+import net.amarantha.gpiomofo.display.pixeltape.ws281xj.WS281x;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.properties.PropertiesService;
 
 public class NeoPixelWS281X implements NeoPixel {
 
-    public static final int PWM_GPIO = 18;
+    @Inject private PropertiesService props;
 
     private WS281x ws281x;
 
@@ -16,7 +18,7 @@ public class NeoPixelWS281X implements NeoPixel {
     @Override
     public void init(int pixelCount) {
         this.pixelCount = pixelCount;
-        ws281x = new WS281x(PWM_GPIO, 255, pixelCount);
+        ws281x = new WS281x(props.getInt("WS281x_PWM_Channel", 18), 255, pixelCount);
     }
 
     @Override

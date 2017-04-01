@@ -1,5 +1,6 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
+import net.amarantha.gpiomofo.display.LightSurface;
 import net.amarantha.utils.colour.RGB;
 
 import static java.lang.Math.PI;
@@ -21,6 +22,7 @@ class Sprite {
     private double[] current = {0, 0};
     private double[] target = {0, 0};
     private double[] delta = {0, 0};
+    private double[] offset = {0, 0};
     private double linearSpeed;
     private double theta;
     private double radius;
@@ -28,7 +30,6 @@ class Sprite {
     int[] real = {0, 0};
     RGB colour;
     int preferredFocus = 0;
-
 
     Sprite(int preferredFocus, RGB colour, int width, int height, int tailLength) {
         this.colour = colour;
@@ -48,6 +49,9 @@ class Sprite {
             tailColours[i] = RGB.BLACK;
             tailPos[i] = new int[]{-1, -1};
         }
+    }
+
+    void render(LightSurface surface) {
     }
 
     void storeTail() {
@@ -99,10 +103,23 @@ class Sprite {
         updateAxis(X);
         updateAxis(Y);
         real[X] = round(current[X] + (Math.sin(theta) * radius));
+        angularBounce(X);
         real[Y] = round(current[Y] + (Math.cos(theta) * radius));
+        angularBounce(Y);
         updateAngle();
         updateDelta();
         storeTail();
+    }
+
+    void angularBounce(int axis) {
+        if ( real[axis] < 0 ) {
+            real[axis] = 0;
+            dTheta = -dTheta;
+        } else  if ( real[axis] >= bounds[axis] ) {
+            real[axis] = bounds[axis] - 1;
+            dTheta = -dTheta;
+        }
+
     }
 
     void updateAngle() {

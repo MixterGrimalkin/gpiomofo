@@ -3,8 +3,12 @@ package net.amarantha.gpiomofo.core;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import net.amarantha.gpiomofo.core.annotation.TapeRefresh;
-import net.amarantha.gpiomofo.service.pixeltape.NeoPixel;
-import net.amarantha.gpiomofo.service.pixeltape.NeoPixelWS281X;
+import net.amarantha.gpiomofo.display.lightboard.LightBoard;
+import net.amarantha.gpiomofo.display.lightboard.NativeLightBoard_192X32_Small_Sign;
+import net.amarantha.gpiomofo.display.lightboard.NeoPixelBoard;
+import net.amarantha.gpiomofo.display.lightboard.TextBoard;
+import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
+import net.amarantha.gpiomofo.display.pixeltape.NeoPixelWS281X;
 import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.RaspberryPi3;
@@ -47,6 +51,7 @@ public class GpioMofoModule extends AbstractModule {
     }
 
     protected void configureAdditional() {
+        bind(LightBoard.class).to(NativeLightBoard_192X32_Small_Sign.class).in(Scopes.SINGLETON);
         bind(GpioService.class).to(RaspberryPi3.class).in(Scopes.SINGLETON);
         bind(NeoPixel.class).to(NeoPixelWS281X.class).in(Scopes.SINGLETON);
         bindConstant().annotatedWith(TapeRefresh.class).to(props.getInt("PixelTapeRefresh", 50));

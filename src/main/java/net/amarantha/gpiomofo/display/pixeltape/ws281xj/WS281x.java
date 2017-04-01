@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.service.pixeltape.ws281xj;
+package net.amarantha.gpiomofo.display.pixeltape.ws281xj;
 
 /*
  * #%L
@@ -53,7 +53,7 @@ public class WS281x implements Closeable {
 //				try {
 //					Path path = Files.createTempFile("lib" + LIB_NAME, ".so");
 //					path.toFile().deleteOnExit();
-//					Files.copy(net.amarantha.gpiomofo.service.pixeltape.ws281xj.WS281x.class.getResourceAsStream("/lib/lib" + LIB_NAME + ".so"), path,
+//					Files.copy(net.amarantha.gpiomofo.display.pixeltape.ws281xj.WS281x.class.getResourceAsStream("/lib/lib" + LIB_NAME + ".so"), path,
 //							StandardCopyOption.REPLACE_EXISTING);
 //					System.load(path.toString());
 //					loaded = Boolean.TRUE;

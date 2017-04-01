@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.service.pixeltape;
+package net.amarantha.gpiomofo.display.pixeltape;
 
 import net.amarantha.utils.colour.RGB;
 

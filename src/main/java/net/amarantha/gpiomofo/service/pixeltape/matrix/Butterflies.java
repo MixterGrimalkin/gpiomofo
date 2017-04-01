@@ -1,8 +1,11 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
+import com.google.inject.Inject;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.time.TimeGuard;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,19 +16,22 @@ import static net.amarantha.utils.math.MathUtils.randomFlip;
 
 public class Butterflies extends Animation {
 
+    @Inject private TimeGuard guard;
+
     private Map<Integer, RGB> colours;
 
     private int[] targetJitter;
 
     public void init(int spriteCount, Map<Integer, RGB> colours, int tailLength) {
         this.colours = colours;
-        targetJitter = new int[]{matrix.width() / 2, 3};
+        targetJitter = new int[]{surface.width() / 10, surface.height() / 2};
         sprites.setTailLength(tailLength);
         for (int i = 0; i < colours.size(); i++) {
             for (int j = 0; j < spriteCount / colours.size(); j++) {
                 sprites.create(i, colours.get(i));
             }
         }
+        randomize();
     }
 
     @Override
@@ -38,18 +44,25 @@ public class Butterflies extends Animation {
 
     }
 
+    private int foreground = 1;
+    private int background = 0;
+
     @Override
     public void refresh() {
-        sprites.forEach(Sprite::updatePosition);
-        matrix.clear();
-        if (sprites.tailLength() > 0) {
-            sprites.forEach(s -> {
-                for (int i = 0; i < sprites.tailLength(); i++) {
-                    matrix.draw(s.tailPos[i][X], s.tailPos[i][Y], s.tailColours[i]);
-                }
+        updateFoci();
+        if ( foci.isEmpty() ) {
+            guard.every(2000, "RandomizeButterflies", ()->{
+                sprites.forEach((s)->s.randomize(0.1));
             });
         }
-        sprites.forEach(s -> matrix.draw(s.real[X], s.real[Y], s.colour));
+        sprites.forEach(Sprite::updatePosition);
+        surface.clear();
+        sprites.forEach(s -> {
+            for (int i = 0; i < sprites.tailLength(); i++) {
+                surface.layer(background).draw(s.tailPos[i][X], s.tailPos[i][Y], s.tailColours[i]);
+            }
+            surface.layer(foreground).draw(s.real[X], s.real[Y], s.colour);
+        });
     }
 
     @Override
@@ -73,7 +86,7 @@ public class Butterflies extends Animation {
     }
 
     private void targetSprites() {
-        if (matrix.foci().isEmpty()) {
+        if (foci.isEmpty()) {
             randomize();
         } else {
             sprites.forEach((sprite) -> {
@@ -87,9 +100,9 @@ public class Butterflies extends Animation {
     }
 
     public Integer[] randomFocus(Sprite sprite) {
-        List<Integer[]> coords = new ArrayList<>(matrix.foci().values());
-        if (coords.size() < colours.size() && matrix.foci().keySet().contains(sprite.preferredFocus)) {
-            return matrix.foci().get(sprite.preferredFocus);
+        List<Integer[]> coords = new ArrayList<>(foci.values());
+        if (foci.keySet().contains(sprite.preferredFocus)) {
+            return foci.get(sprite.preferredFocus);
         } else {
             return coords.get(randomBetween(0, coords.size() - 1));
 
@@ -99,4 +112,43 @@ public class Butterflies extends Animation {
     public void randomize() {
         sprites.forEach((s) -> s.randomize(1.0));
     }
+
+    //////////
+    // Foci //
+    //////////
+
+    private Map<Integer, Integer[]> foci = new HashMap<>();
+    private Map<Integer, Long> cancelledFoci = new HashMap<>();
+    private long persistFocusDelay = 1000;
+
+    public void addFocus(int id, int x, int y) {
+        foci.put(id, new Integer[]{x, y});
+        onFocusAdded(id);
+    }
+
+    public void removeFocus(int id) {
+        cancelledFoci.put(id, System.currentTimeMillis());
+    }
+
+    Map<Integer, Integer[]> foci() {
+        return foci;
+    }
+
+    private void updateFoci() {
+        List<Integer> fociToRemove = new ArrayList<>();
+        cancelledFoci.forEach((id, time) -> {
+            if (System.currentTimeMillis() - time >= persistFocusDelay) {
+                fociToRemove.add(id);
+            }
+        });
+        if (!fociToRemove.isEmpty()) {
+            fociToRemove.forEach((id) -> {
+                cancelledFoci.remove(id);
+                foci.remove(id);
+            });
+            onFocusRemoved(fociToRemove);
+        }
+    }
+
+
 }

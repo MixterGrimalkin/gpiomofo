@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.core.factory.LinkFactory;
 import net.amarantha.gpiomofo.core.factory.TargetFactory;
 import net.amarantha.gpiomofo.core.factory.TriggerFactory;
-import net.amarantha.gpiomofo.service.pixeltape.NeoPixel;
+import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.utils.properties.PropertiesService;
 
 public class Scenario {

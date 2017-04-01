@@ -1,6 +1,5 @@
-package net.amarantha.gpiomofo.service.pixeltape;
+package net.amarantha.gpiomofo.display.pixeltape;
 
-import net.amarantha.gpiomofo.service.pixeltape.NeoPixel;
 import net.amarantha.utils.colour.RGB;
 
 public class NeoPixelMock implements NeoPixel{

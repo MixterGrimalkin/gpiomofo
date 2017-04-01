@@ -3,6 +3,9 @@ package net.amarantha.gpiomofo.scenario;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.core.annotation.Named;
 import net.amarantha.gpiomofo.core.annotation.Parameter;
+import net.amarantha.gpiomofo.display.LightSurface;
+import net.amarantha.gpiomofo.display.animation.AnimationService;
+import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.PixelTapeMatrix;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
@@ -11,10 +14,15 @@ import net.amarantha.utils.colour.RGB;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.amarantha.gpiomofo.display.LightSurface.FG;
+
 public class GreenpeaceTunnel extends Scenario {
 
-    @Inject private PixelTapeMatrix matrix;
+//    @Inject private PixelTapeMatrix matrix;
+    @Inject private LightSurface surface;
+    @Inject private AnimationService animation;
     @Inject private Butterflies butterflies;
+
 
     @Named("PIR1") private Trigger pir1;
     @Named("PIR2") private Trigger pir2;
@@ -43,26 +51,30 @@ public class GreenpeaceTunnel extends Scenario {
         colours.put(3, colour4);
         colours.put(4, colour5);
 
-        matrix.init(width, height, false);
+        surface.init();
+
+//        surface.layer(FG).draw(5, 10, RGB.CYAN);
+
+
+        animation.start();
 
         butterflies.init(spriteCount, colours, tailLength);
+        animation.play(butterflies);
 
-        matrix.startAnimation(butterflies);
-
-        pir1.onFire(callback(0, 1));
-        pir2.onFire(callback(1, 12));
-        pir3.onFire(callback(2, 22));
-        pir4.onFire(callback(3, 32));
-        pir5.onFire(callback(4, 43));
+        pir1.onFire(callback(0, 12));
+        pir2.onFire(callback(1, 54));
+        pir3.onFire(callback(2, 96));
+        pir4.onFire(callback(3, 138));
+        pir5.onFire(callback(4, 180));
 
     }
 
-    private Trigger.TriggerCallback callback(final int id, final int y) {
+    private Trigger.TriggerCallback callback(final int id, final int pos) {
         return (state) -> {
             if (state) {
-                matrix.addFocus(id, width / 2, y);
+                butterflies.addFocus(id, pos, height / 2);
             } else {
-                matrix.removeFocus(id);
+                butterflies.removeFocus(id);
             }
         };
     }

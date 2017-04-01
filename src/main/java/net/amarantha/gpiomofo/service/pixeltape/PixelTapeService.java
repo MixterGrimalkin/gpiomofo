@@ -3,6 +3,7 @@ package net.amarantha.gpiomofo.service.pixeltape;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.core.annotation.TapeRefresh;
+import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.utils.colour.RGB;
 

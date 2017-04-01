@@ -1,8 +1,9 @@
-package net.amarantha.gpiomofo.service.pixeltape;
+package net.amarantha.gpiomofo.display.pixeltape;
 
 import com.google.inject.Inject;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
@@ -23,7 +24,7 @@ public class NeoPixelGUI implements NeoPixel {
 //    @Inject private Stage stage;
 
 //    private int[] widths = { 7, 21, 7, 21, 7 };
-    public int[] widths = { 11 };//47, 47, 47, 47, PIPE_4_SIZE, PIPE_3_SIZE, PIPE_2_SIZE, PIPE_1_SIZE};
+    public int[] widths = {}; // 11 };//47, 47, 47, 47, PIPE_4_SIZE, PIPE_3_SIZE, PIPE_2_SIZE, PIPE_1_SIZE};
 
     private Circle[] pixels;
     private RGB[] colours;
@@ -32,6 +33,10 @@ public class NeoPixelGUI implements NeoPixel {
 
     private Group tape;
     public int defaultWidth = 11;
+
+    public void setDefaultWidth(int defaultWidth) {
+        this.defaultWidth = defaultWidth;
+    }
 
     @Override
     public void init(final int pixelCount) {
@@ -72,12 +77,34 @@ public class NeoPixelGUI implements NeoPixel {
             p++;
         }
 
+        // RIGHT-CLICK => reset UI window (because it messes up all the time - bug in JaxaFX maybe???)
+        pane.setOnMouseClicked((e) -> {
+            if ( e.getButton()== MouseButton.SECONDARY ) {
+                stage.hide();
+                stage = new Stage();
+                init(pixelCount);
+            } else {
+                if (e.isControlDown() && e.isAltDown()) {
+                    stage.hide();
+                    stage = new Stage();
+                    init(pixelCount);
+                }
+            }
+        });
 
-        Stage stage = gui.addStage("NeoPixel");
-        stage.setScene(new Scene(pane, (2*margin)+(r*2*maxWidth)+(s*(maxWidth-1)), (2*margin)+(r*2*(y+1))+(s*(y))));
+
+        stage = gui.addStage("NeoPixel");
+        width = (2*margin)+(r*2*maxWidth)+(s*(maxWidth-1));
+        height = (2*margin)+(r*2*(y+1))+(s*(y));
+        stage.setScene(new Scene(pane, width, height));
         stage.show();
 
     }
+
+    private int width;
+    private int height;
+
+    private Stage stage;
 
     @Override
     public void setPixelColourRGB(int pixel, RGB rgb) {
@@ -111,7 +138,9 @@ public class NeoPixelGUI implements NeoPixel {
             for (int i = 0; i < pixels.length; i++) {
                 if ( colours[i]!=null ) {
                     RGB rgb = colours[i].withBrightness(masterBrightness);
-                    pixels[i].setFill(color(rgb.getRed() / 255.0, rgb.getGreen() / 255.0, rgb.getBlue() / 255.0));
+                    if (pixels[i]!=null ) {
+                        pixels[i].setFill(color(rgb.getRed() / 255.0, rgb.getGreen() / 255.0, rgb.getBlue() / 255.0));
+                    }
                 }
             }
         });

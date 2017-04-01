@@ -2,15 +2,10 @@ package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.service.pixeltape.NeoPixel;
+import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.time.TimeGuard;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static net.amarantha.gpiomofo.service.shell.Utility.log;
 
@@ -65,7 +60,7 @@ public class PixelTapeMatrix {
     /////////////
 
     private void refresh() {
-        updateFoci();
+//        updateFoci();
         if ( animation!=null ) {
             guard.every(animation.getRefreshInterval(), "Animation", () -> animation.refresh());
         }
@@ -85,47 +80,47 @@ public class PixelTapeMatrix {
         }
     }
 
-    //////////
-    // Foci //
-    //////////
-
-    private Map<Integer, Integer[]> foci = new HashMap<>();
-    private Map<Integer, Long> cancelledFoci = new HashMap<>();
-    private long persistFocusDelay = 1000;
-
-    public void addFocus(int id, int x, int y) {
-        foci.put(id, new Integer[]{x, y});
-        if ( animation!=null ) {
-            animation.onFocusAdded(id);
-        }
-    }
-
-    public void removeFocus(int id) {
-        cancelledFoci.put(id, System.currentTimeMillis());
-    }
-
-    Map<Integer, Integer[]> foci() {
-        return foci;
-    }
-
-    private void updateFoci() {
-        List<Integer> fociToRemove = new ArrayList<>();
-        cancelledFoci.forEach((id, time) -> {
-            if (System.currentTimeMillis() - time >= persistFocusDelay) {
-                fociToRemove.add(id);
-            }
-        });
-        if (!fociToRemove.isEmpty()) {
-            fociToRemove.forEach((id) -> {
-                cancelledFoci.remove(id);
-                foci.remove(id);
-            });
-            if ( animation!=null ) {
-                animation.onFocusRemoved(fociToRemove);
-            }
-        }
-    }
-
+//    //////////
+//    // Foci //
+//    //////////
+//
+//    private Map<Integer, Integer[]> foci = new HashMap<>();
+//    private Map<Integer, Long> cancelledFoci = new HashMap<>();
+//    private long persistFocusDelay = 1000;
+//
+//    public void addFocus(int id, int x, int y) {
+//        foci.put(id, new Integer[]{x, y});
+//        if ( animation!=null ) {
+//            animation.onFocusAdded(id);
+//        }
+//    }
+//
+//    public void removeFocus(int id) {
+//        cancelledFoci.put(id, System.currentTimeMillis());
+//    }
+//
+//    Map<Integer, Integer[]> foci() {
+//        return foci;
+//    }
+//
+//    private void updateFoci() {
+//        List<Integer> fociToRemove = new ArrayList<>();
+//        cancelledFoci.forEach((id, time) -> {
+//            if (System.currentTimeMillis() - time >= persistFocusDelay) {
+//                fociToRemove.add(id);
+//            }
+//        });
+//        if (!fociToRemove.isEmpty()) {
+//            fociToRemove.forEach((id) -> {
+//                cancelledFoci.remove(id);
+//                foci.remove(id);
+//            });
+//            if ( animation!=null ) {
+//                animation.onFocusRemoved(fociToRemove);
+//            }
+//        }
+//    }
+//
     /////////////
     // Drawing //
     /////////////

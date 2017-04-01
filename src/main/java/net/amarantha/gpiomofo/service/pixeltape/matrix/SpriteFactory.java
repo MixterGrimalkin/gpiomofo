@@ -1,6 +1,7 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
 import com.google.inject.Inject;
+import net.amarantha.gpiomofo.display.LightSurface;
 import net.amarantha.utils.colour.RGB;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.function.Consumer;
 
 public class SpriteFactory {
 
-    @Inject private PixelTapeMatrix matrix;
+    @Inject private LightSurface surface;
 
     private List<Sprite> sprites = new ArrayList<>();
 
@@ -25,7 +26,7 @@ public class SpriteFactory {
     }
 
     public Sprite create(int group, RGB colour) {
-        Sprite sprite = new Sprite(group, colour, matrix.width(), matrix.height(), tailLength);
+        Sprite sprite = new Sprite(group, colour, surface.width(), surface.height(), tailLength);
         sprites.add(sprite);
         return sprite;
     }
