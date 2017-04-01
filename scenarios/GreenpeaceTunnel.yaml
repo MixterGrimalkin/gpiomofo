@@ -1,15 +1,11 @@
 Parameters:
-#  Width: 11
-#  Height: 45
-  Width: 192
-  Height: 32
-  SpriteCount: 70
+  SpriteCount: 50
   Colour1: 229,56,16
   Colour2: 250,226,217
   Colour3: 255,253,32
   Colour4: 250,226,217
   Colour5: 255,32,211
-  TailLength: 7
+  TailLength: 5
 
 Triggers:
   PIR1:

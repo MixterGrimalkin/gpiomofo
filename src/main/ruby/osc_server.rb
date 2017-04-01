@@ -3,9 +3,9 @@ require 'osc-ruby'
 require 'osc-ruby/em_server'
 require 'unimidi'
 
-@server = OSC::EMServer.new( 5000 )
+@server = OSC::EMServer.new(5000)
 
-@server.add_method '/black' do | message |
+@server.add_method '/black' do |message|
   midi_value = message.to_a[0]
   UniMIDI::Output.first.puts(0xB0, 57, midi_value)
   # percentage = ((midi_value/255.0)*100).round()

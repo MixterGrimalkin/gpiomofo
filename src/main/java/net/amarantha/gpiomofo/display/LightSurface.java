@@ -1,9 +1,9 @@
 package net.amarantha.gpiomofo.display;
 
 import com.google.inject.Injector;
-import net.amarantha.gpiomofo.display.lightboard.LightBoard;
 import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.display.entity.Region;
+import net.amarantha.gpiomofo.display.lightboard.LightBoard;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.math.MathUtils;
@@ -23,7 +23,7 @@ public class LightSurface {
     @Property("LayerCount") private int layerCount = 10;
     @Property("Width") private int width;
     @Property("Height") private int height;
-    @Property("Class") private Class<? extends LightBoard> lightBoardClass;
+    @Property("BoardClass") private Class<? extends LightBoard> lightBoardClass;
 
     private LightBoard board;
 

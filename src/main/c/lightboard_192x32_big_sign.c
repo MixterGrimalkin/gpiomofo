@@ -26,6 +26,7 @@ int addr1 = 22;
 int addr2 = 23;
 int addr3 = 24;
 
+
 bool paused = false;
 
 int CLOCK_DELAY = 1;
@@ -170,6 +171,21 @@ JNIEXPORT void JNICALL Java_net_amarantha_gpiomofo_display_lightboard_NativeLigh
 JNIEXPORT void JNICALL Java_net_amarantha_gpiomofo_display_lightboard_NativeLightBoard_wake
   (JNIEnv *env, jobject o) {
     paused = false;
+  }
+
+JNIEXPORT void JNICALL Java_net_amarantha_gpiomofo_display_lightboard_NativeLightBoard_setPins
+  (JNIEnv *env, jobject o, jint clk, jint sto, jint out, jint d1R, jint d2R, jint d1G, jint d2G, jint a0, jint a1, jint a2, jint a3) {
+    clockPin = clk;
+    store = sto;
+    output = out;
+    data1R = d1R;
+    data2R = d2R;
+    data1G = d1G;
+    data2G = d2G;
+    addr0 = a0;
+    addr1 = a1;
+    addr2 = a2;
+    addr3 = a3;
   }
 
 ////////////////

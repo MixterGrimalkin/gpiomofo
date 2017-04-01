@@ -1,6 +1,6 @@
 package net.amarantha.gpiomofo.display.lightboard;
 
-public class NativeLightBoard extends NativeWrapper {
+public class NativeLightBoard extends NativeLightboardWrapper {
 
     private int height;
     private int width;
@@ -36,7 +36,11 @@ public class NativeLightBoard extends NativeWrapper {
 
     protected native void initNative(int rows, int cols);
 
+    @Override
     protected native void setPoint(int row, int col, boolean red, boolean green);
+
+    @Override
+    protected native void setPins(int clock, int store, int output, int data1R, int data2R, int data1G, int data2G, int addr0, int addr1, int addr2, int addr3);
 
     public native void sleep();
 

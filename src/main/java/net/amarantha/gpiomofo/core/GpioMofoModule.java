@@ -5,8 +5,6 @@ import com.google.inject.Scopes;
 import net.amarantha.gpiomofo.core.annotation.TapeRefresh;
 import net.amarantha.gpiomofo.display.lightboard.LightBoard;
 import net.amarantha.gpiomofo.display.lightboard.NativeLightBoard_192X32_Small_Sign;
-import net.amarantha.gpiomofo.display.lightboard.NeoPixelBoard;
-import net.amarantha.gpiomofo.display.lightboard.TextBoard;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixelWS281X;
 import net.amarantha.gpiomofo.scenario.Scenario;

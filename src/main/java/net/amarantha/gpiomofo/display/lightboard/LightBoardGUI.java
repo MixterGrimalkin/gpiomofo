@@ -15,9 +15,7 @@ import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.Property;
 import net.amarantha.utils.properties.PropertyGroup;
 
-import static net.amarantha.utils.colour.RGB.B;
-import static net.amarantha.utils.colour.RGB.G;
-import static net.amarantha.utils.colour.RGB.R;
+import static net.amarantha.utils.colour.RGB.*;
 
 /**
  * UI Simulation of a colour LightBoard
@@ -27,39 +25,27 @@ public class LightBoardGUI implements LightBoard {
 
     @Property("OnlyRedGreen") private boolean onlyRedGreen;
     @Property("OnlyOnOff") private boolean onlyOnOff;
+    @Property("LedSize") private int ledRadius = 2;
+    @Property("Spacing") private int spacer = 0;
+    @Property("RefreshInterval") private Long refreshInterval = 60L;
 
-    private final static Long LED_REFRESH_TIME = 60L;
-
-    private final static String BLACK_BACKGROUND = "-fx-background-color: black;";
-
-    private int height;
     private int width;
-
+    private int height;
     private Circle[][] leds;
-
     private Stage stage;
 
     @Inject private PropertiesService props;
     @Inject private TaskService tasks;
     @Inject private Gui gui;
 
-    // Background colour
-    private double backR = 0.05;
-    private double backG = 0.05;
-    private double backB = 0.05;
-
-    private int ledRadius = 2;
-    private int spacer = 0;
     private int d;
 
     @Override
     public void init(int width, int height) {
 
-        System.out.println("Starting UI Simulation LightBoard " + width + "x" + height + "...");
+        System.out.println("Starting UI Simulation LightBoard...");
 
         props.injectPropertiesOrExit(this);
-
-        stage = gui.addStage("LightBoard");
 
         this.width = width;
         this.height = height;
@@ -69,14 +55,14 @@ public class LightBoardGUI implements LightBoard {
 
         // Build UI components
         final Pane pane = new Pane();
-        pane.setStyle(BLACK_BACKGROUND);
+        pane.setStyle("-fx-background-color: black;");
         Group board = new Group();
         pane.getChildren().add(board);
 
         // Create LED Board
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                Circle led = new Circle(ledRadius - spacer, Color.color(backR, backG, backB));
+                Circle led = new Circle(ledRadius - spacer, Color.color(0.0, 0.0, 0.0));
                 led.setCenterX(d + x * d);
                 led.setCenterY(d + y * d);
                 board.getChildren().add(led);
@@ -88,29 +74,25 @@ public class LightBoardGUI implements LightBoard {
         pane.setOnMouseClicked((e) -> {
             if ( e.getButton()==MouseButton.SECONDARY ) {
                 stage.hide();
-                stage = new Stage();
+                stage = gui.addStage("LightBoard");
                 init(width, height);
             } else {
                 if (e.isControlDown() && e.isAltDown()) {
                     stage.hide();
-                    stage = new Stage();
+                    stage = gui.addStage("LightBoard");
                     init(width, height);
                 }
             }
         });
 
         // Start UI
+        stage = gui.addStage("LightBoard");
         stage.setScene(new Scene(pane, getWidthPixels(), getHeightPixels()));
         stage.setResizable(false);
         stage.setAlwaysOnTop(true);
         stage.show();
 
     }
-
-
-    ////////////////
-    // LightBoard //
-    ////////////////
 
     @Override
     public void update(RGB[][] data) {
@@ -129,7 +111,7 @@ public class LightBoardGUI implements LightBoard {
 
     @Override
     public Long interval() {
-        return LED_REFRESH_TIME;
+        return refreshInterval;
     }
 
     @Override

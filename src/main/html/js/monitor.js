@@ -2,7 +2,7 @@
 // var url="http://192.168.42.105:8001/gpiomofo/monitor";
 
 // TESTING
-var url="http://192.168.0.72:8001/gpiomofo/monitor";
+var url = "http://192.168.0.72:8001/gpiomofo/monitor";
 
 
 var chambers = 6;
@@ -10,15 +10,15 @@ var panicActive = {};
 
 function onLoad() {
 
-    for ( var i=0; i<chambers; i++ ) {
+    for (var i = 0; i < chambers; i++) {
         panicActive[i] = false;
     }
 
-    setInterval(function() {
+    setInterval(function () {
         getMonitorStates();
     }, 500);
 
-    setInterval(function() {
+    setInterval(function () {
         flashActiveMonitors();
     }, 500);
 
@@ -28,29 +28,29 @@ function onLoad() {
 var flashOn = false;
 
 function flashActiveMonitors() {
-    for ( var i=0; i<chambers; i++ ) {
-        if ( panicActive[i] ) {
-            if ( flashOn ) {
-                $("#chamber"+i)
-                .addClass("flash");
+    for (var i = 0; i < chambers; i++) {
+        if (panicActive[i]) {
+            if (flashOn) {
+                $("#chamber" + i)
+                    .addClass("flash");
             } else {
-                $("#chamber"+i)
-                .removeClass("flash");
+                $("#chamber" + i)
+                    .removeClass("flash");
             }
-           }
-       }
-       flashOn = !flashOn;
-   }
+        }
+    }
+    flashOn = !flashOn;
+}
 
 function getMonitorStates() {
 
-   $.ajax({
+    $.ajax({
         url: url,
         type: "GET",
-        success: function(response) {
+        success: function (response) {
             updateMonitors(response);
         },
-        error: function(response) {
+        error: function (response) {
             offline();
         }
     });
@@ -61,10 +61,10 @@ function updateMonitors(result) {
 
     activeMonitors = result.split(",");
 
-    for ( var i=0; i<chambers; i++ ) {
-        if ( activeMonitors.indexOf(""+i)==-1 ) {
+    for (var i = 0; i < chambers; i++) {
+        if (activeMonitors.indexOf("" + i) == -1) {
             panicActive[i] = false;
-            $("#chamber"+i)
+            $("#chamber" + i)
                 .removeClass("offline")
                 .removeClass("monitorOn")
                 .removeClass("flash")
@@ -72,7 +72,7 @@ function updateMonitors(result) {
 
         } else {
             panicActive[i] = true;
-            $("#chamber"+i)
+            $("#chamber" + i)
                 .removeClass("offline")
                 .removeClass("monitorOff")
                 .addClass("monitorOn");
@@ -82,9 +82,9 @@ function updateMonitors(result) {
 }
 
 function offline() {
-    for ( var i=0; i<chambers; i++ ) {
+    for (var i = 0; i < chambers; i++) {
         panicActive[i] = false;
-        $("#chamber"+i)
+        $("#chamber" + i)
             .removeClass("monitorOn")
             .removeClass("monitorOff")
             .removeClass("flash")

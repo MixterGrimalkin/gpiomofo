@@ -2,9 +2,6 @@ package net.amarantha.gpiomofo.display.lightboard;
 
 import net.amarantha.utils.colour.RGB;
 
-import javax.inject.Inject;
-import java.io.PrintStream;
-
 import static net.amarantha.gpiomofo.service.shell.Utility.log;
 
 /**
@@ -14,12 +11,6 @@ public class TextBoard implements LightBoard {
 
     private int height;
     private int width;
-    private final PrintStream out;
-
-    @Inject
-    public TextBoard(PrintStream out) {
-        this.out = out;
-    }
 
     @Override
     public void init(int width, int height) {

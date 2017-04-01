@@ -56,7 +56,7 @@ else
     sshpass -p ${password} scp -r ../src/main/bash/* pi@${ip}:gpiomofo
     sshpass -p ${password} scp -r ../target/gpiomofo/scripts pi@${ip}:gpiomofo
     sshpass -p ${password} scp -r ../src/main/python/* pi@${ip}:gpiomofo/python
-    sshpass -p ${password} scp ../default.properties pi@${ip}:gpiomofo
+    sshpass -p ${password} scp ../config/default.properties pi@${ip}:gpiomofo
 fi
 
 echo "Activating Scripts..."

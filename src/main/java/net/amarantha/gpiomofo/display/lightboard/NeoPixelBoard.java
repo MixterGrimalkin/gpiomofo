@@ -5,24 +5,33 @@ import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixelGUI;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.properties.PropertiesService;
+import net.amarantha.utils.properties.Property;
+import net.amarantha.utils.properties.PropertyGroup;
 
 import static net.amarantha.gpiomofo.service.shell.Utility.log;
 
+@PropertyGroup("NeoPixelBoard")
 public class NeoPixelBoard implements LightBoard {
 
+    @Inject private PropertiesService props;
     @Inject private NeoPixel neoPixel;
     @Inject private TaskService tasks;
+
+    @Property("RowsFirst") private boolean rowsFirst = true;
+    @Property("LoopBack") private boolean loopback = false;
 
     private int width;
     private int height;
 
     @Override
     public void init(int width, int height) {
-        log("Starting Pixel Tape Board " + width + " x " + height);
+        log("Starting Pixel Tape Board...");
+        props.injectPropertiesOrExit(this);
         this.width = width;
         this.height = height;
         if ( neoPixel instanceof NeoPixelGUI ) {
-            ((NeoPixelGUI)neoPixel).setDefaultWidth(width);
+            ((NeoPixelGUI)neoPixel).setDefaultWidth(rowsFirst ? width : height);
         }
         neoPixel.init(width * height);
     }
@@ -36,9 +45,6 @@ public class NeoPixelBoard implements LightBoard {
         }
         neoPixel.render();
     }
-
-    private boolean rowsFirst = true;
-    private boolean loopback = false;
 
     private int getPixelNumber(int x, int y) {
         if (rowsFirst) {

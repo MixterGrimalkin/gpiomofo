@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.service.gpio.ultrasonic;
 
-import net.amarantha.gpiomofo.core.trigger.Trigger;
 import net.amarantha.gpiomofo.core.target.Target;
+import net.amarantha.gpiomofo.core.trigger.Trigger;
 
 import java.util.LinkedList;
 import java.util.List;

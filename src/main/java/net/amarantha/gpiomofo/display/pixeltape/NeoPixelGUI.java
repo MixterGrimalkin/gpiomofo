@@ -10,20 +10,25 @@ import javafx.stage.Stage;
 import net.amarantha.gpiomofo.GpioMofo;
 import net.amarantha.gpiomofo.Gui;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.properties.PropertiesService;
+import net.amarantha.utils.properties.Property;
+import net.amarantha.utils.properties.PropertyGroup;
 import net.amarantha.utils.time.TimeGuard;
 
 import static javafx.scene.paint.Color.color;
 
+@PropertyGroup("NeoPixelGUI")
 public class NeoPixelGUI implements NeoPixel {
 
     private int pixelCount;
 
     @Inject private Gui gui;
-
     @Inject private GpioMofo application;
-//    @Inject private Stage stage;
+    @Inject private PropertiesService props;
 
-//    private int[] widths = { 7, 21, 7, 21, 7 };
+    @Property("LedSize") private int radius = 5;
+    @Property("Spacer") private int spacer = 2;
+
     public int[] widths = {}; // 11 };//47, 47, 47, 47, PIPE_4_SIZE, PIPE_3_SIZE, PIPE_2_SIZE, PIPE_1_SIZE};
 
     private Circle[] pixels;
@@ -41,6 +46,8 @@ public class NeoPixelGUI implements NeoPixel {
     @Override
     public void init(final int pixelCount) {
 
+        props.injectPropertiesOrExit(this);
+
         this.pixelCount = pixelCount;
         pixels = new Circle[pixelCount];
         colours = new RGB[pixelCount];
@@ -52,8 +59,6 @@ public class NeoPixelGUI implements NeoPixel {
         pane.getChildren().add(tape);
 
         int margin = 5;
-        int r = 5;
-        int s = 2;
 
         int x = 0;
         int y = 0;
@@ -66,10 +71,10 @@ public class NeoPixelGUI implements NeoPixel {
                 x = 0;
                 y++;
             }
-            Circle pixel = new Circle(r, color(0, 0, 0));
+            Circle pixel = new Circle(radius, color(0, 0, 0));
             pixels[p] = pixel;
-            int left = margin + r + ((2*r)+s)*x;
-            int top = margin + r + ((2*r)+s)*y;
+            int left = margin + radius + ((2* radius)+ spacer)*x;
+            int top = margin + radius + ((2* radius)+ spacer)*y;
             pixel.setCenterX(left);
             pixel.setCenterY(top);
             tape.getChildren().add(pixel);
@@ -94,8 +99,8 @@ public class NeoPixelGUI implements NeoPixel {
 
 
         stage = gui.addStage("NeoPixel");
-        width = (2*margin)+(r*2*maxWidth)+(s*(maxWidth-1));
-        height = (2*margin)+(r*2*(y+1))+(s*(y));
+        width = (2*margin)+(radius *2*maxWidth)+(spacer *(maxWidth-1));
+        height = (2*margin)+(radius *2*(y+1))+(spacer *(y));
         stage.setScene(new Scene(pane, width, height));
         stage.show();
 

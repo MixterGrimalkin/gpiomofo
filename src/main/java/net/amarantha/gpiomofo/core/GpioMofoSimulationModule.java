@@ -4,7 +4,6 @@ import com.google.inject.Scopes;
 import javafx.stage.Stage;
 import net.amarantha.gpiomofo.core.annotation.TapeRefresh;
 import net.amarantha.gpiomofo.display.lightboard.LightBoard;
-import net.amarantha.gpiomofo.display.lightboard.LightBoardGUI;
 import net.amarantha.gpiomofo.display.lightboard.NeoPixelBoard;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixelGUI;

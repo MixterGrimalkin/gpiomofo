@@ -25,6 +25,14 @@ JNIEXPORT void JNICALL Java_net_amarantha_gpiomofo_display_lightboard_NativeLigh
 
 /*
  * Class:     net_amarantha_gpiomofo_display_lightboard_NativeLightBoard
+ * Method:    setPins
+ * Signature: (IIIIIIIIIII)V
+ */
+JNIEXPORT void JNICALL Java_net_amarantha_gpiomofo_display_lightboard_NativeLightBoard_setPins
+  (JNIEnv *, jobject, jint, jint, jint, jint, jint, jint, jint, jint, jint, jint, jint);
+
+/*
+ * Class:     net_amarantha_gpiomofo_display_lightboard_NativeLightBoard
  * Method:    sleep
  * Signature: ()V
  */

@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
+import net.amarantha.gpiomofo.service.http.HttpCommand;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
 

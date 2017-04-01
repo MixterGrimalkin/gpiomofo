@@ -18,11 +18,12 @@ LED_DMA = 5  # DMA channel to use for generating signal (try 5)
 LED_BRIGHTNESS = 255  # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
 
+
 # COMM_PIN = 18
 
 class PixelTape:
-
-    strip = Adafruit_NeoPixel(TWINKLE_LED_COUNT+AMBIENT_LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
+    strip = Adafruit_NeoPixel(TWINKLE_LED_COUNT + AMBIENT_LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT,
+                              LED_BRIGHTNESS)
 
     cancelPattern = False
 
@@ -111,11 +112,12 @@ class PixelTape:
                 brightness = 1
             for q in range(3):
                 for i in range(0, self.strip.numPixels(), 3):
-                    self.strip.setPixelColor(i+q, Color(int(g*brightness), int(r*brightness), int(b*brightness)))
+                    self.strip.setPixelColor(i + q,
+                                             Color(int(g * brightness), int(r * brightness), int(b * brightness)))
                 self.strip.show()
-                time.sleep(wait_ms/1000.0)
+                time.sleep(wait_ms / 1000.0)
                 for i in range(0, self.strip.numPixels(), 3):
-                    self.strip.setPixelColor(i+q, 0)
+                    self.strip.setPixelColor(i + q, 0)
 
             g = g + d
             b = b + d
@@ -158,7 +160,7 @@ class PixelTape:
                 red_delta.append(-delta_r)
                 blue_delta.append(-delta_b)
 
-            self.strip.setPixelColor(i, Color(int(g*brightness), int(r*brightness), int(b*brightness)))
+            self.strip.setPixelColor(i, Color(int(g * brightness), int(r * brightness), int(b * brightness)))
             self.strip.show()
 
         while time.time() - start_time <= duration:
@@ -199,7 +201,7 @@ class PixelTape:
                     blue_delta[i] = -blue_delta[i]
                 blue[i] = b
 
-                self.strip.setPixelColor(i, Color(int(g*brightness), int(r*brightness), int(b*brightness)))
+                self.strip.setPixelColor(i, Color(int(g * brightness), int(r * brightness), int(b * brightness)))
                 self.strip.show()
 
     def bound(self, i):
@@ -208,6 +210,7 @@ class PixelTape:
         if i > 255:
             return 255
         return i
+
 
 if __name__ == '__main__':
     PixelTape().time_travel_pattern()
