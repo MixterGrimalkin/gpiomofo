@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.display.LightSurface;
+import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.utils.colour.RGB;
 
 import java.util.ArrayList;

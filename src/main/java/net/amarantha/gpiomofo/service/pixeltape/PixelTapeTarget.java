@@ -7,7 +7,7 @@ import net.amarantha.utils.time.TimeGuard;
 
 public abstract class PixelTapeTarget extends Target {
 
-    @Inject private PixelTapeService pixelTapeService;
+    @Inject private PixelTape pixelTape;
 
     @Inject private TimeGuard guard;
     private boolean forceRGB;
@@ -52,7 +52,7 @@ public abstract class PixelTapeTarget extends Target {
         this.startPixel = startPixel;
         this.pixelCount = pixelCount;
         currentPattern = new RGB[pixelCount];
-        pixelTapeService.addPattern(this);
+        pixelTape.addPattern(this);
         return this;
     }
 
@@ -77,7 +77,7 @@ public abstract class PixelTapeTarget extends Target {
     }
 
     protected RGB getPixel(int pixel) {
-        return pixelTapeService.getPixel(pixel);
+        return pixelTape.getPixel(pixel);
     }
 
     protected void setAll(RGB colour) {

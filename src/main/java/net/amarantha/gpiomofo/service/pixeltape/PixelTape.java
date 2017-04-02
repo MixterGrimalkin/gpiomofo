@@ -2,39 +2,50 @@ package net.amarantha.gpiomofo.service.pixeltape;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.core.annotation.TapeRefresh;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.properties.PropertiesService;
+import net.amarantha.utils.properties.Property;
+import net.amarantha.utils.properties.PropertyGroup;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
+
 @Singleton
-public class PixelTapeService {
+@PropertyGroup("PixelTape")
+public class PixelTape {
 
     private List<PixelTapeTarget> patterns = new LinkedList<>();
     private int totalPixels;
 
+    @Inject private PropertiesService props;
     @Inject private NeoPixel neoPixel;
     @Inject private TaskService tasks;
 
-    private int tapeRefresh = 5;
-
-    public PixelTapeService addPattern(PixelTapeTarget pattern) {
+    // -------------------------------------------------------------------------------------------
+    // Patterns must be added before starting PixelTape
+    // -------------------------------------------------------------------------------------------
+    PixelTape addPattern(PixelTapeTarget pattern) {
         patterns.add(pattern);
         totalPixels = Math.max(totalPixels, pattern.getStartPixel()+pattern.getPixelCount());
         return this;
     }
+    // -------------------------------------------------------------------------------------------
+
+    @Property("TapeRefresh") private int tapeRefresh = 5;
 
     public void start() {
-        System.out.println("Starting PixelTape Service...");
+        log("Starting PixelTape...");
+        props.injectPropertiesOrExit(this);
         neoPixel.init(totalPixels);
         tasks.addRepeatingTask(this, tapeRefresh, this::render);
     }
 
     public void stop() {
-        System.out.println("Stopping PixelTape Service...");
+        log("Stopping PixelTape...");
         neoPixel.close();
     }
 

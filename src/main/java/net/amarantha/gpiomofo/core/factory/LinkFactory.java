@@ -5,21 +5,21 @@ import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.core.target.Target;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
 
-import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
+
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
 
 @Singleton
 public class LinkFactory {
 
     @Inject private TriggerFactory triggers;
     @Inject private TargetFactory targets;
-    @Inject private PrintStream out;
 
     public LinkFactory link(Trigger trigger, Target... targets) {
         for ( Target target : targets ) {
             trigger.onFire(target::processTrigger);
-            out.println("[" + trigger.getName() + "]-->[" + target.getName() + "]");
+            log("[" + trigger.getName() + "]-->[" + target.getName() + "]");
         }
         return this;
     }

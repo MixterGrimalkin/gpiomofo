@@ -3,11 +3,9 @@ package net.amarantha.gpiomofo.core.trigger;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.core.factory.HasName;
-import net.amarantha.gpiomofo.service.shell.Utility;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.utils.time.Now;
 
-import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,7 +17,6 @@ public class Trigger implements HasName {
 
     @Inject private TaskService tasks;
     @Inject private Now now;
-    @Inject private PrintStream out;
 
     public void fire(boolean active) {
         lastState = active;
@@ -27,9 +24,9 @@ public class Trigger implements HasName {
             doFire(active);
         } else {
             if ( active ) {
-                tasks.addTask("holdFire", holdTime, () -> doFire(true));
+                tasks.addTask("hold-"+getName(), holdTime, () -> doFire(true));
             } else {
-                tasks.removeTask("holdFire");
+                tasks.removeTask("hold-"+getName());
             }
         }
     }

@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.service.http;
+package net.amarantha.gpiomofo.service.http.entity;
 
 import java.util.Arrays;
 import java.util.LinkedList;

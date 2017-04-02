@@ -6,10 +6,10 @@ import javax.inject.Inject;
 
 public class TouchTrigger extends Trigger {
 
-    @Inject private MPR121 mpr121;
+    @Inject private TouchSensor sensor;
 
     public TouchTrigger setPin(int pin, boolean triggerState) {
-        mpr121.addListener(pin, (state)->fire(state==triggerState));
+        sensor.addListener(pin, s -> fire(s == triggerState));
         return this;
     }
 

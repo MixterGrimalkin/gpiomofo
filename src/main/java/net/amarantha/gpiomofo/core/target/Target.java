@@ -6,17 +6,18 @@ import net.amarantha.gpiomofo.core.factory.TargetFactory;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.utils.time.Now;
 
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.lang.System.out;
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
 
 public abstract class Target implements HasName {
 
     @Inject private TaskService tasks;
     @Inject private TargetFactory targets;
     @Inject private Now now;
-    @Inject private PrintStream out;
 
     private boolean active = false;
     public Target offTarget;
@@ -46,9 +47,9 @@ public abstract class Target implements HasName {
     public final void activate() {
         String time = now.time().toString();
         if ( locked ) {
-            out.println(time + ": -XX- [" + getName() + "]");
+            log(time + ": -XX- [" + getName() + "]");
         } else {
-            out.println(time + ": " + (oneShot ? "--" : "==") + ">> [" + getName() + "]");
+            log(time + ": " + (oneShot ? "--" : "==") + ">> [" + getName() + "]");
             if ( lockTime!=null ) {
                 for ( Target target : lockTargets ) {
                     target.lockFor(lockTime);

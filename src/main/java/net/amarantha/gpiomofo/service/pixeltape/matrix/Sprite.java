@@ -1,6 +1,6 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
-import net.amarantha.gpiomofo.display.LightSurface;
+import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.utils.colour.RGB;
 
 import static java.lang.Math.PI;

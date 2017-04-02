@@ -8,6 +8,11 @@
     <artifactId>gpiomofo</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <properties>
+        <javafx.location>/usr/lib/jvm/jdk1.8.0_111/jre/lib/ext</javafx.location>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -15,7 +20,7 @@
             <artifactId>javaFX</artifactId>
             <version>2.2</version>
             <scope>system</scope>
-            <systemPath>/usr/lib/jvm/jdk1.8.0_111/jre/lib/ext/jfxrt.jar</systemPath>
+            <systemPath>${javafx.location}/jfxrt.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -138,13 +143,6 @@
             <version>1.0.1-1</version>
         </dependency>
 
-        <!-- OSC -->
-        <dependency>
-            <groupId>com.illposed.osc</groupId>
-            <artifactId>javaosc-core</artifactId>
-            <version>0.3</version>
-        </dependency>
-
     </dependencies>
 
 
@@ -171,6 +169,26 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.6</version>
                 <executions>
+                    <!-- Include Main Scripts -->
+                    <execution>
+                        <id>copy-main-scripts</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/gpiomofo</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main</directory>
+                                    <includes>
+                                        <include>*.sh</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                     <!-- Include BASH Scripts -->
                     <execution>
                         <id>copy-scripts</id>
@@ -182,40 +200,30 @@
                             <outputDirectory>${basedir}/target/gpiomofo/scripts</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/src/main/bash</directory>
+                                    <directory>${basedir}/scripts</directory>
+                                    <includes>
+                                        <include>*.sh</include>
+                                    </includes>
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
+                    <!-- Include README.yaml -->
                     <execution>
-                        <id>copy-python</id>
+                        <id>copy-readme</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/gpiomofo/python</outputDirectory>
+                            <outputDirectory>${basedir}/target/gpiomofo/scenarios</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/src/main/python</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <!-- Include HTML, JS and CSS -->
-                    <execution>
-                        <id>copy-html</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/gpiomofo/html</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/src/main/html</directory>
+                                    <directory>${basedir}/scenarios</directory>
+                                    <includes>
+                                        <include>README.yaml</include>
+                                    </includes>
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>
@@ -229,10 +237,10 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/gpiomofo</outputDirectory>
+                            <outputDirectory>${basedir}/target/gpiomofo/config</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}</directory>
+                                    <directory>${basedir}/config</directory>
                                     <includes>
                                         <include>default.properties</include>
                                     </includes>
@@ -275,7 +283,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>net.amarantha.gpiomofo.Main</mainClass>
+                            <mainClass>net.amarantha.gpiomofo.Live</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>.</Class-Path>

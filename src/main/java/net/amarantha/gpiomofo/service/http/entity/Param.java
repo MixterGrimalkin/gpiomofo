@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.service.http;
+package net.amarantha.gpiomofo.service.http.entity;
 
 public class Param {
 

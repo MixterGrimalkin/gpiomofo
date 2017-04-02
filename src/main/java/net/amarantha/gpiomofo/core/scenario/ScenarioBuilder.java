@@ -12,7 +12,7 @@ import net.amarantha.gpiomofo.core.factory.TargetFactory;
 import net.amarantha.gpiomofo.core.factory.TriggerFactory;
 import net.amarantha.gpiomofo.core.target.Target;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
-import net.amarantha.gpiomofo.service.http.HttpCommand;
+import net.amarantha.gpiomofo.service.http.entity.HttpCommand;
 import net.amarantha.gpiomofo.service.midi.MidiCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.utils.colour.RGB;
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static net.amarantha.gpiomofo.Main.SCENARIO;
+import static net.amarantha.gpiomofo.core.Constants.SCENARIO;
 import static net.amarantha.gpiomofo.service.shell.Utility.bar;
 import static net.amarantha.gpiomofo.service.shell.Utility.log;
 
@@ -93,7 +93,6 @@ public class ScenarioBuilder {
             scenario = injector.getInstance(clazz);
         } catch (ClassNotFoundException e) {
             scenario= injector.getInstance(Scenario.class);
-            System.out.println("Alive!");
         }
         log("Class:\n    " + scenario.getClass().getName());
         scenario.setName(className);
@@ -241,6 +240,9 @@ public class ScenarioBuilder {
             case "gpio":
                 buildGpioTrigger(name, config);
                 break;
+            case "touch":
+                buildTouchTrigger(name, config);
+                break;
             case "http":
                 buildHttpTrigger(name, config);
                 break;
@@ -267,6 +269,21 @@ public class ScenarioBuilder {
         }
 
         addTriggerOptions(triggers.gpio(name, pin, resistance, state), config);
+    }
+
+    private void buildTouchTrigger(String name, Map<String, String> config) throws ScenarioBuilderException {
+        Integer pin = null;
+        Boolean state = null;
+        try {
+            pin = Integer.parseInt(config.get("pin"));
+            state = Boolean.parseBoolean(config.get("triggerState").toLowerCase());
+        } catch ( Exception ignored ) {}
+
+        if ( pin==null || state==null ) {
+            throw new ScenarioBuilderException("Touch trigger '" + name + "' needs pin and triggerState");
+        }
+
+        addTriggerOptions(triggers.touch(name, pin, state), config);
     }
 
     private void buildHttpTrigger(String name, Map<String, String> config) throws ScenarioBuilderException {

@@ -2,6 +2,7 @@ package net.amarantha.gpiomofo.service.http;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.core.target.Target;
+import net.amarantha.gpiomofo.service.http.entity.HttpCommand;
 
 public class HttpTarget extends Target {
 

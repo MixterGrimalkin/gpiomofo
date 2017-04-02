@@ -11,7 +11,7 @@ import java.util.TimerTask;
 import static java.lang.System.currentTimeMillis;
 
 /**
- * Adds listeners to a pair of MPR121 pins and provides these triggers:
+ * Adds listeners to a pair of TouchSensorMPR121 pins and provides these triggers:
  * - TapLeft
  * - TapRight
  * - HoldLeft
@@ -23,7 +23,7 @@ import static java.lang.System.currentTimeMillis;
  */
 public class TouchTriggerSet {
 
-    @Inject private MPR121 mpr121;
+    @Inject private TouchSensorMPR121 touchSensorMpr121;
 
     @Inject private Trigger tapLeftTrigger;
     @Inject private Trigger tapRightTrigger;
@@ -52,13 +52,13 @@ public class TouchTriggerSet {
     }
 
     public TouchTriggerSet setPins(int left, int right) {
-        mpr121.addListener(left, this::processLeft);
-        mpr121.addListener(right, this::processRight);
+        touchSensorMpr121.addListener(left, this::processLeft);
+        touchSensorMpr121.addListener(right, this::processRight);
         return this;
     }
 
     ////////////////
-    // Main Logic //
+    // Live Logic //
     ////////////////
 
     private void processLeft(boolean state) {

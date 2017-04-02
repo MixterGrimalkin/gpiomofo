@@ -79,7 +79,7 @@ def theaterChaseRainbow(strip, wait_ms=50):
                 strip.setPixelColor(i + q, 0)
 
 
-# Main program logic follows:
+# Live program logic follows:
 if __name__ == '__main__':
     # Create NeoPixel object with appropriate configuration.
     strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)

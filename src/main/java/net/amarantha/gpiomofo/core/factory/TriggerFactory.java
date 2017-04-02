@@ -25,14 +25,14 @@ public class TriggerFactory extends Factory<Trigger> {
     }
 
     private boolean gpioUsed;
-    private boolean mprUsed;
+    private boolean touchUsed;
 
     public boolean isGpioUsed() {
         return gpioUsed;
     }
 
-    public boolean isMprUsed() {
-        return mprUsed;
+    public boolean isTouchUsed() {
+        return touchUsed;
     }
 
     //////////
@@ -66,7 +66,7 @@ public class TriggerFactory extends Factory<Trigger> {
 
     public TouchTrigger touch(String name, int pinNumber, boolean triggerState) {
 
-        mprUsed = true;
+        touchUsed = true;
 
         TouchTrigger trigger =
                 injector.getInstance(TouchTrigger.class)
@@ -84,7 +84,7 @@ public class TriggerFactory extends Factory<Trigger> {
 
     public TouchTriggerSet touchSet(String name, int leftPin, int rightPin) {
 
-        mprUsed = true;
+        touchUsed = true;
 
         TouchTriggerSet set =
                 injector.getInstance(TouchTriggerSet.class)

@@ -5,7 +5,7 @@ import net.amarantha.gpiomofo.core.target.Target;
 
 public class StopPixelTapeTarget extends Target {
 
-    @Inject private PixelTapeService pixelTape;
+    @Inject private PixelTape pixelTape;
 
     @Override
     protected void onActivate() {

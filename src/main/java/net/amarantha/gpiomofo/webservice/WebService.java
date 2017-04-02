@@ -10,8 +10,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 import javax.inject.Inject;
 import java.net.URI;
 
-import static net.amarantha.gpiomofo.Main.LOCAL_IP;
-import static net.amarantha.gpiomofo.Main.LOG_HTTP;
+import static net.amarantha.gpiomofo.core.Constants.LOCAL_IP;
+import static net.amarantha.gpiomofo.core.Constants.LOG_HTTP;
 
 @Singleton
 public class WebService {

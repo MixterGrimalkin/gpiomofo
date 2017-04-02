@@ -7,43 +7,18 @@ import com.pi4j.io.i2c.I2CFactory;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.*;
 
 @Singleton
-public class MPR121 {
+public class TouchSensorMPR121 extends TouchSensor {
 
     private I2CDevice device;
 
-    private Timer scanTimer;
-    private int refreshInterval = 20;
-
-    public MPR121() {
-        for ( int i=0; i<12; i++ ) {
-            lastStates.put(i, false);
-            allListeners.put(i, new LinkedList<>());
-        }
+    public TouchSensorMPR121() {
+        super("MPR-121");
     }
 
-    public void start() {
-        System.out.println("Starting MPR121...");
-        init();
-        scanTimer = new Timer();
-        scanTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                scanPins();
-            }
-        }, 0, refreshInterval);
-    }
-
-    public void stop() {
-        System.out.println("Stopping MPR121...");
-        if ( scanTimer!=null ) {
-            scanTimer.cancel();
-        }
-    }
-
-    private void init() {
+    @Override
+    protected void init() {
 
         try {
 
@@ -56,11 +31,11 @@ public class MPR121 {
             // Set electrode configuration to default values
             write(MPR121_ECR, 0x00);
 
-            // Check CDT, SFI, ESI configuration is at default values
-            int c = device.read(MPR121_CONFIG2);
-            if ( c != 0x24 ) {
+//            // Check CDT, SFI, ESI configuration is at default values
+//            int c = device.read(MPR121_CONFIG2);
+//            if ( c != 0x24 ) {
 //                System.out.println(c); // What is this?
-            }
+//            }
 
             // Set threshold for touch and release to default values
             int touch = 12;
@@ -93,10 +68,13 @@ public class MPR121 {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
-    private void scanPins() {
+    private void write(int address, int data) throws IOException {
+        device.write(address, (byte) data);
+    }
+
+    protected void scanPins() {
         try {
             int lsb = device.read(MPR121_TOUCHSTATUS_L);
             byte[] buffer = new byte[2];
@@ -111,29 +89,6 @@ public class MPR121 {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private Map<Integer, Boolean> lastStates = new HashMap<>();
-    private Map<Integer, List<TouchListener>> allListeners = new HashMap<>();
-
-    public void addListener(int pin, TouchListener listener) {
-        allListeners.get(pin).add(listener);
-    }
-
-    private void checkPinState(int pin, boolean state) {
-        if ( state!=lastStates.get(pin) ) {
-            fireListenersFor(pin, state);
-            lastStates.put(pin, state);
-        }
-    }
-
-    private void fireListenersFor(int pin, boolean currentState) {
-        allListeners.get(pin).forEach((listener) -> listener.onTouch(currentState));
-    }
-
-
-    private void write(int address, int data) throws IOException {
-        device.write(address, (byte) data);
     }
 
     private static final int MPR121_I2CADDR_DEFAULT = 0x5A;
@@ -172,9 +127,5 @@ public class MPR121 {
     private static final int MPR121_GPIOCLR         = 0x79;
     private static final int MPR121_GPIOTOGGLE      = 0x7A;
     private static final int MPR121_SOFTRESET       = 0x80;
-
-    public interface TouchListener {
-        void onTouch(boolean state);
-    }
 
 }

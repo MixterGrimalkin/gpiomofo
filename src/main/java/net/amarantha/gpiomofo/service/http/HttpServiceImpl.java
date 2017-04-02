@@ -1,6 +1,9 @@
 package net.amarantha.gpiomofo.service.http;
 
 import com.google.inject.Singleton;
+import net.amarantha.gpiomofo.service.http.entity.HttpCallback;
+import net.amarantha.gpiomofo.service.http.entity.HttpCommand;
+import net.amarantha.gpiomofo.service.http.entity.Param;
 
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
@@ -10,8 +13,8 @@ import java.net.NoRouteToHostException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static net.amarantha.gpiomofo.service.http.HttpCommand.GET;
-import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;
+import static net.amarantha.gpiomofo.service.http.entity.HttpCommand.GET;
+import static net.amarantha.gpiomofo.service.http.entity.HttpCommand.POST;
 import static org.glassfish.jersey.client.ClientProperties.CONNECT_TIMEOUT;
 
 @Singleton

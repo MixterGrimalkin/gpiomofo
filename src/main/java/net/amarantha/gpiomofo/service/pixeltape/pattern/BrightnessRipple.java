@@ -1,14 +1,14 @@
 package net.amarantha.gpiomofo.service.pixeltape.pattern;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.service.pixeltape.PixelTapeService;
+import net.amarantha.gpiomofo.service.pixeltape.PixelTape;
 import net.amarantha.gpiomofo.service.pixeltape.PixelTapeTarget;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.time.TimeGuard;
 
 public class BrightnessRipple extends PixelTapeTarget {
 
-    @Inject private PixelTapeService tape;
+    @Inject private PixelTape tape;
     @Inject private TimeGuard guard;
 
     private int rippleWidth = 14;

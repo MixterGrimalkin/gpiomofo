@@ -1,8 +1,14 @@
 # GpioMofo Scenario definition using YAML
 
-# Triggers are 'fired' or 'cancelled' by external events
+Parameters:
+  # @Property("Name") private Type value
+  # Allowed Types: String, Integer, Boolean, RGB, Class<?>
+  Name: value
+
 Triggers:
 
+  # Triggers are 'fired' or 'cancelled' by external events
+  # @Named("NameOfTrigger") private Trigger myTrigger;
   NameOfTrigger:
     type: GPIO / HTTP / OSC
     # Optional for all trigger types:
@@ -45,6 +51,7 @@ CompositeTriggers:
 Targets:
 
   # A target can be 'activated' or 'deactivated'
+  # @Named("NameOfTarget") private Trigger myTarget;
   NameOfTarget:
     type: GPIO / HTTP / OSC / MIDI / Audio / Python
     # Optional for all target types:

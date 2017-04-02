@@ -8,13 +8,13 @@ import java.util.Map;
 
 import static com.pi4j.io.gpio.RaspiPin.*;
 
-public class RaspberryPi3 extends GpioService {
+public class GpioServiceRaspPi extends GpioService {
 
     private GpioController gpioController = GpioFactory.getInstance();
 
     protected Map<Integer, Pin> availablePins = new HashMap<>();
 
-    public RaspberryPi3() {
+    public GpioServiceRaspPi() {
         availablePins.put( 0, GPIO_00);
         availablePins.put( 1, GPIO_01);
         availablePins.put( 2, GPIO_02);

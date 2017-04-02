@@ -7,7 +7,9 @@ import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.service.osc.OscService;
 import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.properties.Property;
+import net.amarantha.utils.properties.PropertyGroup;
 
+@PropertyGroup("Raspression")
 public class Raspression extends Scenario {
 
     @Inject private HCSR04 blackSensor;

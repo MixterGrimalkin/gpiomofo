@@ -1,17 +1,47 @@
 package net.amarantha.gpiomofo.service.gpio;
 
-import net.amarantha.gpiomofo.Gui;
+import com.pi4j.io.gpio.PinPullResistance;
+import com.pi4j.io.gpio.PinState;
 
+import java.util.HashMap;
 import java.util.Map;
 
-public class GpioServiceMock extends GpioServiceGUI {
+public class GpioServiceMock extends GpioService {
 
-    public GpioServiceMock() {
-        super(null);
+    protected Map<Integer, Boolean> inputStates = new HashMap<>();
+    protected Map<Integer, Boolean> outputStates = new HashMap<>();
+
+//    public GpioServiceMock() {
+//        super("Gpio Service Mock");
+//    }
+
+    ////////////////////
+    // Simulated GPIO //
+    ////////////////////
+
+    @Override
+    public boolean isValidPin(int pinNumber) {
+        return pinNumber >= 0 && pinNumber <= 29;
     }
 
-    public GpioServiceMock(Gui gui) {
-        super(null);
+    @Override
+    protected boolean digitalRead(int pinNumber) {
+        return inputStates.get(pinNumber) == null ? outputStates.get(pinNumber) : inputStates.get(pinNumber);
+    }
+
+    @Override
+    protected void provisionDigitalInput(int pinNumber, PinPullResistance resistance) {
+        inputStates.put(pinNumber, false);
+    }
+
+    @Override
+    protected void digitalWrite(int pinNumber, boolean state) {
+        outputStates.put(pinNumber, state);
+    }
+
+    @Override
+    protected void provisionDigitalOutput(int pinNumber, PinState initialState) {
+        outputStates.put(pinNumber, initialState == PinState.HIGH);
     }
 
     /////////////

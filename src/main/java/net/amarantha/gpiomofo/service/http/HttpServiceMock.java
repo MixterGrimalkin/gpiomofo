@@ -1,7 +1,11 @@
 package net.amarantha.gpiomofo.service.http;
 
-import static net.amarantha.gpiomofo.service.http.HttpCommand.GET;
-import static net.amarantha.gpiomofo.service.http.HttpCommand.POST;
+import net.amarantha.gpiomofo.service.http.entity.HttpCallback;
+import net.amarantha.gpiomofo.service.http.entity.HttpCommand;
+import net.amarantha.gpiomofo.service.http.entity.Param;
+
+import static net.amarantha.gpiomofo.service.http.entity.HttpCommand.GET;
+import static net.amarantha.gpiomofo.service.http.entity.HttpCommand.POST;
 
 public class HttpServiceMock extends HttpServiceImpl {
 

@@ -5,8 +5,8 @@ import net.amarantha.gpiomofo.core.annotation.Named;
 import net.amarantha.gpiomofo.core.annotation.Parameter;
 import net.amarantha.gpiomofo.core.scenario.Scenario;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
-import net.amarantha.gpiomofo.display.LightSurface;
 import net.amarantha.gpiomofo.display.animation.AnimationService;
+import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
 import net.amarantha.utils.colour.RGB;
 
@@ -25,8 +25,6 @@ public class GreenpeaceTunnel extends Scenario {
     @Named("PIR4") private Trigger pir4;
     @Named("PIR5") private Trigger pir5;
 
-    @Parameter("Width") private int width;
-    @Parameter("Height") private int height;
     @Parameter("SpriteCount") private int spriteCount;
     @Parameter("TailLength") private int tailLength;
 
@@ -38,32 +36,42 @@ public class GreenpeaceTunnel extends Scenario {
 
     private Map<Integer, RGB> colours = new HashMap<>();
 
+    private boolean wide;
+    private int step;
+
     @Override
     public void setup() {
-        pir1.onFire(callback(0, 5));
-        pir2.onFire(callback(1, 30));
-        pir3.onFire(callback(2, 60));
-        pir4.onFire(callback(3, 90));
-        pir5.onFire(callback(4, 115));
+
         colours.put(0, colour1);
         colours.put(1, colour2);
         colours.put(2, colour3);
         colours.put(3, colour4);
         colours.put(4, colour5);
+
+        pir1.onFire(callback(0));
+        pir2.onFire(callback(1));
+        pir3.onFire(callback(2));
+        pir4.onFire(callback(3));
+        pir5.onFire(callback(4));
     }
 
     @Override
     protected void startup() {
         surface.init();
+        wide = surface.width() >= surface.height();
+        step = wide ? surface.width() / colours.size() : surface.height() / colours.size();
         butterflies.init(spriteCount, colours, tailLength);
         animation.start();
         animation.play(butterflies);
     }
 
-    private Trigger.TriggerCallback callback(final int id, final int pos) {
+    private Trigger.TriggerCallback callback(final int id) {
         return (state) -> {
             if (state) {
-                butterflies.addFocus(id, pos, height / 2);
+                int x = wide ? (step/2) + (id*step) : surface.width() / 2;
+                int y = wide ? surface.height() / 2 : (step/2) + (id*step);
+                System.out.println(wide + " " + x + " " + y);
+                butterflies.addFocus(id, x, y);
             } else {
                 butterflies.removeFocus(id);
             }

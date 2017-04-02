@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.service.http;
+package net.amarantha.gpiomofo.service.http.entity;
 
 import javax.ws.rs.core.Response;
 

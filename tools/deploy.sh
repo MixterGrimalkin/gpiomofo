@@ -45,22 +45,19 @@ then
     sshpass -p ${password} ssh pi@${ip} "cd /home/pi; rm -r gpiomofo 2>/dev/null"
     echo "Uploading Application and Libraries..."
     sshpass -p ${password} scp -r ../target/gpiomofo pi@${ip}:
-    echo "Uploading Audio Files..."
-    sshpass -p ${password} scp -r ../audio pi@${ip}:gpiomofo
 else
     echo "Uploading Application..."
     sshpass -p ${password} scp ../target/gpiomofo/*.jar pi@${ip}:gpiomofo
-    echo "Uploading Web Interfaces..."
-    sshpass -p ${password} scp -r ../src/main/html/* pi@${ip}:gpiomofo/html
-    echo "Uploading Scripts and Properties..."
-    sshpass -p ${password} scp -r ../src/main/bash/* pi@${ip}:gpiomofo
-    sshpass -p ${password} scp -r ../target/gpiomofo/scripts pi@${ip}:gpiomofo
-    sshpass -p ${password} scp -r ../src/main/python/* pi@${ip}:gpiomofo/python
-    sshpass -p ${password} scp ../config/default.properties pi@${ip}:gpiomofo
+    echo "Uploading Scripts..."
+    sshpass -p ${password} scp -r ../scripts pi@${ip}:gpiomofo
+    sshpass -p ${password} scp ../src/main/*.sh pi@${ip}:gpiomofo
+    echo "Uploading Support Files..."
+    sshpass -p ${password} scp ../config/default.properties pi@${ip}:gpiomofo/config
+    sshpass -p ${password} scp ../scenarios/README.yaml pi@${ip}:gpiomofo/scenarios
 fi
 
-echo "Activating Scripts..."
-sshpass -p ${password} ssh pi@${ip} "cd /home/pi/gpiomofo; sudo chmod +x *.sh; sudo chmod -x *.jar"
+echo "Enabling Scripts..."
+sshpass -p ${password} ssh pi@${ip} "cd /home/pi/gpiomofo; sudo chmod +x *.sh; sudo chmod -x *.jar; sudo chmod +x scripts/*.sh"
 
 echo "Uploading Native Libraries..."
 sshpass -p ${password} scp -r ../src/main/c pi@${ip}:gpiomofo

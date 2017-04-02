@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo;
+package net.amarantha.gpiomofo.core;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -13,16 +13,18 @@ public class GpioMofo {
 
     @Inject private ScenarioBuilder builder;
 
-    void start() {
+    private boolean simulation = false;
+
+    public void startSimulation() {
+        simulation = true;
+        start();
+    }
+
+    public void start() {
         builder.loadFromProperties().getScenario().start();
         if ( !simulation ) {
             waitForEnter();
         }
-    }
-
-    void stop() {
-        builder.getScenario().stop();
-        System.exit(0);
     }
 
     private void waitForEnter() {
@@ -32,11 +34,9 @@ public class GpioMofo {
         stop();
     }
 
-    void startSimulation() {
-        simulation = true;
-        start();
+    public void stop() {
+        builder.getScenario().stop();
+        System.exit(0);
     }
-
-    private boolean simulation = false;
 
 }

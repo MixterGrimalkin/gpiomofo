@@ -1,9 +1,8 @@
-package net.amarantha.gpiomofo.display;
+package net.amarantha.gpiomofo.display.lightboard;
 
 import com.google.inject.Injector;
 import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.display.entity.Region;
-import net.amarantha.gpiomofo.display.lightboard.LightBoard;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.math.MathUtils;

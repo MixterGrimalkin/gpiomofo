@@ -5,9 +5,11 @@ import net.amarantha.gpiomofo.core.target.Target;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.utils.properties.Property;
+import net.amarantha.utils.properties.PropertyGroup;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 
+@PropertyGroup("Gingerline")
 public class GingerlinePanic extends Scenario {
 
     public static final String URL_PANIC_BRIEFING = "panic-briefing";

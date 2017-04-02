@@ -6,15 +6,15 @@ import net.amarantha.gpiomofo.core.factory.TargetFactory;
 import net.amarantha.gpiomofo.core.factory.TriggerFactory;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
-import net.amarantha.gpiomofo.service.gpio.touch.MPR121;
+import net.amarantha.gpiomofo.service.gpio.touch.TouchSensor;
 import net.amarantha.gpiomofo.service.midi.MidiService;
-import net.amarantha.gpiomofo.service.pixeltape.PixelTapeService;
+import net.amarantha.gpiomofo.service.pixeltape.PixelTape;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.gpiomofo.webservice.WebService;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.time.Now;
 
-import static net.amarantha.gpiomofo.Main.WITH_SERVER;
+import static net.amarantha.gpiomofo.core.Constants.WITH_SERVER;
 import static net.amarantha.gpiomofo.service.shell.Utility.log;
 
 public class Scenario {
@@ -26,8 +26,8 @@ public class Scenario {
         if ( requiresGpio() ) {
             gpio.start();
         }
-        if ( requiresMpr() ) {
-            mpr121.start();
+        if ( requiresTouch() ) {
+            touch.start();
         }
         if ( requiresMidi() ) {
             midi.start();
@@ -59,8 +59,8 @@ public class Scenario {
         if ( requiresGpio() ) {
             gpio.stop();
         }
-        if ( requiresMpr() ) {
-            mpr121.stop();
+        if ( requiresTouch() ) {
+            touch.stop();
         }
         if ( requiresMidi() ) {
             midi.stop();
@@ -103,9 +103,9 @@ public class Scenario {
 
     @Inject private Now now;
     @Inject private GpioService gpio;
-    @Inject private MPR121 mpr121;
+    @Inject private TouchSensor touch;
     @Inject private MidiService midi;
-    @Inject private PixelTapeService pixel;
+    @Inject private PixelTape pixel;
     @Inject private WebService web;
     @Inject private TaskService tasks;
     @Inject private PropertiesService props;
@@ -115,8 +115,8 @@ public class Scenario {
         return triggers.isGpioUsed() || targets.isGpioUsed();
     }
 
-    private boolean requiresMpr() {
-        return triggers.isMprUsed();
+    private boolean requiresTouch() {
+        return triggers.isTouchUsed();
     }
 
     private boolean requiresMidi() {

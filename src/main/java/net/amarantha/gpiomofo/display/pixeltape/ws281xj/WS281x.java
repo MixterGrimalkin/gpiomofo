@@ -26,6 +26,8 @@ package net.amarantha.gpiomofo.display.pixeltape.ws281xj;
  * #L%
  */
 
+import com.diozero.ws281xj.WS281xNative;
+
 import java.io.Closeable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

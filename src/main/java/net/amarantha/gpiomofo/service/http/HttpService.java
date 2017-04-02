@@ -1,5 +1,9 @@
 package net.amarantha.gpiomofo.service.http;
 
+import net.amarantha.gpiomofo.service.http.entity.HttpCallback;
+import net.amarantha.gpiomofo.service.http.entity.HttpCommand;
+import net.amarantha.gpiomofo.service.http.entity.Param;
+
 public interface HttpService {
 
     String fire(HttpCommand command);

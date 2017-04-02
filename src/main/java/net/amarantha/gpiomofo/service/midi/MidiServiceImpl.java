@@ -5,43 +5,38 @@ import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.service.shell.Utility;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyNotFoundException;
+import net.amarantha.utils.properties.PropertyGroup;
 
 import javax.sound.midi.*;
 
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
+
 @Singleton
+@PropertyGroup("Services")
 public class MidiServiceImpl implements MidiService {
 
-    @Property("MidiDevice") private String deviceName;
+    @Inject private PropertiesService props;
+
+    @Property("MidiDevice") private String deviceName = "USB Uno MIDI Interface";
 
     private MidiDevice midiOutDevice;
 
-    @Inject
-    public MidiServiceImpl(PropertiesService props) {
-        try {
-            props.injectProperties(this);
-        } catch (PropertyNotFoundException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
-    }
-
     @Override
     public void start() {
-        System.out.println("Starting MIDI Service...");
+        log("Starting MIDI Service...");
+        props.injectPropertiesOrExit(this);
         try {
             connectDevice(deviceName);
             midiOutDevice = getMidiOutDevice(deviceName);
             midiOutDevice.open();
         } catch (MidiUnavailableException e) {
-            System.out.println("Could not open MIDI device '" + deviceName + "'");
+            log("Could not open MIDI device '" + deviceName + "'");
         }
     }
 
-
     @Override
     public void stop() {
-        System.out.println("Stopping MIDI Service...");
+        log("Stopping MIDI Service...");
         if ( midiOutDevice !=null ) {
             midiOutDevice.close();
         }
@@ -98,6 +93,5 @@ public class MidiServiceImpl implements MidiService {
     private void disconnectDevice(String name) {
         Utility.executeCommand(new String[]{"aconnect", "-d", name, "Midi Through"});
     }
-
 
 }

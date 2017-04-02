@@ -9,15 +9,12 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import net.amarantha.gpiomofo.Gui;
+import net.amarantha.gpiomofo.service.gui.Gui;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class GpioServiceGUI extends GpioService {
-
-    protected Map<Integer, Boolean> inputStates = new HashMap<>();
-    protected Map<Integer, Boolean> outputStates = new HashMap<>();
+public class GpioServiceGUI extends GpioServiceMock {
 
     private Gui gui;
 
@@ -27,6 +24,9 @@ public class GpioServiceGUI extends GpioService {
     private HBox inputButtonContainer = new HBox();
     private HBox outputButtonContainer = new HBox();
 
+    private Stage inputWindow;
+    private Stage outputWindow;
+
     @Inject
     public GpioServiceGUI(Gui gui) {
         this.gui = gui;
@@ -35,14 +35,16 @@ public class GpioServiceGUI extends GpioService {
     @Override
     public void start(long period) {
 
-        if ( gui!=null ) {
-            Stage inputWindow = gui.addStage("Input GPIO");
+        if (gui != null) {
+            inputWindow = gui.addStage("Input GPIO");
             buildButtonContainer(inputWindow, inputButtonContainer);
             inputWindow.show();
 
-            Stage outputWindow = gui.addStage("Output GPIO");
+            outputWindow = gui.addStage("Output GPIO");
             buildButtonContainer(outputWindow, outputButtonContainer);
             outputWindow.show();
+
+            redrawGui();
         }
 
         super.start(period);
@@ -54,8 +56,8 @@ public class GpioServiceGUI extends GpioService {
         window.setScene(scene);
         scene.setFill(Color.BLACK);
         root.getChildren().add(container);
-        scene.setOnKeyPressed((event)->{
-            switch(event.getCode()) {
+        scene.setOnKeyPressed((event) -> {
+            switch (event.getCode()) {
                 case DIGIT1:
                     fireButton(0);
                     break;
@@ -92,18 +94,20 @@ public class GpioServiceGUI extends GpioService {
 
     private void fireButton(int b) {
         Button button = inputButtons.get(b);
-        if ( button!=null ) {
+        if (button != null) {
             button.fire();
         }
 
     }
 
     private void redrawGui() {
-        if ( gui!=null ) {
+        if (gui != null) {
             inputButtons.clear();
             inputButtonContainer.getChildren().clear();
             if (inputStates.isEmpty()) {
-                inputButtonContainer.getChildren().add(new Button("(none)"));
+                if ( inputWindow!=null ) {
+                    inputWindow.hide();
+                }
             } else {
                 inputStates.forEach((pin, state) -> {
                     Button button = new Button("Gpio-" + pin);
@@ -118,66 +122,55 @@ public class GpioServiceGUI extends GpioService {
             outputButtons.clear();
             outputButtonContainer.getChildren().clear();
             if (outputStates.isEmpty()) {
-                outputButtonContainer.getChildren().add(new Button("(none)"));
+                if ( outputWindow!=null ) {
+                    outputWindow.hide();
+                }
             } else {
                 outputStates.forEach((pin, state) -> {
                     Button button = new Button("Gpio-" + pin);
                     outputButtons.put(pin, button);
                     outputButtonContainer.getChildren().add(button);
                 });
+                if (outputWindow != null) {
+                    outputWindow.show();
+                }
             }
             refreshGui();
         }
     }
 
     private void refreshGui() {
-        if ( gui!=null ) {
-            inputButtons.forEach((pin, button) -> {
-                if (inputStates.get(pin)) {
-                    button.setStyle("-fx-background-color: red");
-                } else {
-                    button.setStyle("-fx-background-color: white");
-                }
-            });
-            outputButtons.forEach((pin, button) -> {
-                if (outputStates.get(pin)) {
-                    button.setStyle("-fx-background-color: red");
-                } else {
-                    button.setStyle("-fx-background-color: white");
-                }
-            });
+        if (gui != null) {
+            doRefreshGui(inputWindow, inputButtons, inputStates);
+            doRefreshGui(outputWindow, outputButtons, outputStates);
         }
     }
 
-    ////////////////////
-    // Simulated GPIO //
-    ////////////////////
-
-    @Override
-    public boolean isValidPin(int pinNumber) {
-        return pinNumber>=0 && pinNumber<=29;
-    }
-
-    @Override
-    protected boolean digitalRead(int pinNumber) {
-        return inputStates.get(pinNumber)==null ? outputStates.get(pinNumber) : inputStates.get(pinNumber);
+    private void doRefreshGui(Stage window, Map<Integer, Button> buttons, Map<Integer, Boolean> states) {
+        buttons.forEach((pin, button) -> {
+            if (states.get(pin)) {
+                button.setStyle("-fx-background-color: red");
+            } else {
+                button.setStyle("-fx-background-color: white");
+            }
+        });
     }
 
     @Override
     protected void provisionDigitalInput(int pinNumber, PinPullResistance resistance) {
-        inputStates.put(pinNumber, false);
+        super.provisionDigitalInput(pinNumber, resistance);
         redrawGui();
     }
 
     @Override
     protected void digitalWrite(int pinNumber, boolean state) {
-        outputStates.put(pinNumber, state);
+        super.digitalWrite(pinNumber, state);
         refreshGui();
     }
 
     @Override
     protected void provisionDigitalOutput(int pinNumber, PinState initialState) {
-        outputStates.put(pinNumber, initialState==PinState.HIGH);
+        super.provisionDigitalOutput(pinNumber, initialState);
         redrawGui();
     }
 

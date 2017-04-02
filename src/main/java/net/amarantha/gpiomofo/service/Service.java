@@ -1,0 +1,33 @@
+package net.amarantha.gpiomofo.service;
+
+import com.google.inject.Inject;
+import net.amarantha.utils.properties.PropertiesService;
+
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
+
+public abstract class Service {
+
+    @Inject protected PropertiesService props;
+
+    public final String name;
+
+    public Service(String name) {
+        this.name = name;
+    }
+
+    public final void start() {
+        log("Starting " + name + "...");
+        props.injectPropertiesOrExit(this);
+        onStart();
+    }
+
+    public final void stop() {
+        log("Stopping " + name + "...");
+        onStop();
+    }
+
+    protected abstract void onStart();
+
+    protected abstract void onStop();
+
+}
