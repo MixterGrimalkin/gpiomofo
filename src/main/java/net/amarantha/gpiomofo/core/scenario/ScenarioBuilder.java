@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.core.factory;
+package net.amarantha.gpiomofo.core.scenario;
 
 import com.esotericsoftware.yamlbeans.YamlReader;
 import com.google.inject.Inject;
@@ -7,9 +7,11 @@ import com.google.inject.Singleton;
 import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.core.annotation.Named;
 import net.amarantha.gpiomofo.core.annotation.Parameter;
+import net.amarantha.gpiomofo.core.factory.LinkFactory;
+import net.amarantha.gpiomofo.core.factory.TargetFactory;
+import net.amarantha.gpiomofo.core.factory.TriggerFactory;
 import net.amarantha.gpiomofo.core.target.Target;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
-import net.amarantha.gpiomofo.scenario.Scenario;
 import net.amarantha.gpiomofo.service.http.HttpCommand;
 import net.amarantha.gpiomofo.service.midi.MidiCommand;
 import net.amarantha.gpiomofo.service.osc.OscCommand;
@@ -44,18 +46,20 @@ public class ScenarioBuilder {
     @Inject private TargetFactory targets;
     @Inject private LinkFactory links;
 
-    public Scenario get() {
+    public Scenario getScenario() {
         return scenario;
     }
 
-    public ScenarioBuilder load() {
+    public ScenarioBuilder loadFromProperties() {
+        return load(getScenarioName());
+    }
 
-        String name = getScenarioName();
+    public ScenarioBuilder load(String name) {
 
-        log(" LOADING SCENARIO: " + name, true);
+        log(true, " LOADING SCENARIO: " + name, true);
 
         buildScenario(name);
-        injectProperties();
+        props.injectPropertiesOrExit(scenario);
         loadConfig();
         injectComponents();
         scenario.setup();
@@ -89,6 +93,7 @@ public class ScenarioBuilder {
             scenario = injector.getInstance(clazz);
         } catch (ClassNotFoundException e) {
             scenario= injector.getInstance(Scenario.class);
+            System.out.println("Alive!");
         }
         log("Class:\n    " + scenario.getClass().getName());
         scenario.setName(className);

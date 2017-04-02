@@ -21,7 +21,7 @@ public class Gui {
     @Inject
     public Gui(GpioMofo application, Stage stage) {
 
-        log("                s i m u l a t i o n\n");
+        log(" - ( simulation mode ) -", true);
 
         File logoFile = new File("/home/grimalkin/code/gpiomofo/gpiomofo-logo.png");
 
@@ -46,7 +46,7 @@ public class Gui {
         stage.setTitle("GpioMofo");
         stage.show();
 
-        stage.setOnCloseRequest(event -> application.stopApplication());
+        stage.setOnCloseRequest(event -> application.stop());
 
     }
 

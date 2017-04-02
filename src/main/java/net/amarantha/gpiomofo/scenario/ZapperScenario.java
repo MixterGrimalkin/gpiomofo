@@ -1,5 +1,6 @@
 package net.amarantha.gpiomofo.scenario;
 
+import net.amarantha.gpiomofo.core.scenario.Scenario;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
 import net.amarantha.gpiomofo.service.http.HttpCommand;
 
@@ -47,21 +48,21 @@ public class ZapperScenario extends Scenario {
 //            .add(100, targets.gpio(1, false))
 //            .add(100, targets.gpio(2, false))
 //            .add(100, targets.gpio(4, false))
-//        .build().repeat(true, targets.get("Background")).oneShot(true);
+//        .build().repeat(true, targets.getScenario("Background")).oneShot(true);
 
         targets.chain("Finale-1")
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
             .add(targets.http(lightboard.withPath("scene/zapper-finale/load")))
-//            .add(targets.get("Light-Cycle"))
+//            .add(targets.getScenario("Light-Cycle"))
         .build().oneShot(true);
 
         targets.chain("Reset")
             .add(targets.get("Background"))
-//            .add(targets.invert(targets.get("Light-Cycle")).oneShot(true))
+//            .add(targets.invert(targets.getScenario("Light-Cycle")).oneShot(true))
         .build();
 
         targets.chain("Light-One")
-//            .add(targets.invert(targets.get("Light-Cycle")).oneShot(true))
+//            .add(targets.invert(targets.getScenario("Light-Cycle")).oneShot(true))
 //            .add(targets.gpio(1, true))
 //            .add(targets.gpio(2, false))
 //            .add(targets.gpio(4, false))
@@ -71,7 +72,7 @@ public class ZapperScenario extends Scenario {
         .build().oneShot(true);
 
         targets.chain("Light-Two")
-//            .add(targets.invert(targets.get("Light-Cycle")).oneShot(true))
+//            .add(targets.invert(targets.getScenario("Light-Cycle")).oneShot(true))
 //            .add(targets.gpio(1, false))
 //            .add(targets.gpio(2, true))
 //            .add(targets.gpio(4, false))
@@ -81,7 +82,7 @@ public class ZapperScenario extends Scenario {
         .build().oneShot(true);
 
         targets.chain("Light-Three")
-//            .add(targets.invert(targets.get("Light-Cycle")).oneShot(true))
+//            .add(targets.invert(targets.getScenario("Light-Cycle")).oneShot(true))
 //            .add(targets.gpio(1, false))
 //            .add(targets.gpio(2, false))
 //            .add(targets.gpio(4, true))
@@ -91,7 +92,7 @@ public class ZapperScenario extends Scenario {
         .build().oneShot(true);
 
         targets.chain("Light-One-Two")
-//            .add(targets.invert(targets.get("Light-Cycle")).oneShot(true))
+//            .add(targets.invert(targets.getScenario("Light-Cycle")).oneShot(true))
 //            .add(targets.gpio(1, true))
 //            .add(targets.gpio(2, true))
 //            .add(targets.gpio(4, false))
@@ -101,7 +102,7 @@ public class ZapperScenario extends Scenario {
         .build().oneShot(true);
 
         targets.chain("Light-One-Three")
-//            .add(targets.invert(targets.get("Light-Cycle")).oneShot(true))
+//            .add(targets.invert(targets.getScenario("Light-Cycle")).oneShot(true))
 //            .add(targets.gpio(1, true))
 //            .add(targets.gpio(2, false))
 //            .add(targets.gpio(4, true))
@@ -111,7 +112,7 @@ public class ZapperScenario extends Scenario {
         .build().oneShot(true);
 
         targets.chain("Light-Two-Three")
-//            .add(targets.invert(targets.get("Light-Cycle")).oneShot(true))
+//            .add(targets.invert(targets.getScenario("Light-Cycle")).oneShot(true))
 //            .add(targets.gpio(1, false))
 //            .add(targets.gpio(2, true))
 //            .add(targets.gpio(4, true))

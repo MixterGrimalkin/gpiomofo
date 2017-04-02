@@ -16,6 +16,7 @@ import net.amarantha.utils.properties.PropertyGroup;
 import net.amarantha.utils.time.TimeGuard;
 
 import static javafx.scene.paint.Color.color;
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
 
 @PropertyGroup("NeoPixelGUI")
 public class NeoPixelGUI implements NeoPixel {
@@ -45,6 +46,8 @@ public class NeoPixelGUI implements NeoPixel {
 
     @Override
     public void init(final int pixelCount) {
+
+        log("Starting GUI NeoPixel...");
 
         props.injectPropertiesOrExit(this);
 

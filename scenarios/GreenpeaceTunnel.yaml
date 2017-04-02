@@ -1,11 +1,11 @@
 Parameters:
-  SpriteCount: 50
+  SpriteCount: 200
   Colour1: 229,56,16
   Colour2: 250,226,217
-  Colour3: 255,253,32
+  Colour3: 229,229,32
   Colour4: 250,226,217
-  Colour5: 255,32,211
-  TailLength: 5
+  Colour5: 16,229,56
+  TailLength: 10
 
 Triggers:
   PIR1:
@@ -33,3 +33,37 @@ Triggers:
     pin: 4
     resistance: PULL_DOWN
     triggerState: true
+
+Targets:
+  H1:
+    type: HTTP
+    onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR1/fire
+    offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR1/cancel
+  H2:
+    type: HTTP
+    onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR2/fire
+    offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR2/cancel
+  H3:
+    type: HTTP
+    onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR3/fire
+    offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR3/cancel
+  H4:
+    type: HTTP
+    onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR4/fire
+    offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR4/cancel
+  H5:
+    type: HTTP
+    onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR5/fire
+    offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR5/cancel
+
+Links:
+  PIR1:
+    - H1
+  PIR2:
+    - H2
+  PIR3:
+    - H3
+  PIR4:
+    - H4
+  PIR5:
+    - H5

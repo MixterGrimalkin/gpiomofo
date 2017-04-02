@@ -24,7 +24,7 @@ public class Butterflies extends Animation {
 
     public void init(int spriteCount, Map<Integer, RGB> colours, int tailLength) {
         this.colours = colours;
-        targetJitter = new int[]{surface.width() / 10, surface.height() / 2};
+        targetJitter = new int[]{surface.width() / 10, surface.height()};
         sprites.setTailLength(tailLength);
         for (int i = 0; i < colours.size(); i++) {
             for (int j = 0; j < spriteCount / colours.size(); j++) {

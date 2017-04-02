@@ -26,7 +26,7 @@ public class NeoPixelBoard implements LightBoard {
 
     @Override
     public void init(int width, int height) {
-        log("Starting Pixel Tape Board...");
+        log("Starting NeoPixel LightBoard...");
         props.injectPropertiesOrExit(this);
         this.width = width;
         this.height = height;

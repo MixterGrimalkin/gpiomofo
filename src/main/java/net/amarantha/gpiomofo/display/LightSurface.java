@@ -61,8 +61,6 @@ public class LightSurface {
 
         tasks.addRepeatingTask("SurfaceRefresh", board.interval(), () -> board.update(composite().rgb()));
 
-        log("Surface Active");
-
         return this;
     }
 

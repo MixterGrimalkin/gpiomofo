@@ -7,6 +7,8 @@ import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.Property;
 import net.amarantha.utils.properties.PropertyGroup;
 
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
+
 @PropertyGroup("WS281x")
 public class NeoPixelWS281X implements NeoPixel {
 
@@ -22,6 +24,7 @@ public class NeoPixelWS281X implements NeoPixel {
 
     @Override
     public void init(int pixelCount) {
+        log("Starting Native WS281x NeoPixel...");
         props.injectPropertiesOrExit(this);
         this.pixelCount = pixelCount;
         ws281x = new WS281x(pin, 255, pixelCount);

@@ -7,7 +7,7 @@ import net.amarantha.gpiomofo.display.lightboard.LightBoard;
 import net.amarantha.gpiomofo.display.lightboard.NativeLightBoard_192X32_Small_Sign;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixelWS281X;
-import net.amarantha.gpiomofo.scenario.Scenario;
+import net.amarantha.gpiomofo.core.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.RaspberryPi3;
 import net.amarantha.gpiomofo.service.http.HttpService;

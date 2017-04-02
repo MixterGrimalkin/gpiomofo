@@ -1,5 +1,7 @@
 package net.amarantha.gpiomofo.scenario;
 
+import net.amarantha.gpiomofo.core.scenario.Scenario;
+
 public class TouchTest extends Scenario {
 
     @Override

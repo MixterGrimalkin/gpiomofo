@@ -6,14 +6,14 @@ import com.googlecode.guicebehave.Modules;
 import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
 import com.pi4j.io.gpio.PinPullResistance;
-import net.amarantha.gpiomofo.core.factory.ScenarioBuilder;
+import net.amarantha.gpiomofo.core.scenario.ScenarioBuilder;
 import net.amarantha.gpiomofo.core.factory.TargetFactory;
 import net.amarantha.gpiomofo.core.factory.TriggerFactory;
 import net.amarantha.gpiomofo.core.target.Target;
 import net.amarantha.gpiomofo.core.trigger.CompositeTrigger;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
 import net.amarantha.gpiomofo.scenario.ExampleScenario;
-import net.amarantha.gpiomofo.scenario.Scenario;
+import net.amarantha.gpiomofo.core.scenario.Scenario;
 import net.amarantha.gpiomofo.service.audio.AudioTarget;
 import net.amarantha.gpiomofo.service.gpio.GpioTarget;
 import net.amarantha.gpiomofo.service.gpio.GpioTrigger;
@@ -168,11 +168,11 @@ public class ScenarioBuilderTest extends TestBase {
     void given_scenario_$1(String name) {
         props.setProperty("ScenariosDirectory", "test-scenarios");
         props.setProperty("Scenario", name);
-        builder.load();
+        builder.loadFromProperties();
     }
 
     Scenario then_scenario_is_a_$1_called_$2(Class<? extends Scenario> clazz, String name) {
-        Scenario scenario = builder.get();
+        Scenario scenario = builder.getScenario();
         assertNotNull(scenario);
         assertEquals(clazz, scenario.getClass());
         assertEquals(name, scenario.getName());

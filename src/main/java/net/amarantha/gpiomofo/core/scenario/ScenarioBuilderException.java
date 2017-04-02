@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.core.factory;
+package net.amarantha.gpiomofo.core.scenario;
 
 public class ScenarioBuilderException extends Exception {
 

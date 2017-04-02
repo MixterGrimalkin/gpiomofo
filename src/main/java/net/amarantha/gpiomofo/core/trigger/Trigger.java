@@ -3,12 +3,15 @@ package net.amarantha.gpiomofo.core.trigger;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.core.factory.HasName;
+import net.amarantha.gpiomofo.service.shell.Utility;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.utils.time.Now;
 
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
+
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
 
 public class Trigger implements HasName {
 
@@ -32,7 +35,7 @@ public class Trigger implements HasName {
     }
 
     private void doFire(boolean active) {
-        out.println(now.time().toString() + ": ["+getName()+"] " + (active?"==>>":" -- "));
+        log(now.time().toString() + ": [" + getName() + "] " + (active ? "==>>" : " -- "));
         for (TriggerCallback callback : triggerCallbacks) {
             callback.onTrigger(active);
         }

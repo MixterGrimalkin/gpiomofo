@@ -9,12 +9,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import net.amarantha.gpiomofo.Gui;
+import net.amarantha.gpiomofo.service.shell.Utility;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.Property;
 import net.amarantha.utils.properties.PropertyGroup;
 
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
 import static net.amarantha.utils.colour.RGB.*;
 
 /**
@@ -43,7 +45,7 @@ public class LightBoardGUI implements LightBoard {
     @Override
     public void init(int width, int height) {
 
-        System.out.println("Starting UI Simulation LightBoard...");
+        log("Starting GUI LightBoard...");
 
         props.injectPropertiesOrExit(this);
 

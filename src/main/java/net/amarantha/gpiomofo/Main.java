@@ -45,10 +45,8 @@ public class Main {
     public static void main(String[] args) {
         log(LOGO);
         processArgs(args, HELP_TEXT);
-
         Guice.createInjector(new GpioMofoModule())
-            .getInstance(GpioMofo.class)
-                .startApplication();
+            .getInstance(GpioMofo.class).start();
     }
 
 }

@@ -13,19 +13,13 @@ import java.util.List;
 @Singleton
 public class PixelTapeService {
 
-    private TaskService tasks;
-    private NeoPixel neoPixel;
-    private int tapeRefresh;
-
     private List<PixelTapeTarget> patterns = new LinkedList<>();
     private int totalPixels;
 
-    @Inject
-    public PixelTapeService(NeoPixel neoPixel, @TapeRefresh int tapeRefresh, TaskService tasks) {
-        this.neoPixel = neoPixel;
-        this.tapeRefresh = tapeRefresh;
-        this.tasks = tasks;
-    }
+    @Inject private NeoPixel neoPixel;
+    @Inject private TaskService tasks;
+
+    private int tapeRefresh = 5;
 
     public PixelTapeService addPattern(PixelTapeTarget pattern) {
         patterns.add(pattern);

@@ -89,10 +89,7 @@ void init(int r, int c) {
     rows = r;
     cols = c;
 
-
-    printf("Starting C RaspPi LightBoard....\n");
-    printf("Raspberry Pi revision: %d\n", piBoardRev());
-    printf("%dx%d\n", rows, cols);
+    printf("[ - RaspPi native LightBoard %dx%d - ]\n", cols, rows);
 
     pushTestPattern();
 
@@ -111,8 +108,6 @@ void init(int r, int c) {
     pinMode(addr1, OUTPUT);
     pinMode(addr2, OUTPUT);
     pinMode(addr3, OUTPUT);
-
-    printf("Board Running\n");
 
     for ( ;; ) {
         push();

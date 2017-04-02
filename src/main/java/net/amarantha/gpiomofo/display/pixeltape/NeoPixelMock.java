@@ -2,12 +2,15 @@ package net.amarantha.gpiomofo.display.pixeltape;
 
 import net.amarantha.utils.colour.RGB;
 
+import static net.amarantha.gpiomofo.service.shell.Utility.log;
+
 public class NeoPixelMock implements NeoPixel{
 
     private RGB[] pixels;
 
     @Override
     public void init(int pixelCount) {
+        log("Starting Mock NeoPixel...");
         pixels = new RGB[pixelCount];
     }
 
