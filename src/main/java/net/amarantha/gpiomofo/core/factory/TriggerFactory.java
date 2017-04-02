@@ -4,15 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.pi4j.io.gpio.PinPullResistance;
-import net.amarantha.gpiomofo.core.trigger.CompositeTrigger;
-import net.amarantha.gpiomofo.core.trigger.InvertedTrigger;
-import net.amarantha.gpiomofo.core.trigger.Trigger;
+import net.amarantha.gpiomofo.core.trigger.*;
 import net.amarantha.gpiomofo.service.gpio.GpioTrigger;
 import net.amarantha.gpiomofo.service.gpio.touch.TouchTrigger;
 import net.amarantha.gpiomofo.service.gpio.touch.TouchTriggerSet;
 import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeTrigger;
-import net.amarantha.gpiomofo.service.http.HttpTrigger;
-import net.amarantha.gpiomofo.service.osc.OscTrigger;
 
 @Singleton
 public class TriggerFactory extends Factory<Trigger> {

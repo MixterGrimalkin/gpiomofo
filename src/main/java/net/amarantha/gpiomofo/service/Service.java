@@ -3,7 +3,7 @@ package net.amarantha.gpiomofo.service;
 import com.google.inject.Inject;
 import net.amarantha.utils.properties.PropertiesService;
 
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 public abstract class Service {
 

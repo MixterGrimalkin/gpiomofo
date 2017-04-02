@@ -3,9 +3,9 @@ package net.amarantha.gpiomofo.scenario;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.core.scenario.Scenario;
 import net.amarantha.gpiomofo.service.gpio.ultrasonic.HCSR04;
-import net.amarantha.gpiomofo.service.osc.OscCommand;
-import net.amarantha.gpiomofo.service.osc.OscService;
 import net.amarantha.utils.math.MathUtils;
+import net.amarantha.utils.osc.OscCommand;
+import net.amarantha.utils.osc.OscService;
 import net.amarantha.utils.properties.Property;
 import net.amarantha.utils.properties.PropertyGroup;
 

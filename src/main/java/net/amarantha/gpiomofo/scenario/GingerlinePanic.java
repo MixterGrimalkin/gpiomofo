@@ -3,7 +3,7 @@ package net.amarantha.gpiomofo.scenario;
 import net.amarantha.gpiomofo.core.scenario.Scenario;
 import net.amarantha.gpiomofo.core.target.Target;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
-import net.amarantha.gpiomofo.service.osc.OscCommand;
+import net.amarantha.utils.osc.OscCommand;
 import net.amarantha.utils.properties.Property;
 import net.amarantha.utils.properties.PropertyGroup;
 

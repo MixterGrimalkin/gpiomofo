@@ -3,30 +3,38 @@ package net.amarantha.gpiomofo.scenario;
 import net.amarantha.gpiomofo.core.scenario.Scenario;
 import net.amarantha.gpiomofo.core.target.Target;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
-import net.amarantha.gpiomofo.service.http.entity.HttpCommand;
-import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.ChasePattern;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.IntensityFade;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.SlidingBars;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.http.entity.HttpCommand;
+import net.amarantha.utils.osc.OscCommand;
 import net.amarantha.utils.properties.Property;
 import net.amarantha.utils.properties.PropertyGroup;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.*;
-import static net.amarantha.gpiomofo.service.http.entity.HttpCommand.POST;
+import static net.amarantha.utils.http.entity.HttpCommand.POST;
 
 @PropertyGroup("Gingerline")
 public class GingerlineBikeRoom extends Scenario {
 
-    @Property("PanicIP")                private String  panicIp;
-    @Property("PanicPort")              private int     panicPort;
-    @Property("ButtonHoldTime")         private int     holdTime;
-    @Property("LightingServerIP")       private String  lightingIp;
-    @Property("LightingServerOscPort")  private int     lightingPort;
-    @Property("MediaServerIP")          private String  mediaIp;
-    @Property("MediaServerOscPort")     private int     mediaPort;
-    @Property("C3-Colour")              private RGB     pixelColour;
+    @Property("PanicIP")
+    private String panicIp;
+    @Property("PanicPort")
+    private int panicPort;
+    @Property("ButtonHoldTime")
+    private int holdTime;
+    @Property("LightingServerIP")
+    private String lightingIp;
+    @Property("LightingServerOscPort")
+    private int lightingPort;
+    @Property("MediaServerIP")
+    private String mediaIp;
+    @Property("MediaServerOscPort")
+    private int mediaPort;
+    @Property("C3-Colour")
+    private RGB pixelColour;
 
     private Trigger panicChamber2;
     private Trigger panicChamber2Hold;
@@ -53,27 +61,27 @@ public class GingerlineBikeRoom extends Scenario {
     @Override
     public void setupTriggers() {
 
-        panicChamber2 =       triggers.gpio("C2-Panic",         2, PULL_UP, false);
-        panicChamber2Hold =   triggers.gpio("C2-Panic-Hold",    2, PULL_UP, false).setHoldTime(1000);
-        panicChamber3 =       triggers.gpio("C3-Panic",         3, PULL_UP, false);
-        panicChamber3Hold =   triggers.gpio("C3-Panic-Hold",    3, PULL_UP, false).setHoldTime(1000);
-        panicChamber4 =       triggers.gpio("C4-Panic",         4, PULL_UP, false);
-        panicChamber4Hold =   triggers.gpio("C4-Panic-Hold",    4, PULL_UP, false).setHoldTime(1000);
+        panicChamber2 = triggers.gpio("C2-Panic", 2, PULL_UP, false);
+        panicChamber2Hold = triggers.gpio("C2-Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);
+        panicChamber3 = triggers.gpio("C3-Panic", 3, PULL_UP, false);
+        panicChamber3Hold = triggers.gpio("C3-Panic-Hold", 3, PULL_UP, false).setHoldTime(1000);
+        panicChamber4 = triggers.gpio("C4-Panic", 4, PULL_UP, false);
+        panicChamber4Hold = triggers.gpio("C4-Panic-Hold", 4, PULL_UP, false).setHoldTime(1000);
 
-        buttonChamber2Green = triggers.gpio("C2-Button-Green",  5, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber2Green = triggers.gpio("C2-Button-Green", 5, PULL_UP, false).setHoldTime(holdTime);
 
-        oscPixelTape0 =     triggers.osc("Tape-0", 53000, "bike-lights-0");
-        oscPixelTape1 =     triggers.osc("Tape-1", 53000, "bike-lights-1");
-        oscPixelTape2 =     triggers.osc("Tape-2", 53000, "bike-lights-2");
-        oscPixelTape3 =     triggers.osc("Tape-3", 53000, "bike-lights-3");
-        oscPixelTape4 =     triggers.osc("Tape-4", 53000, "bike-lights-4");
-        oscPixelTapeExit =  triggers.osc("Tape-5", 53000, "bike-exit");
+        oscPixelTape0 = triggers.osc("Tape-0", 53000, "bike-lights-0");
+        oscPixelTape1 = triggers.osc("Tape-1", 53000, "bike-lights-1");
+        oscPixelTape2 = triggers.osc("Tape-2", 53000, "bike-lights-2");
+        oscPixelTape3 = triggers.osc("Tape-3", 53000, "bike-lights-3");
+        oscPixelTape4 = triggers.osc("Tape-4", 53000, "bike-lights-4");
+        oscPixelTapeExit = triggers.osc("Tape-5", 53000, "bike-exit");
 
-        buttonChamber3a =   triggers.gpio("C3-Button-A", 6,  PULL_UP, false).setHoldTime(holdTime);
-        buttonChamber3b =   triggers.gpio("C3-Button-B", 7,  PULL_UP, false).setHoldTime(holdTime);
-        buttonChamber3c =   triggers.gpio("C3-Button-C", 12, PULL_UP, false).setHoldTime(holdTime);
-        buttonChamber3d =   triggers.gpio("C3-Button-D", 13, PULL_UP, false).setHoldTime(holdTime);
-        buttonChamber3e =   triggers.gpio("C3-Button-E", 14, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3a = triggers.gpio("C3-Button-A", 6, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3b = triggers.gpio("C3-Button-B", 7, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3c = triggers.gpio("C3-Button-C", 12, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3d = triggers.gpio("C3-Button-D", 13, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3e = triggers.gpio("C3-Button-E", 14, PULL_UP, false).setHoldTime(holdTime);
 
     }
 
@@ -102,22 +110,22 @@ public class GingerlineBikeRoom extends Scenario {
     @Override
     public void setupTargets() {
 
-        panicLightsChamber2 =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2", 255));
-        panicMonitorChamber2 =  targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_UNDERWATER+"/fire", ""));
+        panicLightsChamber2 = targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2", 255));
+        panicMonitorChamber2 = targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_UNDERWATER + "/fire", ""));
 
-        panicLightsChamber3 =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c3", 255));
-        panicMonitorChamber3 =  targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_BIKES+"/fire", ""));
+        panicLightsChamber3 = targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c3", 255));
+        panicMonitorChamber3 = targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_BIKES + "/fire", ""));
 
-        panicLightsChamber4 =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c4", 255));
-        panicMonitorChamber4 =  targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_KITCHEN+"/fire", ""));
+        panicLightsChamber4 = targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c4", 255));
+        panicMonitorChamber4 = targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_KITCHEN + "/fire", ""));
 
-        underwaterControl =     targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2slide", 255));
+        underwaterControl = targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2slide", 255));
 
-        bikeControl1 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1301/start", 255));
-        bikeControl2 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1302/start", 255));
-        bikeControl3 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1303/start", 255));
-        bikeControl4 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1304/start", 255));
-        bikeControl5 =          targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1305/start", 255));
+        bikeControl1 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1301/start", 255));
+        bikeControl2 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1302/start", 255));
+        bikeControl3 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1303/start", 255));
+        bikeControl4 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1304/start", 255));
+        bikeControl5 = targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1305/start", 255));
 
         ////////////////
         // Pixel Tape //
@@ -135,53 +143,53 @@ public class GingerlineBikeRoom extends Scenario {
                 .setMax(0.4)
                 .setMinPause(100)
                 .setIntensityDelta(0.7)
-                .init(0,150);
+                .init(0, 150);
 
         Target bars2 = targets
-            .pixelTape(SlidingBars.class)
+                .pixelTape(SlidingBars.class)
                 .setBarSize(3, 3)
                 .setColour(pixelColour)
                 .setRefreshInterval(150)
                 .init(0, 150);
         Target fade2 = targets
-            .pixelTape(IntensityFade.class)
+                .pixelTape(IntensityFade.class)
                 .setMin(0.1)
                 .setMax(0.6)
                 .setMinPause(25)
                 .setMaxPause(20)
                 .setIntensityDelta(0.1)
-                .init(0,150);
+                .init(0, 150);
 
         Target bars3 = targets
-            .pixelTape(SlidingBars.class)
+                .pixelTape(SlidingBars.class)
                 .setBarSize(3, 3)
                 .setColour(pixelColour)
                 .setRefreshInterval(90)
                 .init(0, 150);
         Target fade3 = targets
-            .pixelTape(IntensityFade.class)
+                .pixelTape(IntensityFade.class)
                 .setMin(0.1)
                 .setMax(0.7)
                 .setMinPause(10)
                 .setIntensityDelta(0.1)
-                .init(0,150);
+                .init(0, 150);
 
         Target bars4 = targets
-            .pixelTape(SlidingBars.class)
+                .pixelTape(SlidingBars.class)
                 .setBarSize(4, 3)
                 .setColour(pixelColour)
                 .setRefreshInterval(50)
                 .init(0, 150);
         Target fade4 = targets
-            .pixelTape(IntensityFade.class)
+                .pixelTape(IntensityFade.class)
                 .setMin(0.45)
                 .setMax(0.9)
                 .setMinPause(0)
                 .setIntensityDelta(0.1)
-                .init(0,150);
+                .init(0, 150);
 
         Target exit = targets
-            .pixelTape(ChasePattern.class)
+                .pixelTape(ChasePattern.class)
                 .setColour(pixelColour.withBrightness(0.8))
                 .setBlockWidth(30)
                 .setMovement(10)
@@ -226,27 +234,27 @@ public class GingerlineBikeRoom extends Scenario {
     public void setupLinks() {
 
         links
-                .link(oscPixelTape0,        lightStop)
-                .link(oscPixelTape1,        lightScene1)
-                .link(oscPixelTape2,        lightScene2)
-                .link(oscPixelTape3,        lightScene3)
-                .link(oscPixelTape4,        lightScene4)
-                .link(oscPixelTapeExit,     lightSceneExit)
+                .link(oscPixelTape0, lightStop)
+                .link(oscPixelTape1, lightScene1)
+                .link(oscPixelTape2, lightScene2)
+                .link(oscPixelTape3, lightScene3)
+                .link(oscPixelTape4, lightScene4)
+                .link(oscPixelTapeExit, lightSceneExit)
 
-                .link(buttonChamber3a,      bikeControl1)
-                .link(buttonChamber3b,      bikeControl2)
-                .link(buttonChamber3c,      bikeControl3)
-                .link(buttonChamber3d,      bikeControl4)
-                .link(buttonChamber3e,      bikeControl5)
+                .link(buttonChamber3a, bikeControl1)
+                .link(buttonChamber3b, bikeControl2)
+                .link(buttonChamber3c, bikeControl3)
+                .link(buttonChamber3d, bikeControl4)
+                .link(buttonChamber3e, bikeControl5)
 
-                .link(panicChamber2,        panicLightsChamber2)
-                .link(panicChamber2Hold,    panicMonitorChamber2)
-                .link(panicChamber3,        panicLightsChamber3)
-                .link(panicChamber3Hold,    panicMonitorChamber3)
-                .link(panicChamber4,        panicLightsChamber4)
-                .link(panicChamber4Hold,    panicMonitorChamber4)
+                .link(panicChamber2, panicLightsChamber2)
+                .link(panicChamber2Hold, panicMonitorChamber2)
+                .link(panicChamber3, panicLightsChamber3)
+                .link(panicChamber3Hold, panicMonitorChamber3)
+                .link(panicChamber4, panicLightsChamber4)
+                .link(panicChamber4Hold, panicMonitorChamber4)
 
-                .link(buttonChamber2Green,  underwaterControl)
+                .link(buttonChamber2Green, underwaterControl)
         ;
 
     }

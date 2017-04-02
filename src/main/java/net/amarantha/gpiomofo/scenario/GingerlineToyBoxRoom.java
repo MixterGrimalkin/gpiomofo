@@ -3,18 +3,18 @@ package net.amarantha.gpiomofo.scenario;
 import net.amarantha.gpiomofo.core.scenario.Scenario;
 import net.amarantha.gpiomofo.core.target.Target;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
-import net.amarantha.gpiomofo.service.http.entity.HttpCommand;
-import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.BrightnessRipple;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.CyclicFade;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.SolidColour;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.http.entity.HttpCommand;
+import net.amarantha.utils.osc.OscCommand;
 import net.amarantha.utils.properties.Property;
 import net.amarantha.utils.properties.PropertyGroup;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_TOYBOX;
-import static net.amarantha.gpiomofo.service.http.entity.HttpCommand.POST;
+import static net.amarantha.utils.http.entity.HttpCommand.POST;
 
 @PropertyGroup("Gingerline")
 public class GingerlineToyBoxRoom extends Scenario {

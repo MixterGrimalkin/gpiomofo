@@ -1,7 +1,8 @@
-package net.amarantha.gpiomofo.service.osc;
+package net.amarantha.gpiomofo.core.target;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.core.target.Target;
+import net.amarantha.utils.osc.OscCommand;
+import net.amarantha.utils.osc.OscService;
 
 public class OscTarget extends Target {
 

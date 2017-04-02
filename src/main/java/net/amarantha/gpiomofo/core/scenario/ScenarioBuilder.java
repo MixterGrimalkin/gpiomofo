@@ -12,10 +12,10 @@ import net.amarantha.gpiomofo.core.factory.TargetFactory;
 import net.amarantha.gpiomofo.core.factory.TriggerFactory;
 import net.amarantha.gpiomofo.core.target.Target;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
-import net.amarantha.gpiomofo.service.http.entity.HttpCommand;
-import net.amarantha.gpiomofo.service.midi.MidiCommand;
-import net.amarantha.gpiomofo.service.osc.OscCommand;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.http.entity.HttpCommand;
+import net.amarantha.utils.midi.MidiCommand;
+import net.amarantha.utils.osc.OscCommand;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.PropertyNotFoundException;
 
@@ -31,8 +31,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static net.amarantha.gpiomofo.core.Constants.SCENARIO;
-import static net.amarantha.gpiomofo.service.shell.Utility.bar;
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.bar;
+import static net.amarantha.utils.shell.Utility.log;
 
 @Singleton
 public class ScenarioBuilder {

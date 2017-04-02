@@ -1,6 +1,6 @@
 package net.amarantha.gpiomofo.display.lightboard;
 
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 public class NativeLightBoard extends NativeLightboardWrapper {
 

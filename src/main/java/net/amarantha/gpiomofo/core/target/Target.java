@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static java.lang.System.out;
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 public abstract class Target implements HasName {
 

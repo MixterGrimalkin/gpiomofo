@@ -6,15 +6,12 @@ import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.core.target.*;
 import net.amarantha.gpiomofo.service.audio.AudioTarget;
 import net.amarantha.gpiomofo.service.gpio.GpioTarget;
-import net.amarantha.gpiomofo.service.http.HttpTarget;
-import net.amarantha.gpiomofo.service.http.entity.HttpCommand;
-import net.amarantha.gpiomofo.service.midi.MidiCommand;
-import net.amarantha.gpiomofo.service.midi.MidiTarget;
-import net.amarantha.gpiomofo.service.osc.OscCommand;
-import net.amarantha.gpiomofo.service.osc.OscTarget;
 import net.amarantha.gpiomofo.service.pixeltape.PixelTapeTarget;
 import net.amarantha.gpiomofo.service.pixeltape.StopPixelTapeTarget;
 import net.amarantha.gpiomofo.service.shell.PythonTarget;
+import net.amarantha.utils.http.entity.HttpCommand;
+import net.amarantha.utils.midi.MidiCommand;
+import net.amarantha.utils.osc.OscCommand;
 
 import java.util.ArrayList;
 import java.util.List;

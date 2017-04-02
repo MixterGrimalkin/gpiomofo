@@ -1,6 +1,7 @@
 package net.amarantha.gpiomofo.service.shell;
 
 import net.amarantha.gpiomofo.core.target.Target;
+import net.amarantha.utils.shell.Utility;
 
 import java.util.Timer;
 import java.util.TimerTask;

@@ -7,7 +7,7 @@ import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.Property;
 import net.amarantha.utils.properties.PropertyGroup;
 
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 @PropertyGroup("WS281x")
 public class NeoPixelWS281X implements NeoPixel {

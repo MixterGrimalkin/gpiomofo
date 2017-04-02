@@ -7,7 +7,7 @@ import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.time.TimeGuard;
 
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 @Singleton
 public class PixelTapeMatrix {

@@ -6,7 +6,7 @@ import net.amarantha.gpiomofo.core.scenario.ScenarioBuilder;
 
 import java.util.Scanner;
 
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 @Singleton
 public class GpioMofo {

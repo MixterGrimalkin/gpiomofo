@@ -8,7 +8,7 @@ import net.amarantha.gpiomofo.core.trigger.Trigger;
 import java.util.LinkedList;
 import java.util.List;
 
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 @Singleton
 public class LinkFactory {

@@ -2,7 +2,7 @@ package net.amarantha.gpiomofo.display.lightboard;
 
 import net.amarantha.utils.colour.RGB;
 
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 /**
  * Simple implementation of a colour LightBoard that dumps lightboard state to the console

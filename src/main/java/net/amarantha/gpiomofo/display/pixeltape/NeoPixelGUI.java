@@ -16,7 +16,7 @@ import net.amarantha.utils.properties.PropertyGroup;
 import net.amarantha.utils.time.TimeGuard;
 
 import static javafx.scene.paint.Color.color;
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 @PropertyGroup("NeoPixelGUI")
 public class NeoPixelGUI implements NeoPixel {

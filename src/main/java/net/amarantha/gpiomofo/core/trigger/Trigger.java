@@ -9,7 +9,7 @@ import net.amarantha.utils.time.Now;
 import java.util.LinkedList;
 import java.util.List;
 
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 public class Trigger implements HasName {
 

@@ -13,7 +13,7 @@ import net.amarantha.utils.properties.PropertyGroup;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 @Singleton
 @PropertyGroup("LightSurface")

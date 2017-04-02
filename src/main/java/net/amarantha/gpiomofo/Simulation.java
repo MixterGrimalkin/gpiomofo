@@ -8,8 +8,8 @@ import net.amarantha.gpiomofo.core.SimulationModule;
 
 import static net.amarantha.gpiomofo.core.Constants.HELP_TEXT;
 import static net.amarantha.gpiomofo.core.Constants.LOGO;
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
 import static net.amarantha.utils.properties.PropertiesService.processArgs;
+import static net.amarantha.utils.shell.Utility.log;
 
 public class Simulation extends Application {
 

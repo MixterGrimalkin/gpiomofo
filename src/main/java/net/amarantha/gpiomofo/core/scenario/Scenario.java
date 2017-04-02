@@ -7,15 +7,15 @@ import net.amarantha.gpiomofo.core.factory.TriggerFactory;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.touch.TouchSensor;
-import net.amarantha.gpiomofo.service.midi.MidiService;
 import net.amarantha.gpiomofo.service.pixeltape.PixelTape;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.gpiomofo.webservice.WebService;
+import net.amarantha.utils.midi.MidiService;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.time.Now;
 
 import static net.amarantha.gpiomofo.core.Constants.WITH_SERVER;
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 public class Scenario {
 

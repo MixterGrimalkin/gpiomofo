@@ -2,7 +2,6 @@ package net.amarantha.gpiomofo;
 
 import com.google.inject.Inject;
 import com.googlecode.guicebehave.Expected;
-import com.illposed.osc.OSCMessage;
 import net.amarantha.gpiomofo.core.factory.LinkFactory;
 import net.amarantha.gpiomofo.core.factory.TargetFactory;
 import net.amarantha.gpiomofo.core.factory.TriggerFactory;
@@ -16,22 +15,24 @@ import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 import net.amarantha.gpiomofo.service.gpio.GpioTarget;
 import net.amarantha.gpiomofo.service.gpio.GpioTrigger;
 import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeTrigger;
-import net.amarantha.gpiomofo.service.http.HttpService;
-import net.amarantha.gpiomofo.service.http.HttpServiceMock;
-import net.amarantha.gpiomofo.service.http.entity.HttpCommand;
-import net.amarantha.gpiomofo.service.midi.MidiCommand;
-import net.amarantha.gpiomofo.service.midi.MidiService;
-import net.amarantha.gpiomofo.service.midi.MidiServiceMock;
-import net.amarantha.gpiomofo.service.osc.OscCommand;
-import net.amarantha.gpiomofo.service.osc.OscService;
-import net.amarantha.gpiomofo.service.osc.OscServiceMock;
 import net.amarantha.gpiomofo.service.task.TaskService;
 import net.amarantha.gpiomofo.webservice.TriggerResource;
+import net.amarantha.utils.http.HttpService;
+import net.amarantha.utils.http.HttpServiceMock;
+import net.amarantha.utils.http.entity.HttpCommand;
+import net.amarantha.utils.midi.MidiCommand;
+import net.amarantha.utils.midi.MidiService;
+import net.amarantha.utils.midi.MidiServiceMock;
+import net.amarantha.utils.osc.OscCommand;
+import net.amarantha.utils.osc.OscService;
+import net.amarantha.utils.osc.OscServiceMock;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.time.Now;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+
+import java.util.ArrayList;
 
 import static com.pi4j.io.gpio.PinPullResistance.OFF;
 import static org.junit.Assert.*;
@@ -246,7 +247,7 @@ public class TestBase {
     }
 
     void when_fire_osc_command_$1(OscCommand command) {
-        ((OscServiceMock)osc).receive(command.getAddress(), new OSCMessage("/"+command.getAddress()));
+        ((OscServiceMock)osc).receive(command.getAddress(), new ArrayList<>() );
     }
 
     void when_time_is_$1(String time) {

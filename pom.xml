@@ -136,6 +136,13 @@
             <version>1.0</version>
         </dependency>
 
+        <!-- OSC -->
+        <dependency>
+            <groupId>com.illposed.osc</groupId>
+            <artifactId>javaosc-core</artifactId>
+            <version>0.3</version>
+        </dependency>
+
         <!-- Audio System -->
         <dependency>
             <groupId>com.googlecode.soundlibs</groupId>

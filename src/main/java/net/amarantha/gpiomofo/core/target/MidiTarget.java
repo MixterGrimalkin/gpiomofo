@@ -1,7 +1,8 @@
-package net.amarantha.gpiomofo.service.midi;
+package net.amarantha.gpiomofo.core.target;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.core.target.Target;
+import net.amarantha.utils.midi.MidiCommand;
+import net.amarantha.utils.midi.MidiService;
 
 public class MidiTarget extends Target {
 

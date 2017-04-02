@@ -18,7 +18,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import static net.amarantha.gpiomofo.service.shell.Utility.log;
+import static net.amarantha.utils.shell.Utility.log;
 
 @Singleton
 public class Gui {

@@ -5,7 +5,7 @@ import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
 import net.amarantha.gpiomofo.core.target.Target;
 import net.amarantha.gpiomofo.core.trigger.Trigger;
-import net.amarantha.gpiomofo.service.midi.MidiCommand;
+import net.amarantha.utils.midi.MidiCommand;
 import org.junit.runner.RunWith;
 
 import static javax.sound.midi.ShortMessage.*;
