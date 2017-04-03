@@ -1,7 +1,6 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.core.scenario.Scenario;
-import net.amarantha.gpiomofo.core.target.Target;
+import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.SolidColourWithWhite;
 import net.amarantha.utils.colour.RGBW;
 

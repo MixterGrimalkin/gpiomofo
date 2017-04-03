@@ -38,10 +38,10 @@ public class WebService {
                 rc.register(LoggingFilter.class);
             }
             server = GrizzlyHttpServerFactory.createHttpServer(URI.create(fullUri), rc);
-            System.out.println("Web Service Online @ " + fullUri);
+            System.out.println("Web AbstractService Online @ " + fullUri);
             running = true;
         } catch ( Exception e ) {
-            System.out.println("Could not start Web Service!");
+            System.out.println("Could not start Web AbstractService!");
             e.printStackTrace();
         }
 

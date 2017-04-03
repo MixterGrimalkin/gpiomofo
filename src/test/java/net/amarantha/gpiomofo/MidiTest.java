@@ -3,8 +3,8 @@ package net.amarantha.gpiomofo;
 import com.googlecode.guicebehave.Modules;
 import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
-import net.amarantha.gpiomofo.core.target.Target;
-import net.amarantha.gpiomofo.core.trigger.Trigger;
+import net.amarantha.gpiomofo.target.Target;
+import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.utils.midi.MidiCommand;
 import org.junit.runner.RunWith;
 

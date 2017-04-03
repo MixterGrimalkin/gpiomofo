@@ -1,6 +1,6 @@
 package net.amarantha.gpiomofo.service.pixeltape.pattern;
 
-import net.amarantha.gpiomofo.service.pixeltape.PixelTapeTarget;
+import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.colour.RGBW;
 

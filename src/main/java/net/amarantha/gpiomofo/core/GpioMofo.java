@@ -2,7 +2,7 @@ package net.amarantha.gpiomofo.core;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.core.scenario.ScenarioBuilder;
+import net.amarantha.gpiomofo.scenario.ScenarioBuilder;
 
 import java.util.Scanner;
 

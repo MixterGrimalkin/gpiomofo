@@ -27,14 +27,18 @@ public class GpioServiceGUI extends GpioServiceMock {
     private Stage inputWindow;
     private Stage outputWindow;
 
+    public GpioServiceGUI() {
+        super("Gpio Service GUI");
+    }
+
     @Inject
     public GpioServiceGUI(Gui gui) {
+        super("Gpio Service GUI");
         this.gui = gui;
     }
 
     @Override
-    public void start(long period) {
-
+    public void onStart() {
         if (gui != null) {
             inputWindow = gui.addStage("Input GPIO");
             buildButtonContainer(inputWindow, inputButtonContainer);
@@ -46,8 +50,7 @@ public class GpioServiceGUI extends GpioServiceMock {
 
             redrawGui();
         }
-
-        super.start(period);
+        super.onStart();
     }
 
     private void buildButtonContainer(Stage window, HBox container) {

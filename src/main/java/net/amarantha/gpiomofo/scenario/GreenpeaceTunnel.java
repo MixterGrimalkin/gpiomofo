@@ -1,10 +1,9 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.core.annotation.Named;
-import net.amarantha.gpiomofo.core.annotation.Parameter;
-import net.amarantha.gpiomofo.core.scenario.Scenario;
-import net.amarantha.gpiomofo.core.trigger.Trigger;
+import net.amarantha.gpiomofo.annotation.Named;
+import net.amarantha.gpiomofo.annotation.Parameter;
+import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.display.animation.AnimationService;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;

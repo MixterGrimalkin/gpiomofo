@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.Property;
@@ -28,7 +29,7 @@ public class PixelTape {
     // -------------------------------------------------------------------------------------------
     // Patterns must be added before starting PixelTape
     // -------------------------------------------------------------------------------------------
-    PixelTape addPattern(PixelTapeTarget pattern) {
+    public PixelTape addPattern(PixelTapeTarget pattern) {
         patterns.add(pattern);
         totalPixels = Math.max(totalPixels, pattern.getStartPixel()+pattern.getPixelCount());
         return this;

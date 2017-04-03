@@ -3,7 +3,7 @@ package net.amarantha.gpiomofo.service.pixeltape.pattern;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.pixeltape.PixelTape;
-import net.amarantha.gpiomofo.service.pixeltape.PixelTapeTarget;
+import net.amarantha.gpiomofo.target.PixelTapeTarget;
 
 public class FadeToBlack extends PixelTapeTarget {
 

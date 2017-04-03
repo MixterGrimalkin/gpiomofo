@@ -1,6 +1,6 @@
 package net.amarantha.gpiomofo.service.gpio.touch;
 
-import net.amarantha.gpiomofo.core.trigger.Trigger;
+import net.amarantha.gpiomofo.trigger.Trigger;
 
 import javax.inject.Inject;
 import java.util.HashMap;

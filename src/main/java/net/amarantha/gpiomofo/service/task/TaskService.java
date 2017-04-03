@@ -39,7 +39,7 @@ public class TaskService {
     }
 
     public void start() {
-        System.out.println("Starting Task Service...");
+        System.out.println("Starting Task AbstractService...");
         run = true;
         taskThread = new Thread() {
             @Override
@@ -53,7 +53,7 @@ public class TaskService {
     }
 
     public void stop() {
-        System.out.println("Stopping Task Service...");
+        System.out.println("Stopping Task AbstractService...");
         run = false;
         taskThread = null;
     }

@@ -11,9 +11,13 @@ public class GpioServiceMock extends GpioService {
     protected Map<Integer, Boolean> inputStates = new HashMap<>();
     protected Map<Integer, Boolean> outputStates = new HashMap<>();
 
-//    public GpioServiceMock() {
-//        super("Gpio Service Mock");
-//    }
+    public GpioServiceMock(String name) {
+        super(name);
+    }
+
+    public GpioServiceMock() {
+        this("Gpio Service Mock");
+    }
 
     ////////////////////
     // Simulated GPIO //

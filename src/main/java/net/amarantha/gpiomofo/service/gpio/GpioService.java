@@ -2,12 +2,22 @@ package net.amarantha.gpiomofo.service.gpio;
 
 import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.PinState;
+import net.amarantha.gpiomofo.service.AbstractService;
+import net.amarantha.utils.properties.Property;
+import net.amarantha.utils.properties.PropertyGroup;
 
 import java.util.*;
 
 import static java.lang.System.currentTimeMillis;
 
-public abstract class GpioService {
+@PropertyGroup("GpioService")
+public abstract class GpioService extends AbstractService {
+
+    public GpioService(String name) {
+        super(name);
+    }
+
+    @Property("PinScanInterval") private int scanInterval = 10;
 
     protected List<Integer> digitalInputs = new ArrayList<>();
     protected List<Integer> digitalOutputs = new ArrayList<>();
@@ -160,33 +170,29 @@ public abstract class GpioService {
 
     private Timer monitorTimer;
 
-    public void start() {
-        start(DEFAULT_SCAN_PERIOD);
-    }
-
-    public void start(long period) {
-        System.out.println("Starting GPIO Service...");
+    @Override
+    public void onStart() {
         stopInputMonitor();
         monitorTimer = new Timer();
         monitorTimer.schedule(new TimerTask() {
             @Override public void run() {
                 scanPins();
             }
-        }, 0, period);
+        }, 0, scanInterval);
+    }
+
+    @Override
+    public void onStop() {
+        stopInputMonitor();
+        for ( Integer pinNumber : digitalOutputs ) {
+            write(pinNumber, false);
+        }
     }
 
     public void stopInputMonitor() {
         if ( monitorTimer!=null ) {
             monitorTimer.cancel();
             monitorTimer = null;
-        }
-    }
-
-    public void stop() {
-        System.out.println("Stopping GPIO Service...");
-        stopInputMonitor();
-        for ( Integer pinNumber : digitalOutputs ) {
-            write(pinNumber, false);
         }
     }
 
@@ -256,7 +262,6 @@ public abstract class GpioService {
     // Constants //
     ///////////////
 
-    private static final int                DEFAULT_SCAN_PERIOD = 10;
     private static final boolean            DEFAULT_OUTPUT_STATE = false;
     private static final PinPullResistance  DEFAULT_PULL_RESISTANCE = PinPullResistance.PULL_DOWN;
 

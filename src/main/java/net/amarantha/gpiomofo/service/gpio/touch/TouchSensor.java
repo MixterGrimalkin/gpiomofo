@@ -1,10 +1,10 @@
 package net.amarantha.gpiomofo.service.gpio.touch;
 
-import net.amarantha.gpiomofo.service.Service;
+import net.amarantha.gpiomofo.service.AbstractService;
 
 import java.util.*;
 
-public abstract class TouchSensor extends Service {
+public abstract class TouchSensor extends AbstractService {
 
     protected Map<Integer, Boolean> lastStates = new HashMap<>();
     protected Map<Integer, List<TouchListener>> allListeners = new HashMap<>();
