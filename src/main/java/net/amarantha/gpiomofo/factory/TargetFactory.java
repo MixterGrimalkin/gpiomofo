@@ -3,12 +3,13 @@ package net.amarantha.gpiomofo.factory;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.service.audio.AudioTarget;
-import net.amarantha.gpiomofo.service.shell.PythonTarget;
+import net.amarantha.gpiomofo.target.AudioTarget;
+import net.amarantha.gpiomofo.target.ShellTarget;
 import net.amarantha.gpiomofo.target.*;
 import net.amarantha.utils.http.entity.HttpCommand;
-import net.amarantha.utils.midi.MidiCommand;
-import net.amarantha.utils.osc.OscCommand;
+import net.amarantha.utils.midi.entity.MidiCommand;
+import net.amarantha.utils.osc.entity.OscCommand;
+import net.amarantha.utils.string.StringMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,22 +23,6 @@ public class TargetFactory extends Factory<Target> {
         super("Target");
     }
 
-    private boolean gpioUsed;
-    private boolean midiUsed;
-    private boolean pixelTapeUsed;
-
-    public boolean isGpioUsed() {
-        return gpioUsed;
-    }
-
-    public boolean isMidiUsed() {
-        return midiUsed;
-    }
-
-    public boolean isPixelTapeUsed() {
-        return pixelTapeUsed;
-    }
-
     //////////
     // GPIO //
     //////////
@@ -46,17 +31,13 @@ public class TargetFactory extends Factory<Target> {
         return gpio(getNextName("Gpio"+outputPin), outputPin, outputState);
     }
 
-    public GpioTarget gpio(String name, int outputPin, Boolean outputState) {
-
-        gpioUsed = true;
-
-        GpioTarget target =
-            injector.getInstance(GpioTarget.class)
-                .outputPin(outputPin, outputState);
-
-        register(name, target);
-
-        return target;
+    public GpioTarget gpio(String name, int pin, Boolean activeState) {
+        return create(name, GpioTarget.class,
+            new StringMap()
+                .add("pin", pin)
+                .add("activeState", activeState)
+            .get()
+        );
     }
 
     //////////
@@ -76,19 +57,12 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public HttpTarget http(String name, HttpCommand onCommand, HttpCommand offCommand) {
-
-        HttpTarget target =
-            injector.getInstance(HttpTarget.class)
-                .onCommand(onCommand)
-                .offCommand(offCommand);
-
-        if ( offCommand==null ) {
-            target.oneShot(true);
-        }
-
-        register(name, target);
-
-        return target;
+        return create(name, HttpTarget.class,
+                new StringMap()
+                    .add("onCommand", onCommand)
+                    .add("offCommand", offCommand)
+                .get()
+        );
     }
 
     //////////
@@ -108,21 +82,12 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public MidiTarget midi(String name, MidiCommand onCommand, MidiCommand offCommand) {
-
-        midiUsed = true;
-
-        MidiTarget target =
-            injector.getInstance(MidiTarget.class)
-                .onCommand(onCommand)
-                .offCommand(offCommand);
-
-        if ( offCommand==null ) {
-            target.oneShot(true);
-        }
-
-        register(name, target);
-
-        return target;
+        return create(name, MidiTarget.class,
+            new StringMap()
+                .add("onCommand", onCommand)
+                .add("offCommand", offCommand)
+            .get()
+        );
     }
 
     /////////
@@ -142,19 +107,12 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public OscTarget osc(String name, OscCommand onCommand, OscCommand offCommand) {
-
-        OscTarget target =
-            injector.getInstance(OscTarget.class)
-                .onCommand(onCommand)
-                .offCommand(offCommand);
-
-        if ( offCommand==null ) {
-            target.oneShot(true);
-        }
-
-        register(name, target);
-
-        return target;
+        return create(name, OscTarget.class,
+            new StringMap()
+                .add("onCommand", onCommand)
+                .add("offCommand", offCommand)
+            .get()
+        );
     }
 
     ///////////
@@ -171,39 +129,31 @@ public class TargetFactory extends Factory<Target> {
 
     public AudioTarget audio(String name, String filename) {
         return audio(name, filename, false);
-
     }
 
     public AudioTarget audio(String name, String filename, boolean loop) {
-
-        AudioTarget target =
-            injector.getInstance(AudioTarget.class)
-                .setAudioFile(filename)
-                .loop(loop);
-
-        register(name, target);
-
-        return target;
+        return create(name, AudioTarget.class,
+            new StringMap()
+                .add("filename", filename)
+                .add("loop", loop)
+            .get()
+        );
     }
 
     ////////////
     // Python //
     ////////////
 
-    public PythonTarget python(String script) {
-        return python(getNextName("Python"), script);
+    public ShellTarget shell(String script) {
+        return shell(getNextName("Shell"), script);
     }
 
-    public PythonTarget python(String name, String script) {
-
-        PythonTarget target =
-            injector.getInstance(PythonTarget.class)
-                .scriptFile(script);
-
-        register(name, target);
-
-        return target;
-
+    public ShellTarget shell(String name, String command) {
+        return create(name, ShellTarget.class,
+            new StringMap()
+                .add("command", command)
+            .get()
+        );
     }
 
     /////////////
@@ -215,13 +165,7 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public ChainBuilder chain(String name) {
-
-        ChainedTarget target =
-            injector.getInstance(ChainedTarget.class);
-
-        register(name, target);
-
-        return new ChainBuilder(target);
+        return new ChainBuilder(create(name, ChainedTarget.class));
     }
 
     public class ChainBuilder {
@@ -246,9 +190,7 @@ public class TargetFactory extends Factory<Target> {
     ////////////
 
     public QueuedTarget queue(String name) {
-        QueuedTarget target = injector.getInstance(QueuedTarget.class);
-        register(name, target);
-        return target;
+        return create(name, QueuedTarget.class);
     }
 
     public QueuedTarget queue(Target... ts) {
@@ -273,15 +215,8 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public QueueResetTarget queueReset(String name, QueuedTarget t) {
-
-        QueueResetTarget target =
-            injector.getInstance(QueueResetTarget.class)
-                .queuedTarget(t);
-
+        QueueResetTarget target = create(name, QueueResetTarget.class).queuedTarget(t);
         target.oneShot(true);
-
-        register(name, target);
-
         return target;
     }
 
@@ -334,17 +269,9 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public <P extends PixelTapeTarget> P pixelTape(String name, Class<P> clazz) {
-
-        pixelTapeUsed = true;
-
-        P target = injector.getInstance(clazz);
-
+        P target = create(name, clazz);
         target.oneShot(true);
-
-        register(name, target);
-
         return target;
-
     }
 
     public StopPixelTapeTarget stopPixelTape() {
@@ -352,16 +279,8 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public StopPixelTapeTarget stopPixelTape(String name) {
-
-        pixelTapeUsed = true;
-
-        StopPixelTapeTarget target =
-            injector.getInstance(StopPixelTapeTarget.class);
-
+        StopPixelTapeTarget target = create(name, StopPixelTapeTarget.class);
         target.oneShot(true);
-
-        register(name, target);
-
         return target;
     }
 

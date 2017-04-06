@@ -9,50 +9,50 @@ Parameters:
 
 Triggers:
   PIR1:
-    type: GPIO
+    type: Gpio
     pin: 0
     resistance: PULL_DOWN
     triggerState: true
   PIR2:
-    type: GPIO
+    type: Gpio
     pin: 1
     resistance: PULL_DOWN
     triggerState: true
   PIR3:
-    type: GPIO
+    type: Gpio
     pin: 2
     resistance: PULL_DOWN
     triggerState: true
   PIR4:
-    type: GPIO
+    type: Gpio
     pin: 3
     resistance: PULL_DOWN
     triggerState: true
   PIR5:
-    type: GPIO
+    type: Gpio
     pin: 4
     resistance: PULL_DOWN
     triggerState: true
 
 Targets:
   H1:
-    type: HTTP
+    type: Http
     onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR1/fire
     offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR1/cancel
   H2:
-    type: HTTP
+    type: Http
     onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR2/fire
     offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR2/cancel
   H3:
-    type: HTTP
+    type: Http
     onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR3/fire
     offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR3/cancel
   H4:
-    type: HTTP
+    type: Http
     onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR4/fire
     offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR4/cancel
   H5:
-    type: HTTP
+    type: Http
     onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR5/fire
     offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR5/cancel
 

@@ -5,7 +5,7 @@ import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.utils.osc.OscCommand;
+import net.amarantha.utils.osc.entity.OscCommand;
 import org.junit.runner.RunWith;
 
 @RunWith(StoryRunner.class) @Modules(TestModule.class)

@@ -5,10 +5,10 @@ import com.googlecode.guicebehave.Modules;
 import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
 import com.pi4j.io.gpio.PinPullResistance;
-import net.amarantha.gpiomofo.factory.ServiceFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
 import net.amarantha.gpiomofo.trigger.GpioTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.utils.service.ServiceFactory;
 import net.amarantha.utils.string.StringUtils;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -34,20 +34,20 @@ public class ServiceInjectionTest {
     public void testServiceInjection() {
         Trigger t = new GpioTrigger();
         assertNull(reflectiveGet(t, "gpio"));
-        services.inject(t);
+        services.injectServices(t);
         assertNotNull(reflectiveGet(t, "gpio"));
     }
 
     @Story
     public void testTriggerFactory() {
         GpioTrigger t =
-                triggers.create(GpioTrigger.class, asMap("pin=1, resistance=PULL_UP, triggerState=true, holdTime=1234"));
+                triggers.create(GpioTrigger.class, asMap("pin=1; resistance=PULL_UP; triggerState=true; holdTime=1234"));
         assertNotNull(t);
         assertNotNull(reflectiveGet(t, "gpio"));
-        assertEquals(1, t.getPinNumber());
-        assertEquals(PinPullResistance.PULL_UP, t.getResistance());
-        assertEquals(true, t.getTriggerState());
-        assertEquals(1234, t.getHoldTime());
+        assertEquals(1, ((Integer)reflectiveGet(t, "pinNumber")).intValue());
+        assertEquals(PinPullResistance.PULL_UP, reflectiveGet(t, "resistance"));
+        assertEquals(true, reflectiveGet(t, "triggerState"));
+        assertEquals(1234, ((Integer)reflectiveGet(t, "holdTime")).intValue());
     }
 
 

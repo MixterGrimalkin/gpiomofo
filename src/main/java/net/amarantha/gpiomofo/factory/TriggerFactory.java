@@ -4,53 +4,26 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.pi4j.io.gpio.PinPullResistance;
-import net.amarantha.gpiomofo.annotation.Parameter;
-import net.amarantha.gpiomofo.trigger.*;
-import net.amarantha.gpiomofo.service.gpio.touch.TouchTrigger;
-import net.amarantha.gpiomofo.service.gpio.touch.TouchTriggerSet;
+import net.amarantha.gpiomofo.trigger.TouchTrigger;
+import net.amarantha.gpiomofo.trigger.TouchTriggerSet;
 import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeTrigger;
+import net.amarantha.gpiomofo.trigger.*;
+import net.amarantha.utils.properties.PropertiesService;
+import net.amarantha.utils.service.ServiceFactory;
+import net.amarantha.utils.string.StringMap;
 
-import java.util.Map;
-
-import static net.amarantha.utils.reflection.ReflectionUtils.iterateAnnotatedFields;
 import static net.amarantha.utils.reflection.ReflectionUtils.reflectiveSet;
+import static net.amarantha.utils.string.StringUtils.asMap;
 
 @Singleton
 public class TriggerFactory extends Factory<Trigger> {
 
     @Inject private Injector injector;
     @Inject private ServiceFactory services;
+    @Inject private PropertiesService props;
 
     public TriggerFactory() {
         super("Trigger");
-    }
-
-    private boolean gpioUsed;
-    private boolean touchUsed;
-
-    public boolean isGpioUsed() {
-        return gpioUsed;
-    }
-
-    public boolean isTouchUsed() {
-        return touchUsed;
-    }
-
-    public <T extends Trigger> T create(Class<T> triggerClass, Map<String, String> config) {
-        return create(getNextName(), triggerClass, config);
-    }
-
-    public <T extends Trigger> T create(String name, Class<T> triggerClass, Map<String, String> config) {
-        T trigger = injector.getInstance(triggerClass);
-        services.inject(trigger);
-        iterateAnnotatedFields(trigger, Parameter.class,
-                (field, annotation) ->
-                        reflectiveSet(trigger, field, config.get(annotation.value()),
-                            (type, value) ->
-                                    type==PinPullResistance.class ? PinPullResistance.valueOf(value) : null)
-        );
-        register(name, trigger);
-        return trigger;
     }
 
     //////////
@@ -62,16 +35,13 @@ public class TriggerFactory extends Factory<Trigger> {
     }
 
     public GpioTrigger gpio(String name, int pinNumber, PinPullResistance resistance, boolean triggerState) {
-
-        gpioUsed = true;
-
-        GpioTrigger trigger = injector.getInstance(GpioTrigger.class);
-        services.inject(trigger);
-        trigger.setTriggerPin(pinNumber, resistance, triggerState);
-
-        register(name, trigger);
-
-        return trigger;
+        return create(name, GpioTrigger.class,
+            new StringMap()
+                .add("pin", pinNumber)
+                .add("resistance", resistance.name())
+                .add("triggerState", triggerState)
+            .get()
+        );
     }
 
     ///////////
@@ -83,17 +53,12 @@ public class TriggerFactory extends Factory<Trigger> {
     }
 
     public TouchTrigger touch(String name, int pinNumber, boolean triggerState) {
-
-        touchUsed = true;
-
-        TouchTrigger trigger =
-                injector.getInstance(TouchTrigger.class)
-                        .setPin(pinNumber, triggerState);
-
-        register(name, trigger);
-
-        return trigger;
-
+        return create(name, TouchTrigger.class,
+            new StringMap()
+                .add("pin", pinNumber)
+                .add("triggerState", triggerState)
+                .get()
+        );
     }
 
     public TouchTriggerSet touchSet(int leftPin, int rightPin) {
@@ -101,8 +66,6 @@ public class TriggerFactory extends Factory<Trigger> {
     }
 
     public TouchTriggerSet touchSet(String name, int leftPin, int rightPin) {
-
-        touchUsed = true;
 
         TouchTriggerSet set =
                 injector.getInstance(TouchTriggerSet.class)
@@ -121,8 +84,6 @@ public class TriggerFactory extends Factory<Trigger> {
 
     }
 
-
-
     //////////
     // HTTP //
     //////////
@@ -132,13 +93,7 @@ public class TriggerFactory extends Factory<Trigger> {
     }
 
     public HttpTrigger http(String name) {
-
-        HttpTrigger trigger =
-            injector.getInstance(HttpTrigger.class);
-
-        register(name, trigger);
-
-        return trigger;
+        return create(name, HttpTrigger.class);
     }
 
     /////////
@@ -150,15 +105,12 @@ public class TriggerFactory extends Factory<Trigger> {
     }
 
     public OscTrigger osc(String name, int port, String address) {
-
-        OscTrigger trigger =
-            injector.getInstance(OscTrigger.class)
-                .setReceiver(port, address);
-
-        register(name, trigger);
-
-        return trigger;
-
+        return create(name, OscTrigger.class,
+            new StringMap()
+                .add("port", port)
+                .add("address", address)
+            .get()
+        );
     }
 
     ///////////////
@@ -170,14 +122,7 @@ public class TriggerFactory extends Factory<Trigger> {
     }
 
     public CompositeTrigger composite(String name, Trigger... triggers) {
-
-        CompositeTrigger trigger =
-            injector.getInstance(CompositeTrigger.class)
-                .addTriggers(triggers);
-
-        register(name, trigger);
-
-        return trigger;
+        return create(name, CompositeTrigger.class).addTriggers(triggers);
     }
 
     //////////////
@@ -189,14 +134,7 @@ public class TriggerFactory extends Factory<Trigger> {
     }
 
     public InvertedTrigger invert(String name, Trigger t) {
-
-        InvertedTrigger trigger =
-            injector.getInstance(InvertedTrigger.class)
-                .trigger(t);
-
-        register(name, trigger);
-
-        return trigger;
+        return create(name, InvertedTrigger.class, null).trigger(t);
     }
 
     ///////////
@@ -208,14 +146,7 @@ public class TriggerFactory extends Factory<Trigger> {
     }
 
     public RangeTrigger range(String name) {
-
-        RangeTrigger trigger =
-            injector.getInstance(RangeTrigger.class);
-
-        register(name, trigger);
-
-        return trigger;
-
+        return create(name, RangeTrigger.class);
     }
 
 }

@@ -11,18 +11,20 @@ import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeTrigger;
-import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.utils.task.TaskService;
 import net.amarantha.gpiomofo.webservice.TriggerResource;
 import net.amarantha.utils.http.HttpService;
 import net.amarantha.utils.http.HttpServiceMock;
 import net.amarantha.utils.http.entity.HttpCommand;
-import net.amarantha.utils.midi.MidiCommand;
 import net.amarantha.utils.midi.MidiService;
 import net.amarantha.utils.midi.MidiServiceMock;
-import net.amarantha.utils.osc.OscCommand;
+import net.amarantha.utils.midi.entity.MidiCommand;
 import net.amarantha.utils.osc.OscService;
 import net.amarantha.utils.osc.OscServiceMock;
+import net.amarantha.utils.osc.entity.OscCommand;
 import net.amarantha.utils.properties.PropertiesService;
+import net.amarantha.utils.service.Service;
+import net.amarantha.utils.service.ServiceFactory;
 import net.amarantha.utils.time.Now;
 import org.junit.After;
 import org.junit.Assert;
@@ -31,6 +33,7 @@ import org.junit.Before;
 import java.util.ArrayList;
 
 import static com.pi4j.io.gpio.PinPullResistance.OFF;
+import static net.amarantha.utils.reflection.ReflectionUtils.reflectiveGet;
 import static org.junit.Assert.*;
 
 public class TestBase {
@@ -39,10 +42,11 @@ public class TestBase {
 
     @Inject protected PropertiesService props;
 
-    @Inject protected GpioService gpio;
-    @Inject protected MidiService midi;
-    @Inject protected HttpService http;
-    @Inject protected OscService osc;
+    @Inject protected ServiceFactory services;
+    @Service protected GpioService gpio;
+    @Service protected MidiService midi;
+    @Service protected HttpService http;
+    @Service protected OscService osc;
 
     @Inject protected Now now;
     @Inject protected TaskService tasks;
@@ -53,21 +57,22 @@ public class TestBase {
 
     @Before
     public void given_system() {
+        services.injectServices(this);
         ((GpioServiceMock)gpio).reset();
         ((MidiServiceMock)midi).clearLastCommand();
         ((HttpServiceMock)http).clearLastCommand();
         ((OscServiceMock)osc).clearLastCommand();
         triggers.clearAll();
         targets.clearAll();
-        midi.start();
         now.setOffset(0L);
         tasks.reset();
+        services.startAll();
+        props.setProperty("HttpAsyncTargets", "false");
     }
 
     @After
     public void shutdown() {
-        midi.stop();
-        gpio.stop();
+        services.stopAll();
     }
 
     ///////////
@@ -76,7 +81,7 @@ public class TestBase {
 
     Trigger given_trigger_on_pin_$1(int pin) {
         GpioTrigger trigger = triggers.gpio(pin, OFF, true);
-        assertEquals(true, trigger.getTriggerState());
+        assertEquals(true, reflectiveGet(trigger, "triggerState"));
         return trigger;
     }
 
@@ -88,7 +93,7 @@ public class TestBase {
 
     Trigger given_inverted_trigger_on_pin_$1(int pin) {
         GpioTrigger trigger = triggers.gpio(pin, OFF, false);
-        assertEquals(false, trigger.getTriggerState());
+        assertEquals(false, reflectiveGet(trigger, "triggerState"));
         return trigger;
     }
 
@@ -113,8 +118,8 @@ public class TestBase {
         assertEquals(true, target.isFollowTrigger());
         assertEquals(false, target.isOneShot());
         assertEquals(true, target.getTriggerState());
-        assertEquals(true, target.getOutputState().booleanValue());
-        assertEquals(pin, target.getOutputPin());
+        assertEquals(true, target.getActiveState().booleanValue());
+        assertEquals(pin, target.getPinNumber());
         return target;
     }
 
@@ -160,7 +165,7 @@ public class TestBase {
 
     Target given_toggle_target_on_pin_$1(int pin) {
         GpioTarget target = targets.gpio(pin, null);
-        assertNull(target.getOutputState());
+        assertNull(target.getActiveState());
         return target;
     }
 

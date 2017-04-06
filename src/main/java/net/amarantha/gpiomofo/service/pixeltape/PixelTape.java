@@ -3,21 +3,20 @@ package net.amarantha.gpiomofo.service.pixeltape;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
-import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.utils.task.TaskService;
 import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
-import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyGroup;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
+import net.amarantha.utils.service.AbstractService;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import static net.amarantha.utils.shell.Utility.log;
-
 @Singleton
 @PropertyGroup("PixelTape")
-public class PixelTape {
+public class PixelTape extends AbstractService {
 
     private List<PixelTapeTarget> patterns = new LinkedList<>();
     private int totalPixels;
@@ -25,6 +24,10 @@ public class PixelTape {
     @Inject private PropertiesService props;
     @Inject private NeoPixel neoPixel;
     @Inject private TaskService tasks;
+
+    public PixelTape() {
+        super("Pixel Tape");
+    }
 
     // -------------------------------------------------------------------------------------------
     // Patterns must be added before starting PixelTape
@@ -38,15 +41,12 @@ public class PixelTape {
 
     @Property("TapeRefresh") private int tapeRefresh = 5;
 
-    public void start() {
-        log("Starting PixelTape...");
-        props.injectPropertiesOrExit(this);
+    public void onStart() {
         neoPixel.init(totalPixels);
         tasks.addRepeatingTask(this, tapeRefresh, this::render);
     }
 
-    public void stop() {
-        log("Stopping PixelTape...");
+    public void onStop() {
         neoPixel.close();
     }
 

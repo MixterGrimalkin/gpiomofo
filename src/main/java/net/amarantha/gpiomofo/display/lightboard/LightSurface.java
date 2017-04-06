@@ -3,12 +3,13 @@ package net.amarantha.gpiomofo.display.lightboard;
 import com.google.inject.Injector;
 import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.display.entity.Region;
-import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.utils.service.AbstractService;
+import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.properties.PropertiesService;
-import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyGroup;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -17,7 +18,7 @@ import static net.amarantha.utils.shell.Utility.log;
 
 @Singleton
 @PropertyGroup("LightSurface")
-public class LightSurface {
+public class LightSurface extends AbstractService {
 
     @Property("LayerCount") private int layerCount = 10;
     @Property("Width") private int width;
@@ -37,9 +38,12 @@ public class LightSurface {
     private Pattern[] layers = new Pattern[layerCount];
     private Region boardRegion;
 
-    public LightSurface init() {
+    public LightSurface() {
+        super("Light Surface");
+    }
 
-        log("Starting LightSurface....");
+    @Override
+    public void onStart() {
 
         props.injectPropertiesOrExit(this);
 
@@ -59,9 +63,10 @@ public class LightSurface {
         }
 
         tasks.addRepeatingTask("SurfaceRefresh", board.interval(), () -> board.update(composite().rgb()));
-
-        return this;
     }
+
+    @Override
+    protected void onStop() {}
 
     public Pattern composite() {
         Pattern result = new Pattern(width, height, false);

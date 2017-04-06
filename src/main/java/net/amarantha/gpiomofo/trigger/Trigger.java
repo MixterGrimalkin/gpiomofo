@@ -3,8 +3,10 @@ package net.amarantha.gpiomofo.trigger;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.annotation.Parameter;
-import net.amarantha.gpiomofo.factory.HasName;
-import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.gpiomofo.factory.entity.HasEnable;
+import net.amarantha.gpiomofo.factory.entity.HasName;
+import net.amarantha.utils.service.Service;
+import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.time.Now;
 
 import java.util.LinkedList;
@@ -12,12 +14,17 @@ import java.util.List;
 
 import static net.amarantha.utils.shell.Utility.log;
 
-public class Trigger implements HasName {
+public class Trigger implements HasName, HasEnable {
 
-    private boolean lastState;
-
-    @Inject private TaskService tasks;
     @Inject private Now now;
+
+    @Service private TaskService tasks;
+
+    @Parameter("holdTime") private Integer holdTime;
+
+    @Override
+    public void enable() {
+    }
 
     public void fire(boolean active) {
         lastState = active;
@@ -42,13 +49,6 @@ public class Trigger implements HasName {
         }
     }
 
-    @Parameter("holdTime")
-    private Integer holdTime;
-
-    public int getHoldTime() {
-        return holdTime==null ? 0 : holdTime;
-    }
-
     public Trigger setHoldTime(int holdTime) {
         this.holdTime = holdTime;
         return this;
@@ -57,6 +57,8 @@ public class Trigger implements HasName {
     public boolean isActive() {
         return lastState;
     }
+
+    private boolean lastState;
 
     ///////////////
     // Callbacks //

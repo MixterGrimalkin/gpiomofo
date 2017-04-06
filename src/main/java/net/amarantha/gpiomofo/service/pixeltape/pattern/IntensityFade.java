@@ -3,18 +3,20 @@ package net.amarantha.gpiomofo.service.pixeltape.pattern;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.target.PixelTapeTarget;
+import net.amarantha.utils.service.Service;
 import net.amarantha.utils.time.TimeGuard;
 
 public class IntensityFade extends PixelTapeTarget {
+
+    @Inject private TimeGuard guard;
+
+    @Inject private NeoPixel tape;
 
     private double intensity = 1.0;
     private double intensityDelta = 0.1;
 
     private double max = 1.0;
     private double min = 0.0;
-
-    @Inject private TimeGuard guard;
-    @Inject private NeoPixel tape;
 
     private int pause;
 

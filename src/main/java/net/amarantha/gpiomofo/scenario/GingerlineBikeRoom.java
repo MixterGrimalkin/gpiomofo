@@ -7,9 +7,9 @@ import net.amarantha.gpiomofo.service.pixeltape.pattern.IntensityFade;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.SlidingBars;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.http.entity.HttpCommand;
-import net.amarantha.utils.osc.OscCommand;
-import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyGroup;
+import net.amarantha.utils.osc.entity.OscCommand;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.*;
@@ -57,33 +57,6 @@ public class GingerlineBikeRoom extends Scenario {
     private Trigger buttonChamber3d;
     private Trigger buttonChamber3e;
 
-    @Override
-    public void setupTriggers() {
-
-        panicChamber2 = triggers.gpio("C2-Panic", 2, PULL_UP, false);
-        panicChamber2Hold = triggers.gpio("C2-Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);
-        panicChamber3 = triggers.gpio("C3-Panic", 3, PULL_UP, false);
-        panicChamber3Hold = triggers.gpio("C3-Panic-Hold", 3, PULL_UP, false).setHoldTime(1000);
-        panicChamber4 = triggers.gpio("C4-Panic", 4, PULL_UP, false);
-        panicChamber4Hold = triggers.gpio("C4-Panic-Hold", 4, PULL_UP, false).setHoldTime(1000);
-
-        buttonChamber2Green = triggers.gpio("C2-Button-Green", 5, PULL_UP, false).setHoldTime(holdTime);
-
-        oscPixelTape0 = triggers.osc("Tape-0", 53000, "bike-lights-0");
-        oscPixelTape1 = triggers.osc("Tape-1", 53000, "bike-lights-1");
-        oscPixelTape2 = triggers.osc("Tape-2", 53000, "bike-lights-2");
-        oscPixelTape3 = triggers.osc("Tape-3", 53000, "bike-lights-3");
-        oscPixelTape4 = triggers.osc("Tape-4", 53000, "bike-lights-4");
-        oscPixelTapeExit = triggers.osc("Tape-5", 53000, "bike-exit");
-
-        buttonChamber3a = triggers.gpio("C3-Button-A", 6, PULL_UP, false).setHoldTime(holdTime);
-        buttonChamber3b = triggers.gpio("C3-Button-B", 7, PULL_UP, false).setHoldTime(holdTime);
-        buttonChamber3c = triggers.gpio("C3-Button-C", 12, PULL_UP, false).setHoldTime(holdTime);
-        buttonChamber3d = triggers.gpio("C3-Button-D", 13, PULL_UP, false).setHoldTime(holdTime);
-        buttonChamber3e = triggers.gpio("C3-Button-E", 14, PULL_UP, false).setHoldTime(holdTime);
-
-    }
-
     private Target panicLightsChamber2;
     private Target panicMonitorChamber2;
     private Target panicLightsChamber3;
@@ -107,7 +80,29 @@ public class GingerlineBikeRoom extends Scenario {
     private Target bikeControl5;
 
     @Override
-    public void setupTargets() {
+    public void setup() {
+
+        panicChamber2 = triggers.gpio("C2-Panic", 2, PULL_UP, false);
+        panicChamber2Hold = triggers.gpio("C2-Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);
+        panicChamber3 = triggers.gpio("C3-Panic", 3, PULL_UP, false);
+        panicChamber3Hold = triggers.gpio("C3-Panic-Hold", 3, PULL_UP, false).setHoldTime(1000);
+        panicChamber4 = triggers.gpio("C4-Panic", 4, PULL_UP, false);
+        panicChamber4Hold = triggers.gpio("C4-Panic-Hold", 4, PULL_UP, false).setHoldTime(1000);
+
+        buttonChamber2Green = triggers.gpio("C2-Button-Green", 5, PULL_UP, false).setHoldTime(holdTime);
+
+        oscPixelTape0 = triggers.osc("Tape-0", 53000, "bike-lights-0");
+        oscPixelTape1 = triggers.osc("Tape-1", 53000, "bike-lights-1");
+        oscPixelTape2 = triggers.osc("Tape-2", 53000, "bike-lights-2");
+        oscPixelTape3 = triggers.osc("Tape-3", 53000, "bike-lights-3");
+        oscPixelTape4 = triggers.osc("Tape-4", 53000, "bike-lights-4");
+        oscPixelTapeExit = triggers.osc("Tape-5", 53000, "bike-exit");
+
+        buttonChamber3a = triggers.gpio("C3-Button-A", 6, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3b = triggers.gpio("C3-Button-B", 7, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3c = triggers.gpio("C3-Button-C", 12, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3d = triggers.gpio("C3-Button-D", 13, PULL_UP, false).setHoldTime(holdTime);
+        buttonChamber3e = triggers.gpio("C3-Button-E", 14, PULL_UP, false).setHoldTime(holdTime);
 
         panicLightsChamber2 = targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c2", 255));
         panicMonitorChamber2 = targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_UNDERWATER + "/fire", ""));
@@ -227,10 +222,6 @@ public class GingerlineBikeRoom extends Scenario {
                 .add(exit)
                 .build().oneShot(true);
 
-    }
-
-    @Override
-    public void setupLinks() {
 
         links
                 .link(oscPixelTape0, lightStop)

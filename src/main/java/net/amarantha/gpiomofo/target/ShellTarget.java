@@ -1,15 +1,15 @@
-package net.amarantha.gpiomofo.service.shell;
+package net.amarantha.gpiomofo.target;
 
+import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.utils.shell.Utility;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class PythonTarget extends Target {
+public class ShellTarget extends Target {
 
-    private Timer timer;
-    private Process shellProcess;
+    @Parameter("command") private String command;
 
     @Override
     protected void onActivate() {
@@ -37,19 +37,11 @@ public class PythonTarget extends Target {
         timer = null;
     }
 
-    private String scriptFile;
-
-    public PythonTarget scriptFile(String scriptFile) {
-        this.scriptFile = scriptFile;
-        return this;
-    }
-
-    public String getScriptFile() {
-        return scriptFile;
-    }
-
     private void fireProcess() {
-        Utility.executeCommand(new String[]{"python", scriptFile});
+        Utility.executeCommand(new String[]{command});
     }
+
+    private Timer timer;
+    private Process shellProcess;
 
 }

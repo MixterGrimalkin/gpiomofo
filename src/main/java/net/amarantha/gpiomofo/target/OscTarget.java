@@ -1,12 +1,23 @@
 package net.amarantha.gpiomofo.target;
 
-import com.google.inject.Inject;
-import net.amarantha.utils.osc.OscCommand;
+import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.utils.osc.OscService;
+import net.amarantha.utils.osc.entity.OscCommand;
+import net.amarantha.utils.service.Service;
 
 public class OscTarget extends Target {
 
-    @Inject private OscService osc;
+    @Service private OscService osc;
+
+    @Parameter("onCommand") private OscCommand onCommand;
+    @Parameter("offCommand") private OscCommand offCommand;
+
+    @Override
+    public void enable() {
+        if ( offCommand==null ) {
+            oneShot(true);
+        }
+    }
 
     @Override
     protected void onActivate() {
@@ -22,24 +33,4 @@ public class OscTarget extends Target {
         }
     }
 
-    private OscCommand onCommand;
-    private OscCommand offCommand;
-
-    public OscTarget onCommand(OscCommand command) {
-        onCommand = command;
-        return this;
-    }
-
-    public OscTarget offCommand(OscCommand command) {
-        offCommand = command;
-        return this;
-    }
-
-    public OscCommand getOnCommand() {
-        return onCommand;
-    }
-
-    public OscCommand getOffCommand() {
-        return offCommand;
-    }
 }

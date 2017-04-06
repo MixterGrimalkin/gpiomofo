@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.service.gpio.ultrasonic;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.utils.task.TaskService;
 
 import java.util.LinkedList;
 import java.util.List;

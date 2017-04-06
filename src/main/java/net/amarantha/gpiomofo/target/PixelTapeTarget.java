@@ -4,13 +4,15 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.service.pixeltape.PixelTape;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.service.Service;
 import net.amarantha.utils.time.TimeGuard;
 
 public abstract class PixelTapeTarget extends Target {
 
-    @Inject private PixelTape pixelTape;
-
     @Inject private TimeGuard guard;
+
+    @Service protected PixelTape pixelTape;
+
     private boolean forceRGB;
     private boolean requiresRender = true;
 

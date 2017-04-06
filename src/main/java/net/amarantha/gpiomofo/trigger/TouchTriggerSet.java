@@ -1,6 +1,8 @@
-package net.amarantha.gpiomofo.service.gpio.touch;
+package net.amarantha.gpiomofo.trigger;
 
-import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.factory.TriggerFactory;
+import net.amarantha.gpiomofo.service.gpio.touch.TouchSensor;
+import net.amarantha.utils.service.Service;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -23,16 +25,18 @@ import static java.lang.System.currentTimeMillis;
  */
 public class TouchTriggerSet {
 
-    @Inject private TouchSensorMPR121 touchSensorMpr121;
+    @Service private TouchSensor touchSensor;
 
-    @Inject private Trigger tapLeftTrigger;
-    @Inject private Trigger tapRightTrigger;
-    @Inject private Trigger holdLeftTrigger;
-    @Inject private Trigger holdRightTrigger;
-    @Inject private Trigger dblTapLeftTrigger;
-    @Inject private Trigger dblTapRightTrigger;
-    @Inject private Trigger swipeLeftTrigger;
-    @Inject private Trigger swipeRightTrigger;
+    @Inject private TriggerFactory triggers;
+
+    private Trigger tapLeftTrigger;
+    private Trigger tapRightTrigger;
+    private Trigger holdLeftTrigger;
+    private Trigger holdRightTrigger;
+    private Trigger dblTapLeftTrigger;
+    private Trigger dblTapRightTrigger;
+    private Trigger swipeLeftTrigger;
+    private Trigger swipeRightTrigger;
 
     private static final int LEFT = -1;
     private static final int RIGHT = 1;
@@ -52,8 +56,16 @@ public class TouchTriggerSet {
     }
 
     public TouchTriggerSet setPins(int left, int right) {
-        touchSensorMpr121.addListener(left, this::processLeft);
-        touchSensorMpr121.addListener(right, this::processRight);
+        tapLeftTrigger = triggers.create(Trigger.class);
+        tapRightTrigger = triggers.create(Trigger.class);
+        holdLeftTrigger = triggers.create(Trigger.class);
+        holdRightTrigger = triggers.create(Trigger.class);
+        dblTapLeftTrigger = triggers.create(Trigger.class);
+        dblTapRightTrigger = triggers.create(Trigger.class);
+        swipeLeftTrigger = triggers.create(Trigger.class);
+        swipeRightTrigger = triggers.create(Trigger.class);
+        touchSensor.addListener(left, this::processLeft);
+        touchSensor.addListener(right, this::processRight);
         return this;
     }
 

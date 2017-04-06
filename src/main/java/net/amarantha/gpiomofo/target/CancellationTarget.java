@@ -27,4 +27,5 @@ public class CancellationTarget extends Target {
         this.force = force;
         return this;
     }
+
 }

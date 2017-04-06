@@ -51,6 +51,8 @@ else
     echo "Uploading Scripts..."
     sshpass -p ${password} scp -r ../scripts pi@${ip}:gpiomofo
     sshpass -p ${password} scp ../src/main/*.sh pi@${ip}:gpiomofo
+    echo "Uploading Utility Libraries..."
+    sshpass -p ${password} scp ../target/gpiomofo/lib/amarantha*.jar pi@${ip}:gpiomofo/lib
     echo "Uploading Support Files..."
     sshpass -p ${password} scp ../config/default.properties pi@${ip}:gpiomofo/config
     sshpass -p ${password} scp ../scenarios/README.yaml pi@${ip}:gpiomofo/scenarios

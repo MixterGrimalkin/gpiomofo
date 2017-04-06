@@ -1,9 +1,11 @@
 package net.amarantha.gpiomofo.target;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.factory.HasName;
+import net.amarantha.gpiomofo.annotation.Parameter;
+import net.amarantha.gpiomofo.factory.entity.HasEnable;
+import net.amarantha.gpiomofo.factory.entity.HasName;
 import net.amarantha.gpiomofo.factory.TargetFactory;
-import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.time.Now;
 
 import java.util.Arrays;
@@ -13,7 +15,7 @@ import java.util.List;
 import static java.lang.System.out;
 import static net.amarantha.utils.shell.Utility.log;
 
-public abstract class Target implements HasName {
+public abstract class Target implements HasName, HasEnable {
 
     @Inject private TaskService tasks;
     @Inject private TargetFactory targets;
@@ -24,6 +26,11 @@ public abstract class Target implements HasName {
 
     public final boolean isActive() {
         return active;
+    }
+
+    @Override
+    public void enable() {
+
     }
 
     /////////////
@@ -126,10 +133,10 @@ public abstract class Target implements HasName {
     // Setup //
     ///////////
 
-    private boolean oneShot = false;
-    private boolean triggerState = true;
-    private boolean followTrigger = true;
-    private Long clearDelay = null;
+    @Parameter("oneShot") private boolean oneShot = false;
+    @Parameter("triggerState") private boolean triggerState = true;
+    @Parameter("followTrigger") private boolean followTrigger = true;
+    @Parameter("clearDelay") private Long clearDelay = null;
 
     public Target oneShot(boolean oneShot) {
         this.oneShot = oneShot;

@@ -1,49 +1,54 @@
 package net.amarantha.gpiomofo.target;
 
-import com.google.inject.Inject;
+import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
-import net.amarantha.gpiomofo.target.Target;
+import net.amarantha.utils.service.Service;
 
 public class GpioTarget extends Target {
 
-    @Inject private GpioService gpio;
+    @Service private GpioService gpio;
+
+    @Parameter("pin") private int pinNumber;
+    @Parameter("activeState") private Boolean activeState;
+
+    @Override
+    public void enable() {
+        if ( !gpio.isDigitalOutput(pinNumber) ) {
+            gpio.setupDigitalOutput(pinNumber, activeState != null && !activeState);
+        }
+    }
 
     @Override
     public void onActivate() {
-        if ( outputState!=null ) {
-            gpio.write(outputPin, outputState);
+        if ( activeState !=null ) {
+            gpio.write(pinNumber, activeState);
         } else {
-            gpio.toggle(outputPin);
+            gpio.toggle(pinNumber);
         }
     }
 
     @Override
     public void onDeactivate() {
-        if ( outputState!=null ) {
-            gpio.write(outputPin, !outputState);
+        if ( activeState !=null ) {
+            gpio.write(pinNumber, !activeState);
         } else {
-            gpio.toggle(outputPin);
+            gpio.toggle(pinNumber);
         }
     }
 
-    private int outputPin;
-    private Boolean outputState;
-
-    public GpioTarget outputPin(int pinNumber, Boolean outputState) {
-        if ( !gpio.isDigitalOutput(pinNumber) ) {
-            gpio.setupDigitalOutput(pinNumber, outputState != null && !outputState);
-        }
-        this.outputPin = pinNumber;
-        this.outputState = outputState;
+    public GpioTarget outputPin(int pinNumber, Boolean activeState) {
+        this.pinNumber = pinNumber;
+        this.activeState = activeState;
+        enable();
         return this;
     }
 
-    public int getOutputPin() {
-        return outputPin;
+    public int getPinNumber() {
+        return pinNumber;
     }
 
-    public Boolean getOutputState() {
-        return outputState;
+    public Boolean getActiveState() {
+        return activeState;
     }
 
 }

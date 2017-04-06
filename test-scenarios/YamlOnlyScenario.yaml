@@ -1,28 +1,28 @@
 Triggers:
   FirstTrigger:
-    type: GPIO
+    type: Gpio
     pin: 1
     resistance: PULL_DOWN
     triggerState: true
   SecondTrigger:
-    type: GPIO
+    type: Gpio
     pin: 2
     resistance: PULL_UP
     triggerState: true
     holdTime: 1540
   ThirdTrigger:
-    type: HTTP
+    type: Http
   FourthTrigger:
-    type: OSC
+    type: Osc
     port: 55
     address: testOsc
   CompTrig1:
-    type: GPIO
+    type: Gpio
     pin: 10
     resistance: PULL_UP
     triggerState: true
   CompTrig2:
-    type: GPIO
+    type: Gpio
     pin: 11
     resistance: PULL_UP
     triggerState: true
@@ -39,11 +39,11 @@ CompositeTriggers:
 
 Targets:
   FirstTarget:
-    type: GPIO
+    type: Gpio
     pin: 0
     activeState: true
   SecondTarget:
-    type: GPIO
+    type: Gpio
     pin: 3
     activeState: false
   ThirdTarget:
@@ -51,7 +51,7 @@ Targets:
     filename: SnootyBobs-MisterBastard.mp3
     loop: true
   FourthTarget:
-    type: HTTP
+    type: Http
     onCommand: GET|host.com:9000/resource?key=value&one=two
     offCommand: POST|host.org:5000/path/to?thing=thong|nicebody
     oneShot: true
@@ -59,18 +59,18 @@ Targets:
     followTrigger: false
     clearDelay: 100
   FifthTarget:
-    type: MIDI
+    type: Midi
     onCommand: NOTE_ON|5|64|100
     offCommand: CONTROL_CHANGE|16|64|0
   SixthTarget:
-    type: OSC
+    type: Osc
     onCommand: host.com:1234/path/to
     offCommand: host.org:4321/resource|127|0|0
   SeventhTarget:
-    type: Python
-    filename: funky.py
+    type: Shell
+    command: ./some-script.sh
   CompTarget:
-    type: GPIO
+    type: Gpio
     pin: 12
     activeState: true
 

@@ -3,9 +3,9 @@ package net.amarantha.gpiomofo.scenario;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.utils.http.entity.HttpCommand;
-import net.amarantha.utils.osc.OscCommand;
-import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyGroup;
+import net.amarantha.utils.osc.entity.OscCommand;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_GAMESHOW;
@@ -34,8 +34,20 @@ public class GingerlineGameShowRoom extends Scenario {
     private Trigger effectButton04;
     private Trigger effectButton05;
 
+    private Target panicTarget;
+    private Target panicHoldTarget;
+    private Target podiumTarget1;
+    private Target podiumTarget2;
+    private Target podiumTarget3;
+    private Target podiumTarget4;
+    private Target effectTarget01;
+    private Target effectTarget02;
+    private Target effectTarget03;
+    private Target effectTarget04;
+    private Target effectTarget05;
+
     @Override
-    public void setupTriggers() {
+    public void setup() {
 
         panicButton =       triggers.gpio("Panic",      0, PULL_UP, false);
         panicButtonHold =   triggers.gpio("Panic-Hold", 0, PULL_UP, false).setHoldTime(1000);
@@ -51,23 +63,6 @@ public class GingerlineGameShowRoom extends Scenario {
         effectButton04 =    triggers.gpio("FX04",       9, PULL_UP, false).setHoldTime(holdTime);
         effectButton05 =    triggers.gpio("FX05",       10, PULL_UP, false).setHoldTime(holdTime);
 
-    }
-
-    private Target panicTarget;
-    private Target panicHoldTarget;
-    private Target podiumTarget1;
-    private Target podiumTarget2;
-    private Target podiumTarget3;
-    private Target podiumTarget4;
-    private Target effectTarget01;
-    private Target effectTarget02;
-    private Target effectTarget03;
-    private Target effectTarget04;
-    private Target effectTarget05;
-
-    @Override
-    public void setupTargets() {
-
         panicTarget =       targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c1", 255));
         panicHoldTarget =   targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_GAMESHOW+"/fire", ""));
 
@@ -81,11 +76,6 @@ public class GingerlineGameShowRoom extends Scenario {
         effectTarget03 =    targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1107/start", 255));
         effectTarget04 =    targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1108/start", 255));
         effectTarget05 =    targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1109/start", 255));
-
-    }
-
-    @Override
-    public void setupLinks() {
 
         links
             .link(panicButton,      panicTarget)

@@ -3,7 +3,7 @@ package net.amarantha.gpiomofo.display.animation;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Animation;
-import net.amarantha.gpiomofo.service.task.TaskService;
+import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.time.TimeGuard;
 
 @Singleton

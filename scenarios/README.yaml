@@ -1,16 +1,17 @@
 # GpioMofo Scenario definition using YAML
 
 Parameters:
-  # @Property("Name") private Type value
-  # Allowed Types: String, Integer, Boolean, RGB, Class<?>
-  Name: value
+  # @Property("Name1") private Type value
+  # Allowed Types: String, Integer, Long, Double, Boolean, RGB, Class<?>
+  Name1: value1
+  Name2: value2
 
 Triggers:
 
   # Triggers are 'fired' or 'cancelled' by external events
   # @Named("NameOfTrigger") private Trigger myTrigger;
   NameOfTrigger:
-    type: GPIO / HTTP / OSC
+    type: Gpio / Http / Osc
     # Optional for all trigger types:
     holdTime: 500                             # trigger fired when held for 500ms (default 0)
 
@@ -18,7 +19,7 @@ Triggers:
   # 'Fired' when pin state changes to match trigger state
   # 'Cancelled' when pin state changes to the opposite state
   AGpioTrigger:
-    type: GPIO
+    type: Gpio
     pin: 0                                    # wiringPi pin numbers
     resistance: PULL_UP / PULL_DOWN / OFF
     triggerState: true / false                # true = trigger fired when pin state goes HIGH
@@ -26,13 +27,13 @@ Triggers:
   # HTTP Triggers
   # 'Fired' or 'Cancelled' by the appropriate incoming HTTP calls
   AnHttpTrigger:
-    type: HTTP                                # fired by calls to http://...:8001/gpiomofo/trigger/AnHttpTrigger/fire (or /cancel)
+    type: Http                                # fired by calls to http://...:8001/gpiomofo/trigger/AnHttpTrigger/fire (or /cancel)
 
   # OSC Triggers
   # 'Fired' by the appropriate incoming OSC command
   # This trigger type cannot be 'cancelled'
   AnOscTrigger:
-    type: OSC
+    type: Osc
     port: 5300
     address: someAddress
 
@@ -53,33 +54,32 @@ Targets:
   # A target can be 'activated' or 'deactivated'
   # @Named("NameOfTarget") private Trigger myTarget;
   NameOfTarget:
-    type: GPIO / HTTP / OSC / MIDI / Audio / Python
+    type: Gpio / Http / Osc / Midi / Audio / Shell
     # Optional for all target types:
     oneShot: true / false                     # true = target will never deactivate (default=false)
     triggerState: true / false                # true = activation matches trigger state (default=true)
     followTrigger: true / false               # true = target will deactivate when trigger goes false (default=true)
     clearDelay: 100                           # target will deactivate after 100ms (default none)
 
-  # When 'activated'
   AGpioTarget:
-    type: GPIO
+    type: Gpio
     pin: 1                                    # wiringPi pin numbers
     activeState: true / false / toggle        # toggle = pin output will invert when target is activated
 
   AnHttpTarget:
-    type: HTTP
+    type: Http
     onCommand: method|host:port/path?params|payload
     # Optional:
     offCommand: e.g. POST|somehost.net:8080/resource/location?key=value&thing=thong|nicebody
 
   AnOscTarget:
-    type: OSC
+    type: Osc
     onCommand: host:port/address|data1|data2|...
     # Optional:
     offCommand: e.g. somehost.net:53000/cue/start|127|64
 
   AMidiTarget:
-    type: MIDI
+    type: Midi
     onCommand: type|channel|data1|data2
     # Optional:
     offCommand: e.g. NOTE_ON|1|64|100
@@ -91,8 +91,8 @@ Targets:
     loop: true                                  # true = restart audio when finished (default=false)
 
   APythonTarget:
-    type: Python
-    filename: script_to_run.py
+    type: Shell
+    filename: ./command.sh
 
 
 Links:

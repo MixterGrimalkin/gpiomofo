@@ -27,7 +27,7 @@ public class WebService {
 
     public HttpServer start() {
 
-        System.out.println("Starting HTTP Server...");
+        System.out.println("Starting Web Server...");
 
         String ip = props.isArgumentPresent(LOCAL_IP) ? "127.0.0.1" : props.getIp().trim();
         String fullUri = "http://" + ip + ":8001/gpiomofo/";
@@ -38,10 +38,10 @@ public class WebService {
                 rc.register(LoggingFilter.class);
             }
             server = GrizzlyHttpServerFactory.createHttpServer(URI.create(fullUri), rc);
-            System.out.println("Web AbstractService Online @ " + fullUri);
+            System.out.println("Web Service Online @ " + fullUri);
             running = true;
         } catch ( Exception e ) {
-            System.out.println("Could not start Web AbstractService!");
+            System.out.println("Could not start Web Service!");
             e.printStackTrace();
         }
 
@@ -49,7 +49,7 @@ public class WebService {
     }
 
     public void stop() {
-        System.out.println("Stopping HTTP Server...");
+        System.out.println("Stopping Web Server...");
         if ( server!=null ) {
             server.shutdown();
         }

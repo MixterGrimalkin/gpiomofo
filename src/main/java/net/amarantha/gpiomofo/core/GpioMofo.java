@@ -2,7 +2,7 @@ package net.amarantha.gpiomofo.core;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.scenario.ScenarioBuilder;
+import net.amarantha.gpiomofo.factory.ScenarioBuilder;
 
 import java.util.Scanner;
 
@@ -21,14 +21,14 @@ public class GpioMofo {
     }
 
     public void start() {
-        builder.loadFromProperties().getScenario().start();
+        builder.loadScenario().getScenario().start();
         if ( !simulation ) {
             waitForEnter();
         }
     }
 
     private void waitForEnter() {
-        log(true, " (Press ENTER to quit)", true);
+        log(true, " (Press ENTER to quit) ", true);
         Scanner scanner = new Scanner(System.in);
         while (!scanner.hasNextLine()) {}
         stop();

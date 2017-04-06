@@ -5,7 +5,7 @@ import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.utils.midi.MidiCommand;
+import net.amarantha.utils.midi.entity.MidiCommand;
 import org.junit.runner.RunWith;
 
 import static javax.sound.midi.ShortMessage.*;
@@ -26,6 +26,8 @@ public class MidiTest extends TestBase {
         Target target2 = given_midi_target(on2);
         given_link_between_$1_and_$2(trigger1, target1);
         given_link_between_$1_and_$2(trigger2, target2);
+
+        then_target_$1_is_one_shot_$2(target2, true);
 
         then_last_midi_command_was_$1(null);
 

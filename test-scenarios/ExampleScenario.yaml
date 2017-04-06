@@ -1,12 +1,15 @@
+Parameters:
+  Colour: 255,0,0
+  Style: Thong
 Triggers:
   TestTrigger:
-    type: GPIO
+    type: Gpio
     pin: 0
     resistance: PULL_DOWN
     triggerState: true
 Targets:
   TestTarget:
-    type: GPIO
+    type: Gpio
     pin: 1
     activeState: true
 Links:

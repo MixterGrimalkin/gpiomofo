@@ -22,7 +22,7 @@ public interface LightBoard {
     Long interval();
 
     /**
-     * @return <code>true</code> if #init() should be called in its own thread
+     * @return <code>true</code> if #onStart() should be called in its own thread
      */
     boolean needsOwnThread();
 

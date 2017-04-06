@@ -1,12 +1,23 @@
 package net.amarantha.gpiomofo.target;
 
-import com.google.inject.Inject;
-import net.amarantha.utils.midi.MidiCommand;
+import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.utils.midi.MidiService;
+import net.amarantha.utils.midi.entity.MidiCommand;
+import net.amarantha.utils.service.Service;
 
 public class MidiTarget extends Target {
 
-    @Inject private MidiService midi;
+    @Service  private MidiService midi;
+
+    @Parameter("onCommand") private MidiCommand onCommand;
+    @Parameter("offCommand") private MidiCommand offCommand;
+
+    @Override
+    public void enable() {
+        if ( offCommand==null ) {
+            oneShot(true);
+        }
+    }
 
     @Override
     protected void onActivate() {
@@ -22,24 +33,4 @@ public class MidiTarget extends Target {
         }
     }
 
-    private MidiCommand onCommand;
-    private MidiCommand offCommand;
-
-    public MidiTarget onCommand(MidiCommand command) {
-        onCommand = command;
-        return this;
-    }
-
-    public MidiTarget offCommand(MidiCommand command) {
-        offCommand = command;
-        return this;
-    }
-
-    public MidiCommand getOnCommand() {
-        return onCommand;
-    }
-
-    public MidiCommand getOffCommand() {
-        return offCommand;
-    }
 }

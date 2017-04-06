@@ -5,8 +5,7 @@ import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static net.amarantha.utils.shell.Utility.log;
 
@@ -16,10 +15,16 @@ public class LinkFactory {
     @Inject private TriggerFactory triggers;
     @Inject private TargetFactory targets;
 
+    private Map<Trigger, List<Target>> links = new HashMap<>();
+
     public LinkFactory link(Trigger trigger, Target... targets) {
         for ( Target target : targets ) {
             trigger.onFire(target::processTrigger);
-            log("[" + trigger.getName() + "]-->[" + target.getName() + "]");
+            List<Target> currentTargets = links.get(trigger);
+            if ( currentTargets==null ) {
+                links.put(trigger, currentTargets = new LinkedList<>());
+            }
+            currentTargets.add(target);
         }
         return this;
     }
@@ -48,4 +53,7 @@ public class LinkFactory {
         return lock(lockTime, ts.toArray(new Target[ts.size()]));
     }
 
+    public Map<Trigger, List<Target>> getLinks() {
+        return links;
+    }
 }

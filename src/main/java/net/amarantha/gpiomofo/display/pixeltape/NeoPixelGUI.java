@@ -11,15 +11,19 @@ import net.amarantha.gpiomofo.core.GpioMofo;
 import net.amarantha.gpiomofo.service.gui.Gui;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
-import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyGroup;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.time.TimeGuard;
 
 import static javafx.scene.paint.Color.color;
+import static net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom.*;
 import static net.amarantha.utils.shell.Utility.log;
 
 @PropertyGroup("NeoPixelGUI")
 public class NeoPixelGUI implements NeoPixel {
+
+    public static int[] widths = {};
+    public static int defaultWidth = 25;
 
     private int pixelCount;
 
@@ -30,15 +34,12 @@ public class NeoPixelGUI implements NeoPixel {
     @Property("LedSize") private int radius = 5;
     @Property("Spacer") private int spacer = 2;
 
-    public int[] widths = {}; // 11 };//47, 47, 47, 47, PIPE_4_SIZE, PIPE_3_SIZE, PIPE_2_SIZE, PIPE_1_SIZE};
-
     private Circle[] pixels;
     private RGB[] colours;
 
     private double masterBrightness = 1.0;
 
     private Group tape;
-    public int defaultWidth = 11;
 
     public void setDefaultWidth(int defaultWidth) {
         this.defaultWidth = defaultWidth;

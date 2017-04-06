@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.display.pixeltape.ws281xj.WS281x;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
-import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyGroup;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
 
 import static net.amarantha.utils.shell.Utility.log;
 

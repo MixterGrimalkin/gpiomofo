@@ -1,64 +1,104 @@
 Triggers:
   Button:
-    type: gpio
+    type: Gpio
     pin: 2
     resistance: PULL_DOWN
     triggerState: true
   Pad1:
-    type: touch
+    type: Touch
     pin: 0
     triggerState: true
   Pad2:
-    type: touch
+    type: Touch
     pin: 1
     triggerState: true
   Pad3:
-    type: touch
-    pin: 2
+    type: Touch
+    pin: 3
     triggerState: true
   Pad4:
-    type: touch
-    pin: 3
+    type: Touch
+    pin: 2
     triggerState: true
 
 Targets:
 
   Lamp:
-    type: gpio
+    type: Gpio
     pin: 0
     activeState: true
   PIR1:
-    type: http
-    onCommand: POST|192.168.0.71:8001/gpiomofo/trigger/PIR1/fire
-    offCommand: POST|192.168.0.71:8001/gpiomofo/trigger/PIR1/cancel
+    type: Http
+    onCommand: POST|192.168.0.14:8001/gpiomofo/trigger/PIR1/fire
+    offCommand: POST|192.168.0.14:8001/gpiomofo/trigger/PIR1/cancel
   PIR2:
-    type: http
-    onCommand: POST|192.168.0.71:8001/gpiomofo/trigger/PIR2/fire
-    offCommand: POST|192.168.0.71:8001/gpiomofo/trigger/PIR2/cancel
+    type: Http
+    onCommand: POST|192.168.0.14:8001/gpiomofo/trigger/PIR2/fire
+    offCommand: POST|192.168.0.14:8001/gpiomofo/trigger/PIR2/cancel
   PIR3:
-    type: http
-    onCommand: POST|192.168.0.71:8001/gpiomofo/trigger/PIR3/fire
-    offCommand: POST|192.168.0.71:8001/gpiomofo/trigger/PIR3/cancel
+    type: Http
+    onCommand: POST|192.168.0.14:8001/gpiomofo/trigger/PIR3/fire
+    offCommand: POST|192.168.0.14:8001/gpiomofo/trigger/PIR3/cancel
   PIR4:
-    type: http
-    onCommand: POST|192.168.0.71:8001/gpiomofo/trigger/PIR4/fire
-    offCommand: POST|192.168.0.71:8001/gpiomofo/trigger/PIR4/cancel
+    type: Http
+    onCommand: POST|192.168.0.14:8001/gpiomofo/trigger/PIR4/fire
+    offCommand: POST|192.168.0.14:8001/gpiomofo/trigger/PIR4/cancel
   PIR5:
-    type: http
-    onCommand: POST|192.168.0.71:8001/gpiomofo/trigger/PIR5/fire
-    offCommand: POST|192.168.0.71:8001/gpiomofo/trigger/PIR5/cancel
+    type: Http
+    onCommand: POST|192.168.0.14:8001/gpiomofo/trigger/PIR5/fire
+    offCommand: POST|192.168.0.14:8001/gpiomofo/trigger/PIR5/cancel
+  Osc1:
+    type: Osc
+    onCommand: 192.168.0.14:8000/hello
+  Osc2:
+    type: Osc
+    onCommand: 192.168.0.14:8000/you
+  Osc3:
+    type: Osc
+    onCommand: 192.168.0.14:8000/sexy
+  Osc4:
+    type: Osc
+    onCommand: 192.168.0.14:8000/mofo
+  Midi1:
+    type: Midi
+    onCommand: NOTE_ON|1|64|127
+    offCommand: NOTE_OFF|1|64|127
+  Midi2:
+    type: Midi
+    onCommand: NOTE_ON|1|68|127
+    offCommand: NOTE_OFF|1|68|127
+  Midi3:
+    type: Midi
+    onCommand: NOTE_ON|1|71|127
+    offCommand: NOTE_OFF|1|71|127
+  Midi4:
+    type: Midi
+    onCommand: NOTE_ON|1|74|127
+    offCommand: NOTE_OFF|1|74|127
+  Audio:
+    type: Audio
+    filename: audio/bsp.mp3
 
 Links:
   Pad1:
     - PIR1
+    - Osc1
+    - Midi1
   Pad2:
     - PIR2
+    - Osc2
+    - Midi2
   Button:
     - Lamp
     - PIR3
+    - Audio
   Pad3:
     - PIR4
+    - Osc3
+    - Midi3
   Pad4:
     - PIR5
+    - Osc4
+    - Midi4
     
 

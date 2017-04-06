@@ -2,9 +2,9 @@ package net.amarantha.gpiomofo.service.gpio;
 
 import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.PinState;
-import net.amarantha.gpiomofo.service.AbstractService;
-import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyGroup;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
+import net.amarantha.utils.service.AbstractService;
 
 import java.util.*;
 

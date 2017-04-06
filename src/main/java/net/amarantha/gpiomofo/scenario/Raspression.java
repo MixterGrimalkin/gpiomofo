@@ -3,33 +3,30 @@ package net.amarantha.gpiomofo.scenario;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.service.gpio.ultrasonic.HCSR04;
 import net.amarantha.utils.math.MathUtils;
-import net.amarantha.utils.osc.OscCommand;
 import net.amarantha.utils.osc.OscService;
-import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyGroup;
+import net.amarantha.utils.osc.entity.OscCommand;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
+import net.amarantha.utils.service.Service;
 
 @PropertyGroup("Raspression")
 public class Raspression extends Scenario {
 
+    @Service private OscService osc;
+
     @Inject private HCSR04 blackSensor;
     @Inject private HCSR04 redSensor;
-    @Inject private OscService osc;
 
     @Property("RaspressionClientIP") private String raspressionClientIP;
-
-    @Override
-    public void setupTriggers() {
-
-        blackSensor.start(0, 2);
-//        redSensor.start(4, 5);
-
-    }
 
     private int lastBlack = -1;
     private int lastRed = -1;
 
     @Override
-    public void setupTargets() {
+    public void setup() {
+
+        blackSensor.start(0, 2);
+//        redSensor.start(4, 5);
 
         blackSensor.onReadSensor((value) -> {
             int midiValue = MathUtils.bound(0, 255, (int)Math.round(value*255));
@@ -46,7 +43,4 @@ public class Raspression extends Scenario {
 //        });
     }
 
-    @Override
-    public void setupLinks() {
-    }
 }

@@ -1,6 +1,6 @@
 package net.amarantha.gpiomofo.service.gpio.touch;
 
-import net.amarantha.gpiomofo.service.AbstractService;
+import net.amarantha.utils.service.AbstractService;
 
 import java.util.*;
 

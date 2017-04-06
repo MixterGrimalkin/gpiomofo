@@ -1,13 +1,14 @@
 package net.amarantha.gpiomofo.scenario;
 
+import net.amarantha.gpiomofo.display.pixeltape.NeoPixelGUI;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.*;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.http.entity.HttpCommand;
-import net.amarantha.utils.osc.OscCommand;
-import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyGroup;
+import net.amarantha.utils.osc.entity.OscCommand;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_BRIEFING;
@@ -40,23 +41,6 @@ public class GingerlineBriefingRoom extends Scenario {
     private Trigger httpActivate;
     private Trigger httpStop;
 
-    @Override
-    public void setupTriggers() {
-
-        buttonRed =             triggers.gpio("Panic",          2, PULL_UP, false);
-        buttonRedHold =         triggers.gpio("Panic-Hold",     2, PULL_UP, false).setHoldTime(1000);
-
-        buttonBriefingGreen =   triggers.gpio("Briefing-Green", 4, PULL_UP, false).setHoldTime(holdTime);
-        buttonBriefingBlue =    triggers.gpio("Briefing-Blue",  3, PULL_UP, false).setHoldTime(holdTime);
-        buttonCapsuleGreen =    triggers.gpio("Capsule-Green",  6, PULL_UP, false).setHoldTime(holdTime);
-        buttonCapsuleBlue =     triggers.gpio("Capsule-Blue",   5, PULL_UP, false).setHoldTime(holdTime);
-
-        httpBackground =        triggers.http("background");
-        httpActivate =          triggers.http("active");
-        httpStop =              triggers.http("stop");
-
-    }
-
     private Target stopPixelTape;
     private Target backgroundScene;
     private Target activationScene;
@@ -70,7 +54,22 @@ public class GingerlineBriefingRoom extends Scenario {
     private Target panicMonitor;
 
     @Override
-    public void setupTargets() {
+    public void setup() {
+
+        NeoPixelGUI.widths = new int[] { 47, 47, 47, 47, PIPE_4_SIZE, PIPE_3_SIZE, PIPE_2_SIZE, PIPE_1_SIZE } ;
+
+        buttonRed =             triggers.gpio("Panic",          2, PULL_UP, false);
+        buttonRedHold =         triggers.gpio("Panic-Hold",     2, PULL_UP, false).setHoldTime(1000);
+
+        buttonBriefingGreen =   triggers.gpio("Briefing-Green", 4, PULL_UP, false).setHoldTime(holdTime);
+        buttonBriefingBlue =    triggers.gpio("Briefing-Blue",  3, PULL_UP, false).setHoldTime(holdTime);
+        buttonCapsuleGreen =    triggers.gpio("Capsule-Green",  6, PULL_UP, false).setHoldTime(holdTime);
+        buttonCapsuleBlue =     triggers.gpio("Capsule-Blue",   5, PULL_UP, false).setHoldTime(holdTime);
+
+        httpBackground =        triggers.http("background");
+        httpActivate =          triggers.http("active");
+        httpStop =              triggers.http("stop");
+
 
         briefingGreen =     targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1001/start", 255));
         briefingBlue =      targets.osc(new OscCommand(mediaIp, mediaPort, "cue/1002/start", 255));
@@ -352,11 +351,6 @@ public class GingerlineBriefingRoom extends Scenario {
 
             .build().oneShot(true);
 
-    }
-
-    @Override
-    public void setupLinks() {
-
         links
             .link(buttonRed,            panicLights)
             .link(buttonRedHold,        panicMonitor)
@@ -376,7 +370,7 @@ public class GingerlineBriefingRoom extends Scenario {
     }
 
     @Override
-    protected void startup() {
+    public void startup() {
 
         backgroundScene.activate();
 

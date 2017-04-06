@@ -2,9 +2,9 @@ package net.amarantha.gpiomofo.scenario;
 
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.utils.osc.OscCommand;
-import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyGroup;
+import net.amarantha.utils.osc.entity.OscCommand;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 
@@ -17,11 +17,6 @@ public class GingerlinePanic extends Scenario {
     public static final String URL_PANIC_BIKES = "panic-bikes";
     public static final String URL_PANIC_KITCHEN = "panic-kitchen";
     public static final String URL_PANIC_TOYBOX = "panic-toybox";
-
-//    public static final String PANIC_IP = "192.168.42.105";
-//    public static final int PANIC_PORT = 8001;
-
-//    public static final HttpCommand PANIC = new HttpCommand(POST, PANIC_IP, PANIC_PORT, "gpiomofo/trigger", "", "");
 
     @Property("ButtonHoldTime")         private int     holdTime;
     @Property("LightingServerIP")       private String  lightingIp;
@@ -36,8 +31,11 @@ public class GingerlinePanic extends Scenario {
     private Trigger kitchenRoom;
     private Trigger toyBoxRoom;
 
+    private Target lightsOn;
+    private Target alarm;
+
     @Override
-    public void setupTriggers() {
+    public void setup() {
 
         panicReset =     triggers.gpio("reset",      0, PULL_UP, false).setHoldTime(holdTime);
         panicResetHold = triggers.gpio("reset-hold", 0, PULL_UP, false).setHoldTime(5000);
@@ -49,22 +47,9 @@ public class GingerlinePanic extends Scenario {
         kitchenRoom =    triggers.http(URL_PANIC_KITCHEN);
         toyBoxRoom =     triggers.http(URL_PANIC_TOYBOX);
 
-    }
-
-    private Target lightsOn;
-    private Target alarm;
-
-    @Override
-    public void setupTargets() {
-
         lightsOn = targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/kitchenhold", 255));
 
         alarm = targets.audio("audio/alarm.mp3", true);//.followTrigger(false);
-
-    }
-
-    @Override
-    public void setupLinks() {
 
         links
             .link(briefingRoom, alarm)

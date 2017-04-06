@@ -8,7 +8,7 @@ import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
 public class ZapperScenario extends Scenario {
 
     @Override
-    public void setupTriggers() {
+    public void setup() {
 
         Trigger one = triggers.gpio("One", 0, PULL_DOWN, true);
         Trigger two = triggers.gpio("Two", 3, PULL_DOWN, false);
@@ -19,11 +19,6 @@ public class ZapperScenario extends Scenario {
         triggers.composite("Two-Three",     two,    three);
 
         triggers.composite("All",           one,    two,    three);
-
-    }
-
-    @Override
-    public void setupTargets() {
 
         HttpCommand lightboard = new HttpCommand("POST", "192.168.1.60", 8001, "lightboard", "", "");
 
@@ -37,7 +32,7 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(4, false))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("-;;-;;-")))
-            .add(targets.http(lightboard.withPath("scene/splash/load")))
+            .add(targets.http(lightboard.withPath("scene/splash/loadScenario")))
         .build().oneShot(true);
 
 //        targets.chain("Light-Cycle")
@@ -51,7 +46,7 @@ public class ZapperScenario extends Scenario {
 
         targets.chain("Finale-1")
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
-            .add(targets.http(lightboard.withPath("scene/zapper-finale/load")))
+            .add(targets.http(lightboard.withPath("scene/zapper-finale/loadScenario")))
 //            .add(targets.getScenario("Light-Cycle"))
         .build().oneShot(true);
 
@@ -67,7 +62,7 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(4, false))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("A;;-;;-")))
-            .add(targets.http(lightboard.withPath("scene/zapper/load")))
+            .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
         targets.chain("Light-Two")
@@ -77,7 +72,7 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(4, false))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("-;;B;;-")))
-            .add(targets.http(lightboard.withPath("scene/zapper/load")))
+            .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
         targets.chain("Light-Three")
@@ -87,7 +82,7 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(4, true))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("-;;-;;C")))
-            .add(targets.http(lightboard.withPath("scene/zapper/load")))
+            .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
         targets.chain("Light-One-Two")
@@ -97,7 +92,7 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(4, false))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("A;;B;;-")))
-            .add(targets.http(lightboard.withPath("scene/zapper/load")))
+            .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
         targets.chain("Light-One-Three")
@@ -107,7 +102,7 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(4, true))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("A;;-;;C")))
-            .add(targets.http(lightboard.withPath("scene/zapper/load")))
+            .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
         targets.chain("Light-Two-Three")
@@ -117,13 +112,9 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(4, true))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
             .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("-;;B;;C")))
-            .add(targets.http(lightboard.withPath("scene/zapper/load")))
+            .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
-    }
-
-    @Override
-    public void setupLinks() {
         links
             .link("None",   "Reset")
             .link("Just-One", "Light-One")

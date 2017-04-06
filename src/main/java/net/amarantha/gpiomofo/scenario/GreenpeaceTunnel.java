@@ -8,15 +8,19 @@ import net.amarantha.gpiomofo.display.animation.AnimationService;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.properties.entity.PropertyGroup;
+import net.amarantha.utils.service.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@PropertyGroup("Greenpeace")
 public class GreenpeaceTunnel extends Scenario {
 
-    @Inject private LightSurface surface;
     @Inject private AnimationService animation;
     @Inject private Butterflies butterflies;
+
+    @Service private LightSurface surface;
 
     @Named("PIR1") private Trigger pir1;
     @Named("PIR2") private Trigger pir2;
@@ -55,8 +59,7 @@ public class GreenpeaceTunnel extends Scenario {
     }
 
     @Override
-    protected void startup() {
-        surface.init();
+    public void startup() {
         wide = surface.width() >= surface.height();
         step = wide ? surface.width() / colours.size() : surface.height() / colours.size();
         butterflies.init(spriteCount, colours, tailLength);

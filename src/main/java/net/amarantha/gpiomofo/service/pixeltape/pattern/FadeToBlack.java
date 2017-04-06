@@ -4,11 +4,11 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.pixeltape.PixelTape;
 import net.amarantha.gpiomofo.target.PixelTapeTarget;
+import net.amarantha.utils.service.Service;
 
 public class FadeToBlack extends PixelTapeTarget {
 
     @Inject private NeoPixel neoPixel;
-    @Inject private PixelTape pixelTape;
 
     private double intensity;
     private long fadeTime = 1000;

@@ -1,5 +1,6 @@
 package net.amarantha.gpiomofo.scenario;
 
+import net.amarantha.gpiomofo.display.pixeltape.NeoPixelGUI;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.BrightnessRipple;
@@ -7,9 +8,9 @@ import net.amarantha.gpiomofo.service.pixeltape.pattern.CyclicFade;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.SolidColour;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.http.entity.HttpCommand;
-import net.amarantha.utils.osc.OscCommand;
-import net.amarantha.utils.properties.Property;
-import net.amarantha.utils.properties.PropertyGroup;
+import net.amarantha.utils.osc.entity.OscCommand;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
 
 import static com.pi4j.io.gpio.PinPullResistance.PULL_UP;
 import static net.amarantha.gpiomofo.scenario.GingerlinePanic.URL_PANIC_TOYBOX;
@@ -52,8 +53,31 @@ public class GingerlineToyBoxRoom extends Scenario {
     private Trigger oscKillFade;
     private Trigger oscEndOfWorld;
 
+    private Target panicLights;
+    private Target panicMonitor;
+    private Target stopAndClear;
+    private Target osc1;
+    private Target osc2;
+    private Target osc3;
+    private Target osc4;
+    private Target amberScene;
+    private Target blueScene;
+    private Target greenScene;
+    private Target purpleScene;
+    private Target mix1;
+    private Target mix2;
+    private Target mix3;
+    private Target slowFade;
+    private Target fastFade;
+    private Target rippleFade;
+    private Target killFade;
+    private Target endOfWorld;
+    private Target cancelEndOfWorld;
+
     @Override
-    public void setupTriggers() {
+    public void setup() {
+
+        NeoPixelGUI.widths = new int[]{ SMALL_BALL, BIG_BALL, SMALL_BALL, BIG_BALL, SMALL_BALL };
 
         panicButton =   triggers.gpio("Panic",      2, PULL_UP, false);
         panicHold =     triggers.gpio("Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);
@@ -76,33 +100,6 @@ public class GingerlineToyBoxRoom extends Scenario {
         oscRippleFade = triggers.osc("Ripple-Fade",     53000, "ripple-fade");
         oscKillFade =   triggers.osc("Kill-Fade",       53000, "kill-fade");
         oscEndOfWorld = triggers.osc("End-Of-World",    53000, "end-of-world");
-
-    }
-
-    private Target panicLights;
-    private Target panicMonitor;
-    private Target stopAndClear;
-    private Target osc1;
-    private Target osc2;
-    private Target osc3;
-    private Target osc4;
-    private Target amberScene;
-    private Target blueScene;
-    private Target greenScene;
-    private Target purpleScene;
-    private Target mix1;
-    private Target mix2;
-    private Target mix3;
-    private Target slowFade;
-    private Target fastFade;
-    private Target rippleFade;
-    private Target killFade;
-    private Target endOfWorld;
-    private Target cancelEndOfWorld;
-
-
-    @Override
-    public void setupTargets() {
 
         panicLights =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c5", 255));
         panicMonitor =  targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_TOYBOX+"/fire", ""));
@@ -247,11 +244,6 @@ public class GingerlineToyBoxRoom extends Scenario {
                 .build().repeat(true).oneShot(true);
 
         cancelEndOfWorld = endOfWorld.cancel();
-
-    }
-
-    @Override
-    public void setupLinks() {
 
         links
                 .link(oscStop,          cancelEndOfWorld, stopAndClear)

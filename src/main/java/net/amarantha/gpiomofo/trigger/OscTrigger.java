@@ -1,27 +1,19 @@
 package net.amarantha.gpiomofo.trigger;
 
-import com.google.inject.Inject;
+import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.utils.osc.OscService;
+import net.amarantha.utils.service.Service;
 
 public class OscTrigger extends Trigger {
 
-    @Inject private OscService osc;
+    @Service private OscService osc;
 
-    private int port;
-    private String address;
+    @Parameter("port")      private int port;
+    @Parameter("address")   private String address;
 
-    public OscTrigger setReceiver(int port, String address) {
+    @Override
+    public void enable() {
         osc.onReceive(port, address, ((time, message) -> fire(true)));
-        this.port = port;
-        this.address = address;
-        return this;
     }
 
-    public int getPort() {
-        return port;
-    }
-
-    public String getAddress() {
-        return address;
-    }
 }

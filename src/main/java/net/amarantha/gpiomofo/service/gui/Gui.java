@@ -28,7 +28,7 @@ public class Gui {
     @Inject
     public Gui(GpioMofo application, Stage stage, PropertiesService props) {
 
-        log(" - ( simulation mode ) -", true);
+        log("                 s i m u l a t i o n");
 
         this.props = props;
 
