@@ -5,6 +5,7 @@ import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.factory.entity.HasEnable;
 import net.amarantha.gpiomofo.factory.entity.HasName;
 import net.amarantha.gpiomofo.factory.TargetFactory;
+import net.amarantha.utils.service.Service;
 import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.time.Now;
 
@@ -17,9 +18,15 @@ import static net.amarantha.utils.shell.Utility.log;
 
 public abstract class Target implements HasName, HasEnable {
 
-    @Inject private TaskService tasks;
     @Inject private TargetFactory targets;
     @Inject private Now now;
+
+    @Service private TaskService tasks;
+
+    @Parameter("oneShot") private boolean oneShot = false;
+    @Parameter("triggerState") private boolean triggerState = true;
+    @Parameter("followTrigger") private boolean followTrigger = true;
+    @Parameter("clearDelay") private Long clearDelay = null;
 
     private boolean active = false;
     public Target offTarget;
@@ -132,11 +139,6 @@ public abstract class Target implements HasName, HasEnable {
     ///////////
     // Setup //
     ///////////
-
-    @Parameter("oneShot") private boolean oneShot = false;
-    @Parameter("triggerState") private boolean triggerState = true;
-    @Parameter("followTrigger") private boolean followTrigger = true;
-    @Parameter("clearDelay") private Long clearDelay = null;
 
     public Target oneShot(boolean oneShot) {
         this.oneShot = oneShot;

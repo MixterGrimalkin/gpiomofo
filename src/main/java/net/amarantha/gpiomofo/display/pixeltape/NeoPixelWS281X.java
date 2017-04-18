@@ -15,6 +15,8 @@ public class NeoPixelWS281X implements NeoPixel {
     @Inject private PropertiesService props;
 
     @Property("PwmPin") private int pin = 18;
+    @Property("DMA") private int dma = 5;
+    @Property("Frequency") private int frequency = 800000;
 
     private WS281x ws281x;
 
@@ -27,7 +29,7 @@ public class NeoPixelWS281X implements NeoPixel {
         log("Starting Native WS281x NeoPixel...");
         props.injectPropertiesOrExit(this);
         this.pixelCount = pixelCount;
-        ws281x = new WS281x(pin, 255, pixelCount);
+        ws281x = new WS281x(frequency, dma, pin, 255, pixelCount);
     }
 
     @Override

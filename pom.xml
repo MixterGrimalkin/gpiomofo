@@ -15,6 +15,13 @@
 
     <dependencies>
 
+        <!-- Utility -->
+        <dependency>
+            <groupId>net.amarantha</groupId>
+            <artifactId>amarantha-utils</artifactId>
+            <version>[1]</version>
+        </dependency>
+
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>javaFX</artifactId>

@@ -72,7 +72,6 @@ public class GreenpeaceTunnel extends Scenario {
             if (state) {
                 int x = wide ? (step/2) + (id*step) : surface.width() / 2;
                 int y = wide ? surface.height() / 2 : (step/2) + (id*step);
-                System.out.println(wide + " " + x + " " + y);
                 butterflies.addFocus(id, x, y);
             } else {
                 butterflies.removeFocus(id);

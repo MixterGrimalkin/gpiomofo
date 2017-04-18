@@ -8,7 +8,7 @@ public class NativeLightBoard_256X64_Big_Sign extends NativeLightBoard {
 
     @Override
     public Long interval() {
-        return 5L;
+        return 1L;
     }
 
 }

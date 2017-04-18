@@ -229,14 +229,7 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public InvertedTarget invert(String name, Target target) {
-
-        InvertedTarget invertedTarget =
-            injector.getInstance(InvertedTarget.class)
-                .target(target);
-
-        register(name, invertedTarget);
-
-        return invertedTarget;
+        return create(name, InvertedTarget.class).target(target);
     }
 
     //////////////////
@@ -248,15 +241,8 @@ public class TargetFactory extends Factory<Target> {
     }
 
     public CancellationTarget cancel(String name, Target t) {
-
-        CancellationTarget target =
-            injector.getInstance(CancellationTarget.class)
-                .cancel(t);
-
+        CancellationTarget target = create(name, CancellationTarget.class).cancel(t);
         target.oneShot(true);
-
-        register(name, target);
-
         return target;
     }
 

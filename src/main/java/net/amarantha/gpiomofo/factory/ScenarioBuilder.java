@@ -65,48 +65,6 @@ public class ScenarioBuilder {
         return this;
     }
 
-    private void logScenarioSetup() {
-
-        log(true, " "+scenario.getName(), true);
-
-        log("Class:\n\t"+scenario.getClass().getName());
-        log("Configuration:\n\t"+(configFilename==null?"(none)":configFilename));
-
-        log("Parameters:");
-        if ( parameters.isEmpty() ) {
-            log("\t(none)");
-        } else {
-            parameters.forEach((key,value)->log("\t"+key+"="+value));
-        }
-
-        log("Triggers:");
-        if ( triggers.getAll().isEmpty() ) {
-            log("\t(none)");
-        } else {
-            triggers.getAll().forEach((trigger) ->
-                    log("\t" + trigger.getClass().getSimpleName().replaceAll("Trigger", "") + ": " + trigger.getName()));
-        }
-
-        log("Targets:");
-        if ( targets.getAll().isEmpty() ) {
-            log("\t(none)");
-        } else {
-            targets.getAll().forEach((target) ->
-                    log("\t" + target.getClass().getSimpleName().replaceAll("Target", "") + ": " + target.getName()));
-        }
-
-        log("Links:");
-        if ( links.getLinks().isEmpty() ) {
-            log("\t(none)");
-        } else {
-            links.getLinks().forEach((trig, targs) -> {
-                StringBuilder sb = new StringBuilder();
-                targs.forEach((targ)->sb.append("[").append(targ.getName()).append("]"));
-                log("\t["+trig.getName()+"]-->"+sb.toString());
-            });
-        }
-    }
-
     private String getScenarioName() {
         String scenarioName = "";
         try {
@@ -215,15 +173,19 @@ public class ScenarioBuilder {
     // Triggers //
     //////////////
 
+    interface TreeConsumer<T> {
+        void accept(String name, Map<String, T> config) throws ScenarioBuilderException;
+    }
+
     @SuppressWarnings("unchecked")
-    private void processTriggers(Map<String, Map> config) {
+    private <T> void iterateTree(String key, Map<String, Map> config, TreeConsumer<T> consumer) {
         List<ScenarioBuilderException> errors = new LinkedList<>();
         if ( config!=null ) {
-            HashMap<String, Map> triggerConfig = (HashMap<String, Map>) config.get("Triggers");
-            if ( triggerConfig!=null ) {
-                for (Entry<String, Map> entry : triggerConfig.entrySet()) {
+            HashMap<String, T> subConfig = (HashMap<String, T>) config.get(key);
+            if ( subConfig!=null ) {
+                for (Entry<String, T> entry : subConfig.entrySet()) {
                     try {
-                        buildTrigger(entry.getKey(), (HashMap<String, String>) entry.getValue());
+                        consumer.accept(entry.getKey(), (HashMap<String, T>) entry.getValue());
                     } catch (ScenarioBuilderException e) {
                         errors.add(e);
                     }
@@ -231,6 +193,10 @@ public class ScenarioBuilder {
             }
         }
         checkErrors(errors);
+    }
+
+    private void processTriggers(Map<String, Map> config) {
+        iterateTree("Triggers", config, this::buildTrigger);
     }
 
     private void buildTrigger(String name, Map<String, String> config) throws ScenarioBuilderException {
@@ -251,6 +217,10 @@ public class ScenarioBuilder {
 
     @SuppressWarnings("unchecked")
     private void processCompositeTriggers(Map<String, Map> config) {
+//        iterateTree("CompositeTriggers", config, (name, compTrigConfig) -> {
+//                List<String> triggerNames = ((HashMap<String, List>)compTrigConfig).get("triggers");
+//                buildCompositeTrigger(name, triggerNames, (HashMap<String, String>) entry.getValue());
+//        });
         List<ScenarioBuilderException> errors = new LinkedList<>();
         if ( config!=null ) {
             HashMap<String, Map> compTriggerConfigs = (HashMap<String, Map>) config.get("CompositeTriggers");
@@ -279,20 +249,7 @@ public class ScenarioBuilder {
 
     @SuppressWarnings("unchecked")
     private void processTargets(Map<String, Map> config) {
-        List<ScenarioBuilderException> errors = new LinkedList<>();
-        if ( config!=null ) {
-            HashMap<String, Map> targetConfigs = (HashMap<String, Map>) config.get("Targets");
-            if ( targetConfigs!=null ) {
-                for (Entry<String, Map> entry : targetConfigs.entrySet() ) {
-                    try {
-                        buildTarget(entry.getKey(), (HashMap<String, String>) entry.getValue());
-                    } catch (ScenarioBuilderException e) {
-                        errors.add(e);
-                    }
-                }
-            }
-        }
-        checkErrors(errors);
+        iterateTree("Targets", config, this::buildTarget);
     }
 
     private void buildTarget(String name, Map<String, String> config) throws ScenarioBuilderException {
@@ -330,6 +287,48 @@ public class ScenarioBuilder {
     /////////////
     // Utility //
     /////////////
+
+    private void logScenarioSetup() {
+
+        log(true, " "+scenario.getName(), true);
+
+        log("Class:\n\t"+scenario.getClass().getName());
+        log("Configuration:\n\t"+(configFilename==null?"(none)":configFilename));
+
+        log("Parameters:");
+        if ( parameters.isEmpty() ) {
+            log("\t(none)");
+        } else {
+            parameters.forEach((key,value)->log("\t"+key+"="+value));
+        }
+
+        log("Triggers:");
+        if ( triggers.getAll().isEmpty() ) {
+            log("\t(none)");
+        } else {
+            triggers.getAll().forEach((trigger) ->
+                    log("\t" + trigger.getClass().getSimpleName().replaceAll("Trigger", "") + ": " + trigger.getName()));
+        }
+
+        log("Targets:");
+        if ( targets.getAll().isEmpty() ) {
+            log("\t(none)");
+        } else {
+            targets.getAll().forEach((target) ->
+                    log("\t" + target.getClass().getSimpleName().replaceAll("Target", "") + ": " + target.getName()));
+        }
+
+        log("Links:");
+        if ( links.getLinks().isEmpty() ) {
+            log("\t(none)");
+        } else {
+            links.getLinks().forEach((trig, targs) -> {
+                StringBuilder sb = new StringBuilder();
+                targs.forEach((targ)->sb.append("[").append(targ.getName()).append("]"));
+                log("\t["+trig.getName()+"]-->"+sb.toString());
+            });
+        }
+    }
 
     private void checkErrors(List<ScenarioBuilderException> errors ) {
         if ( !errors.isEmpty() ) {
