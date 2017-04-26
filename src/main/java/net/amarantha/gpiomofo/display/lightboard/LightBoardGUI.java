@@ -96,6 +96,10 @@ public class LightBoardGUI implements LightBoard {
     }
 
     @Override
+    public void shutdown() {
+    }
+
+    @Override
     public void update(RGB[][] data) {
         for (int x = 0; x < data.length; x++) {
             for (int y = 0; y < data[0].length; y++) {

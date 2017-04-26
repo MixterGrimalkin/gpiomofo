@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.display.pixeltape.ws281xj;
+package com.diozero.ws281xj;
 
 /*
  * #%L

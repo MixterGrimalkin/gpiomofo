@@ -5,6 +5,8 @@ public class Constants {
     public static final int X = 0;
     public static final int Y = 1;
 
+    public static int[] neoPixelGUIWidths = {};
+
     // Command line arguments
     public static final String SCENARIO =       "scenario";
     public static final String LIST_SCENARIOS = "list";

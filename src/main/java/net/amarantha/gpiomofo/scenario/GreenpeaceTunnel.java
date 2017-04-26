@@ -3,6 +3,10 @@ package net.amarantha.gpiomofo.scenario;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.annotation.Named;
 import net.amarantha.gpiomofo.annotation.Parameter;
+import net.amarantha.gpiomofo.service.gpio.ultrasonic.HCSR04;
+import net.amarantha.gpiomofo.service.pixeltape.matrix.Paddle;
+import net.amarantha.gpiomofo.trigger.HttpTrigger;
+import net.amarantha.gpiomofo.trigger.TouchTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.display.animation.AnimationService;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
@@ -19,8 +23,11 @@ public class GreenpeaceTunnel extends Scenario {
 
     @Inject private AnimationService animation;
     @Inject private Butterflies butterflies;
+    @Inject private Paddle paddle;
 
     @Service private LightSurface surface;
+
+    @Inject private HCSR04 sensor;
 
     @Named("PIR1") private Trigger pir1;
     @Named("PIR2") private Trigger pir2;
@@ -45,12 +52,30 @@ public class GreenpeaceTunnel extends Scenario {
     @Override
     public void setup() {
 
+        Trigger switchMode = triggers.create("switch", HttpTrigger.class);
+
+        switchMode.onFire((state)->{
+            animation.play(state?paddle:butterflies);
+        });
+
         colours.put(0, colour1);
         colours.put(1, colour2);
         colours.put(2, colour3);
         colours.put(3, colour4);
         colours.put(4, colour5);
 
+        sensor.start(12, 13);
+        sensor.onReadSensor(paddle::setPosition);
+
+
+//        pir1.onFire((state)->{
+//            if ( state ) {
+//                animation.play(butterflies);
+//            } else {
+//                animation.play(null);
+//                surface.clear();
+//            }
+//        });
         pir1.onFire(callback(0));
         pir2.onFire(callback(1));
         pir3.onFire(callback(2));
@@ -65,6 +90,7 @@ public class GreenpeaceTunnel extends Scenario {
         butterflies.init(spriteCount, colours, tailLength);
         animation.start();
         animation.play(butterflies);
+//        animation.play(paddle);
     }
 
     private Trigger.TriggerCallback callback(final int id) {

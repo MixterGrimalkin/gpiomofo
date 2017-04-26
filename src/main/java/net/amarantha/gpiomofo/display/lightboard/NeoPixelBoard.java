@@ -37,6 +37,11 @@ public class NeoPixelBoard implements LightBoard {
     }
 
     @Override
+    public void shutdown() {
+        neoPixel.close();
+    }
+
+    @Override
     public void update(RGB[][] data) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {

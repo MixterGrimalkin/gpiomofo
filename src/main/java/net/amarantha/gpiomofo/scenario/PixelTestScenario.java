@@ -2,6 +2,7 @@ package net.amarantha.gpiomofo.scenario;
 
 import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.SlidingBars;
+import net.amarantha.gpiomofo.service.pixeltape.pattern.SolidColour;
 import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.utils.colour.RGB;
 

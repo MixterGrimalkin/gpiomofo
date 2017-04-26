@@ -8,6 +8,8 @@ import java.util.List;
 
 public class HCSR04 extends RangeTrigger {
 
+    // TRIG 12, ECHO 13
+
     static {
         System.loadLibrary("hc-sr04");
     }
@@ -17,11 +19,11 @@ public class HCSR04 extends RangeTrigger {
     private final static int SAMPLES = 1;
 
     private final static int MIN_VALUE = 200;
-    private final static int MAX_VALUE = 1500;
+    private final static int MAX_VALUE = 13000;
 
     public void start(int trigger, int echo) {
         init(trigger, echo);
-        tasks.addRepeatingTask(this, 10, ()->readSensor(trigger, echo));
+        tasks.addRepeatingTask(this, 100, ()->readSensor(trigger, echo));
     }
 
     private void readSensor(int trigger, int echo) {

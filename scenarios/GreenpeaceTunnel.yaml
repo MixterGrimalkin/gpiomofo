@@ -1,10 +1,10 @@
 Parameters:
-  SpriteCount: 200
-  Colour1: 229,56,16
-  Colour2: 250,226,217
-  Colour3: 229,229,32
-  Colour4: 250,226,217
-  Colour5: 16,229,56
+  SpriteCount: 100
+  Colour1: 255,0,0
+  Colour2: 0,255,0
+  Colour3: 0,0,255
+  Colour4: 255,255,0
+  Colour5: 255,0,255
   TailLength: 10
 
 Triggers:

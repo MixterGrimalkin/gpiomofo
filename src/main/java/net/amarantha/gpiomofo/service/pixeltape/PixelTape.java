@@ -41,11 +41,17 @@ public class PixelTape extends AbstractService {
 
     @Property("TapeRefresh") private int tapeRefresh = 5;
 
+    @Override
     public void onStart() {
         neoPixel.init(totalPixels);
+        for ( int i=0; i<15; i++) {
+            neoPixel.setPixelColourRGB(i, 0, 255, 0);
+        }
+        neoPixel.render();
         tasks.addRepeatingTask(this, tapeRefresh, this::render);
     }
 
+    @Override
     public void onStop() {
         neoPixel.close();
     }

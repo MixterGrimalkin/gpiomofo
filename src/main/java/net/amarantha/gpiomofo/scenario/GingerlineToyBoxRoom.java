@@ -1,5 +1,6 @@
 package net.amarantha.gpiomofo.scenario;
 
+import net.amarantha.gpiomofo.core.Constants;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixelGUI;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
@@ -77,7 +78,7 @@ public class GingerlineToyBoxRoom extends Scenario {
     @Override
     public void setup() {
 
-        NeoPixelGUI.widths = new int[]{ SMALL_BALL, BIG_BALL, SMALL_BALL, BIG_BALL, SMALL_BALL };
+        Constants.neoPixelGUIWidths = new int[]{ SMALL_BALL, BIG_BALL, SMALL_BALL, BIG_BALL, SMALL_BALL };
 
         panicButton =   triggers.gpio("Panic",      2, PULL_UP, false);
         panicHold =     triggers.gpio("Panic-Hold", 2, PULL_UP, false).setHoldTime(1000);

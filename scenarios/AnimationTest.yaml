@@ -1,0 +1,7 @@
+
+Triggers:
+  PIR1:
+    type: Gpio
+    pin: 0
+    resistance: PULL_DOWN
+    triggerState: true

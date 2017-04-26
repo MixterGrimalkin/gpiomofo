@@ -16,13 +16,12 @@ import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.time.TimeGuard;
 
 import static javafx.scene.paint.Color.color;
-import static net.amarantha.gpiomofo.scenario.GingerlineBriefingRoom.*;
+import static net.amarantha.gpiomofo.core.Constants.neoPixelGUIWidths;
 import static net.amarantha.utils.shell.Utility.log;
 
 @PropertyGroup("NeoPixelGUI")
 public class NeoPixelGUI implements NeoPixel {
 
-    public static int[] widths = {};
     public static int defaultWidth = 25;
 
     private int pixelCount;
@@ -69,7 +68,7 @@ public class NeoPixelGUI implements NeoPixel {
         int p = 0;
         int maxWidth = 0;
         while ( p < pixelCount ) {
-            int widthCheck = y >= widths.length ? defaultWidth : widths[y] ;
+            int widthCheck = y >= neoPixelGUIWidths.length ? defaultWidth : neoPixelGUIWidths[y] ;
             maxWidth = Math.max(maxWidth, widthCheck);
             if ( x >= widthCheck ) {
                 x = 0;

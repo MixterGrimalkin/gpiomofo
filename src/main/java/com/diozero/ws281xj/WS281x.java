@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo.display.pixeltape.ws281xj;
+package com.diozero.ws281xj;
 
 /*
  * #%L
@@ -26,8 +26,6 @@ package net.amarantha.gpiomofo.display.pixeltape.ws281xj;
  * #L%
  */
 
-import com.diozero.ws281xj.WS281xNative;
-
 import java.io.Closeable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -49,13 +47,17 @@ public class WS281x implements Closeable {
 	private static final String LIB_NAME = "com/diozero/ws281xj";
 	private static Boolean loaded = Boolean.FALSE;
 
+	static {
+		System.loadLibrary("ws281xj");
+	}
+
 	private static void init() {
 		synchronized (loaded) {
 			if (!loaded.booleanValue()) {
 //				try {
 //					Path path = Files.createTempFile("lib" + LIB_NAME, ".so");
 //					path.toFile().deleteOnExit();
-//					Files.copy(net.amarantha.gpiomofo.display.pixeltape.ws281xj.WS281x.class.getResourceAsStream("/lib/lib" + LIB_NAME + ".so"), path,
+//					Files.copy(com.diozero.ws281xj.WS281x.class.getResourceAsStream("/lib/lib" + LIB_NAME + ".so"), path,
 //							StandardCopyOption.REPLACE_EXISTING);
 //					System.load(path.toString());
 //					loaded = Boolean.TRUE;
@@ -67,10 +69,10 @@ public class WS281x implements Closeable {
 //					System.loadLibrary(LIB_NAME);
 //					loaded = Boolean.TRUE;
 //				}
-
-				System.loadLibrary("ws281xj");
-
-				Runtime.getRuntime().addShutdownHook(new Thread(WS281xNative::terminate, "WS281x Shutdown Handler"));
+//
+//				System.loadLibrary("ws281xj");
+//
+//				Runtime.getRuntime().addShutdownHook(new Thread(WS281xNative::terminate, "WS281x Shutdown Handler"));
 			}
 		}
 	}
@@ -100,13 +102,13 @@ public class WS281x implements Closeable {
 		this.numPixels = numPixels;
 
 		ch0LedBuffer = WS281xNative.initialise(frequency, dmaNum, gpioNum, brightness, numPixels);
-		System.out.println("order=" + ch0LedBuffer.order());
+//		System.out.println("order=" + ch0LedBuffer.order());
 		ch0LedBuffer.order(ByteOrder.LITTLE_ENDIAN);
 	}
 
 	@Override
 	public void close() {
-		System.out.println("close()");
+//		System.out.println("close()");
 		allOff();
 		ch0LedBuffer = null;
 		WS281xNative.terminate();
@@ -121,6 +123,7 @@ public class WS281x implements Closeable {
 	 */
 	@SuppressWarnings("static-method")
 	public void render() {
+//		System.out.println("RENDERING");
 		int rc = WS281xNative.render();
 		if (rc != 0) {
 			throw new RuntimeException("Error in render() - " + rc);
@@ -173,6 +176,7 @@ public class WS281x implements Closeable {
 	 */
 	public void setPixelColour(int pixel, int colour) {
 		validatePixel(pixel);
+//		System.out.println(pixel + "=" + colour);
 		ch0LedBuffer.putInt(pixel * SIZE_OF_INT, colour);
 	}
 
@@ -185,6 +189,7 @@ public class WS281x implements Closeable {
 	 */
 	public void setPixelColourRGB(int pixel, int red, int green, int blue) {
 		validatePixel(pixel);
+//		System.out.println(pixel + "=" + red + "," + green + "," + blue + " == " + PixelColour.createColourRGB(red, green, blue));
 		ch0LedBuffer.putInt(pixel * SIZE_OF_INT, PixelColour.createColourRGB(red, green, blue));
 	}
 

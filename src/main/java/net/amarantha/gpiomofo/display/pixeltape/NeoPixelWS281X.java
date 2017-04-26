@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.display.pixeltape;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.display.pixeltape.ws281xj.WS281x;
+import com.diozero.ws281xj.WS281x;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.entity.Property;

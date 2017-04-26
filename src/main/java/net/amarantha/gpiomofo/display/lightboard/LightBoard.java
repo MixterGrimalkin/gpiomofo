@@ -9,6 +9,8 @@ public interface LightBoard {
 
     void init(int width, int height);
 
+    void shutdown();
+
     void update(RGB[][] data);
 
     int width();

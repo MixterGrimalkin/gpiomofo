@@ -27,6 +27,23 @@ public class Pattern {
         }
     }
 
+    public Pattern(int cols, String data) {
+        int rows = data.length()/cols;
+        pixels = new RGB[this.width = max(1, cols)][this.height = max(1, rows)];
+        transparent = true;
+        int i = 0;
+        for ( int x=0; x<width; x++ ) {
+            for (int y = 0; y < height; y++) {
+                if ( data.charAt(i)=='#' ) {
+                    pixels[x][y] = RGB.WHITE;
+                } else {
+                    pixels[x][y] = RGB.BLACK;
+                }
+                i++;
+            }
+        }
+    }
+
     //////////
     // Read //
     //////////
@@ -106,4 +123,11 @@ public class Pattern {
         void process(int x, int y, RGB rgb);
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
 }

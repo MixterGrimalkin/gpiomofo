@@ -24,8 +24,12 @@ public class AnimationService {
         }
     }
 
-    public void play(Animation animation) {
-        this.animation = animation;
+    public void play(Animation anim) {
+        if ( animation!=null ) {
+            animation.stop();
+        }
+        animation = anim;
+        animation.start();
     }
 
 

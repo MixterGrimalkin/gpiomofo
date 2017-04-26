@@ -14,6 +14,9 @@ public class NativeLightBoard extends NativeLightboardWrapper {
     }
 
     @Override
+    public void shutdown() { }
+
+    @Override
     public int width() {
         return width;
     }

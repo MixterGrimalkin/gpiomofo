@@ -4,10 +4,7 @@ import com.google.inject.Inject;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.time.TimeGuard;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
@@ -51,17 +48,18 @@ public class Butterflies extends Animation {
     @Override
     public void refresh() {
         updateFoci();
-        if ( foci.isEmpty() ) {
-            guard.every(2000, "RandomizeButterflies", ()->{
-                sprites.forEach((s)->s.randomize(0.1));
-            });
+        if (foci.isEmpty()) {
+            guard.every(2000, "RandomizeButterflies", () -> sprites.forEach((s) -> s.randomize(0.2)));
         }
-        sprites.forEach(Sprite::updatePosition);
+        List<int[]> usedPositions = new ArrayList<>(sprites.get().size());
+        sprites.forEach((s) -> usedPositions.add(s.updatePosition(usedPositions)));
         surface.clear();
         sprites.forEach(s -> {
             for (int i = 0; i < sprites.tailLength(); i++) {
                 surface.layer(background).draw(s.tailPos[i][X], s.tailPos[i][Y], s.tailColours[i]);
             }
+        });
+        sprites.forEach(s -> {
             surface.layer(foreground).draw(s.real[X], s.real[Y], s.colour);
         });
     }
@@ -123,6 +121,7 @@ public class Butterflies extends Animation {
     private long persistFocusDelay = 1000;
 
     public void addFocus(int id, int x, int y) {
+        cancelledFoci.remove(id);
         foci.put(id, new Integer[]{x, y});
         onFocusAdded(id);
     }

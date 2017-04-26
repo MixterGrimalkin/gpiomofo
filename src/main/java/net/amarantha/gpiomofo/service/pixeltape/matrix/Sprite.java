@@ -3,6 +3,8 @@ package net.amarantha.gpiomofo.service.pixeltape.matrix;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.utils.colour.RGB;
 
+import java.util.List;
+
 import static java.lang.Math.PI;
 import static java.lang.Math.random;
 import static net.amarantha.gpiomofo.core.Constants.X;
@@ -99,16 +101,36 @@ class Sprite {
         }
     }
 
-    void updatePosition() {
+    int[] updatePosition(List<int[]> usedPositions) {
         updateAxis(X);
         updateAxis(Y);
-        real[X] = round(current[X] + (Math.sin(theta) * radius));
+        int newX = round(current[X] + (Math.sin(theta) * radius));
+        int newY = round(current[Y] + (Math.cos(theta) * radius));
+        if ( positionUsed(new int[]{newX, newY}, usedPositions) ) {
+//            randomize(1.0);
+        } else {
+            real[X] = newX;
+            real[Y] = newY;
+        }
         angularBounce(X);
-        real[Y] = round(current[Y] + (Math.cos(theta) * radius));
         angularBounce(Y);
         updateAngle();
         updateDelta();
         storeTail();
+        return real;
+    }
+
+    private boolean blockCollisions = false;
+
+    boolean positionUsed(int[] newPosition, List<int[]> usedPositions) {
+        if ( blockCollisions ) {
+            for (int[] position : usedPositions) {
+                if (position[X] == newPosition[X] && position[Y] == newPosition[Y]) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     void angularBounce(int axis) {

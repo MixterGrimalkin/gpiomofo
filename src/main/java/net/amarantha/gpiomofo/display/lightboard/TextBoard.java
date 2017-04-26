@@ -20,6 +20,9 @@ public class TextBoard implements LightBoard {
     }
 
     @Override
+    public void shutdown() { }
+
+    @Override
     public void update(RGB[][] data) {
         StringBuilder sb = new StringBuilder();
         for (int r = 0; r< height; r++ ) {
