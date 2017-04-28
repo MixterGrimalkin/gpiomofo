@@ -6,8 +6,21 @@ Parameters:
   Colour4: 255,255,0
   Colour5: 255,0,255
   TailLength: 10
+  PaddleAxis: Y
+  LingerTime: 50
 
 Triggers:
+  Paddle1:
+    type: Range
+    triggerPin: 12
+    echoPin: 13
+    min: 400
+    max: 13000
+  GameOn:
+    type: Gpio
+    pin: 9
+    resistance: PULL_DOWN
+    triggerState: true
   PIR1:
     type: Gpio
     pin: 0

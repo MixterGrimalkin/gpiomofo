@@ -10,7 +10,7 @@ import net.amarantha.gpiomofo.trigger.GpioTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
-import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeTrigger;
+import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeSensor;
 import net.amarantha.utils.task.TaskService;
 import net.amarantha.gpiomofo.webservice.TriggerResource;
 import net.amarantha.utils.http.HttpService;
@@ -101,18 +101,18 @@ public class TestBase {
         return triggers.composite(ts);
     }
 
-    RangeTrigger given_range_trigger() {
-        return triggers.range();
-    }
-
-    RangeTrigger on_target_$4_between_$2_and_$3(RangeTrigger trigger, double min, double max, Target target) {
-        return trigger.addRange(min, max, target);
-    }
-
-    void when_range_trigger_$1_fires_value_$2(RangeTrigger trigger, double value) {
-        trigger.fireTriggers(value);
-    }
-
+//    RangeSensor given_range_trigger() {
+//        return triggers.range();
+//    }
+//
+//    RangeSensor on_target_$4_between_$2_and_$3(RangeSensor trigger, double min, double max, Target target) {
+//        return trigger.addRange(min, max, target);
+//    }
+//
+//    void when_range_trigger_$1_fires_value_$2(RangeSensor trigger, double value) {
+//        trigger.fireTriggers(value);
+//    }
+//
     Target given_target_on_pin_$1(int pin) {
         GpioTarget target = targets.gpio(pin, true);
         assertEquals(true, target.isFollowTrigger());

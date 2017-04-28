@@ -1,16 +1,20 @@
 package net.amarantha.gpiomofo.service.gpio.touch;
 
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.service.AbstractService;
 
 import java.util.*;
 
+@PropertyGroup("TouchSensor")
 public abstract class TouchSensor extends AbstractService {
 
     protected Map<Integer, Boolean> lastStates = new HashMap<>();
     protected Map<Integer, List<TouchListener>> allListeners = new HashMap<>();
 
     private Timer scanTimer;
-    private int refreshInterval = 20;
+
+    @Property("Refresh") private int refreshInterval = 20;
 
     public TouchSensor(String name) {
         super(name);

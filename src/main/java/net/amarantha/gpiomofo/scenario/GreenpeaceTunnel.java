@@ -3,10 +3,10 @@ package net.amarantha.gpiomofo.scenario;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.annotation.Named;
 import net.amarantha.gpiomofo.annotation.Parameter;
-import net.amarantha.gpiomofo.service.gpio.ultrasonic.HCSR04;
+import net.amarantha.gpiomofo.core.Constants;
+import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeSensorHCSR04;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Paddle;
-import net.amarantha.gpiomofo.trigger.HttpTrigger;
-import net.amarantha.gpiomofo.trigger.TouchTrigger;
+import net.amarantha.gpiomofo.trigger.RangeTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.display.animation.AnimationService;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
@@ -18,6 +18,9 @@ import net.amarantha.utils.service.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.amarantha.gpiomofo.core.Constants.X;
+import static net.amarantha.gpiomofo.core.Constants.Y;
+
 @PropertyGroup("Greenpeace")
 public class GreenpeaceTunnel extends Scenario {
 
@@ -27,16 +30,18 @@ public class GreenpeaceTunnel extends Scenario {
 
     @Service private LightSurface surface;
 
-    @Inject private HCSR04 sensor;
-
     @Named("PIR1") private Trigger pir1;
     @Named("PIR2") private Trigger pir2;
     @Named("PIR3") private Trigger pir3;
     @Named("PIR4") private Trigger pir4;
     @Named("PIR5") private Trigger pir5;
+    @Named("GameOn") private Trigger switchMode;
+    @Named("Paddle1") private RangeTrigger paddle1;
 
     @Parameter("SpriteCount") private int spriteCount;
     @Parameter("TailLength") private int tailLength;
+    @Parameter("PaddleAxis") private String axis;
+    @Parameter("LingerTime") private int lingerTime;
 
     @Parameter("Colour1") private RGB colour1;
     @Parameter("Colour2") private RGB colour2;
@@ -49,14 +54,10 @@ public class GreenpeaceTunnel extends Scenario {
     private boolean wide;
     private int step;
 
+    private boolean gameOn = false;
+
     @Override
     public void setup() {
-
-        Trigger switchMode = triggers.create("switch", HttpTrigger.class);
-
-        switchMode.onFire((state)->{
-            animation.play(state?paddle:butterflies);
-        });
 
         colours.put(0, colour1);
         colours.put(1, colour2);
@@ -64,33 +65,21 @@ public class GreenpeaceTunnel extends Scenario {
         colours.put(3, colour4);
         colours.put(4, colour5);
 
-        sensor.start(12, 13);
-        sensor.onReadSensor(paddle::setPosition);
-
-
-//        pir1.onFire((state)->{
-//            if ( state ) {
-//                animation.play(butterflies);
-//            } else {
-//                animation.play(null);
-//                surface.clear();
-//            }
-//        });
         pir1.onFire(callback(0));
         pir2.onFire(callback(1));
         pir3.onFire(callback(2));
         pir4.onFire(callback(3));
         pir5.onFire(callback(4));
-    }
 
-    @Override
-    public void startup() {
-        wide = surface.width() >= surface.height();
-        step = wide ? surface.width() / colours.size() : surface.height() / colours.size();
-        butterflies.init(spriteCount, colours, tailLength);
-        animation.start();
-        animation.play(butterflies);
-//        animation.play(paddle);
+        paddle1.onMeasure(paddle::setPosition);
+
+        switchMode.onFire((state)->{
+            if ( state ) {
+                gameOn = !gameOn;
+                animation.play(gameOn ? paddle : butterflies);
+            }
+        });
+
     }
 
     private Trigger.TriggerCallback callback(final int id) {
@@ -103,6 +92,17 @@ public class GreenpeaceTunnel extends Scenario {
                 butterflies.removeFocus(id);
             }
         };
+    }
+
+    @Override
+    public void startup() {
+        wide = surface.width() >= surface.height();
+        step = wide ? surface.width() / colours.size() : surface.height() / colours.size();
+        butterflies.setLingerTime(lingerTime);
+        butterflies.init(spriteCount, colours, tailLength);
+        paddle.setAxis(axis.equalsIgnoreCase("X") ? X : Y);
+        animation.start();
+        animation.play(butterflies);
     }
 
 }

@@ -5,7 +5,7 @@
 #include <time.h>
 #include <jni.h>
 #include <stdbool.h>
-#include "net_amarantha_gpiomofo_service_gpio_ultrasonic_HCSR04.h"
+#include "net_amarantha_gpiomofo_service_gpio_ultrasonic_RangeSensorHCSR04.h"
 
 int TIMEOUT = 10000000;
 
@@ -80,13 +80,13 @@ int main(int argc, char **argv) {
 
 }
 
-JNIEXPORT void JNICALL Java_net_amarantha_gpiomofo_service_gpio_ultrasonic_HCSR04_init
+JNIEXPORT void JNICALL Java_net_amarantha_gpiomofo_service_gpio_ultrasonic_RangeSensorHCSR04_init
   (JNIEnv * env, jobject o, jint trigger, jint echo) {
     init(trigger, echo);
   }
 
 
-JNIEXPORT jlong JNICALL Java_net_amarantha_gpiomofo_service_gpio_ultrasonic_HCSR04_measure
+JNIEXPORT jlong JNICALL Java_net_amarantha_gpiomofo_service_gpio_ultrasonic_RangeSensorHCSR04_measure
   (JNIEnv * env, jobject o, jint trigger, jint echo) {
     return measure(trigger, echo);
   }

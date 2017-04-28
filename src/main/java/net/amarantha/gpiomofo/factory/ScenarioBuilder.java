@@ -104,9 +104,9 @@ public class ScenarioBuilder {
             (field, annotation)->
                 reflectiveSet(scenario, field, annotation.value(),
                     (type, name)->{
-                        if ( type==Trigger.class ) {
+                        if ( Trigger.class.isAssignableFrom(type) ) {
                             return triggers.get(name);
-                        } else if ( type==Target.class ) {
+                        } else if ( Target.class.isAssignableFrom(type) ) {
                             return targets.get(name);
                         }
                         return null;
@@ -208,7 +208,7 @@ public class ScenarioBuilder {
                 throw new ScenarioBuilderException("Unknown type '" + type + "' for trigger '" + name + "'");
             }
         }
-        triggers.create(name, triggerClass, config).enable();
+        triggers.create(name, triggerClass, config);
     }
 
     ////////////////////////
@@ -261,7 +261,7 @@ public class ScenarioBuilder {
                 throw new ScenarioBuilderException("Unknown type '" + type + "' for target '" + name + "'");
             }
         }
-        targets.create(name, targetClass, config).enable();
+        targets.create(name, targetClass, config);
     }
 
     ///////////

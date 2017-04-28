@@ -8,6 +8,8 @@ import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 import net.amarantha.gpiomofo.service.gpio.touch.TouchSensor;
 import net.amarantha.gpiomofo.service.gpio.touch.TouchSensorMock;
+import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeSensor;
+import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeSensorMock;
 import net.amarantha.utils.UtilityModule;
 
 public class TestModule extends AbstractModule {
@@ -18,6 +20,7 @@ public class TestModule extends AbstractModule {
         bind(GpioService.class).to(GpioServiceMock.class).in(Scopes.SINGLETON);
         bind(NeoPixel.class).to(NeoPixelMock.class).in(Scopes.SINGLETON);
         bind(TouchSensor.class).to(TouchSensorMock.class).in(Scopes.SINGLETON);
+        bind(RangeSensor.class).to(RangeSensorMock.class).in(Scopes.SINGLETON);
     }
 
 }

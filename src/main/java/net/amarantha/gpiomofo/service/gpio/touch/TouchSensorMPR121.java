@@ -14,7 +14,7 @@ public class TouchSensorMPR121 extends TouchSensor {
     private I2CDevice device;
 
     public TouchSensorMPR121() {
-        super("MPR-121");
+        super("Touch Sensor MPR-121");
     }
 
     @Override

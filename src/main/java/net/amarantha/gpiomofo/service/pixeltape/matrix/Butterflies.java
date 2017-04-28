@@ -118,7 +118,11 @@ public class Butterflies extends Animation {
 
     private Map<Integer, Integer[]> foci = new HashMap<>();
     private Map<Integer, Long> cancelledFoci = new HashMap<>();
-    private long persistFocusDelay = 1000;
+    private long lingerTime = 1000;
+
+    public void setLingerTime(long lingerTime) {
+        this.lingerTime = lingerTime;
+    }
 
     public void addFocus(int id, int x, int y) {
         cancelledFoci.remove(id);
@@ -137,7 +141,7 @@ public class Butterflies extends Animation {
     private void updateFoci() {
         List<Integer> fociToRemove = new ArrayList<>();
         cancelledFoci.forEach((id, time) -> {
-            if (System.currentTimeMillis() - time >= persistFocusDelay) {
+            if (System.currentTimeMillis() - time >= lingerTime) {
                 fociToRemove.add(id);
             }
         });

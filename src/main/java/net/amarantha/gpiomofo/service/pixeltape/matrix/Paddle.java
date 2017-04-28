@@ -27,8 +27,12 @@ public class Paddle extends Animation {
 
     }
 
+    public void setAxis(int axis) {
+        this.axis = axis;
+    }
+
     public void setPosition(double value) {
-        target[axis] = round((1-value)*fieldSize);
+        target[axis] = round(value*(fieldSize-paddleSize));
         delta = (target[axis] - position[axis])/5;
     }
 

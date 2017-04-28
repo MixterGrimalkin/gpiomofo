@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.trigger.TouchTrigger;
 import net.amarantha.gpiomofo.trigger.TouchTriggerSet;
-import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeTrigger;
+import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeSensor;
 import net.amarantha.gpiomofo.trigger.*;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.service.ServiceFactory;
@@ -141,12 +141,17 @@ public class TriggerFactory extends Factory<Trigger> {
     // Range //
     ///////////
 
-    public RangeTrigger range() {
-        return range(getNextName("Range"));
+    public RangeTrigger range(int trigger, int echo) {
+        return range(getNextName("Range"), trigger, echo);
     }
 
-    public RangeTrigger range(String name) {
-        return create(name, RangeTrigger.class);
+    public RangeTrigger range(String name, int trigger, int echo) {
+        return create(name, RangeTrigger.class,
+            new StringMap()
+                .add("triggerPin", trigger)
+                .add("echoPin", echo)
+            .get()
+        );
     }
 
 }
