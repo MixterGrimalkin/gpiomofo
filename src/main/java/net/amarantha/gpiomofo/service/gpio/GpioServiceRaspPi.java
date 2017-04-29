@@ -16,6 +16,7 @@ public class GpioServiceRaspPi extends GpioService {
 
     public GpioServiceRaspPi() {
         super("Raspberry Pi GPIO Service");
+        WiringPiSetup.init();
         availablePins.put( 0, GPIO_00);
         availablePins.put( 1, GPIO_01);
         availablePins.put( 2, GPIO_02);

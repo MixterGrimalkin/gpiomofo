@@ -3,8 +3,6 @@ package net.amarantha.gpiomofo.factory;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.target.AudioTarget;
-import net.amarantha.gpiomofo.target.ShellTarget;
 import net.amarantha.gpiomofo.target.*;
 import net.amarantha.utils.http.entity.HttpCommand;
 import net.amarantha.utils.midi.entity.MidiCommand;
@@ -140,9 +138,9 @@ public class TargetFactory extends Factory<Target> {
         );
     }
 
-    ////////////
-    // Python //
-    ////////////
+    ///////////
+    // Shell //
+    ///////////
 
     public ShellTarget shell(String script) {
         return shell(getNextName("Shell"), script);

@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.display.pixeltape;
 
-import com.google.inject.Inject;
 import com.diozero.ws281xj.WS281x;
+import com.google.inject.Inject;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.entity.Property;
@@ -17,6 +17,7 @@ public class NeoPixelWS281X implements NeoPixel {
     @Property("PwmPin") private int pin = 18;
     @Property("DMA") private int dma = 5;
     @Property("Frequency") private int frequency = 800000;
+    @Property("ColourMode") private ColourMode colourMode = ColourMode.RGB;
 
     private WS281x ws281x;
 
@@ -27,22 +28,25 @@ public class NeoPixelWS281X implements NeoPixel {
     @Override
     public void init(int pixelCount) {
         log("Starting Native WS281x NeoPixel...");
-        props.injectPropertiesOrExit(this);
+        props.injectPropertiesOrExit(this, (type, value)->{
+            System.out.println(value);
+            if (type==ColourMode.class) {
+                return ColourMode.valueOf(value);
+            } else {
+                return null;
+            }
+        });
+        System.out.println("actual="+colourMode);
         this.pixelCount = pixelCount;
         ws281x = new WS281x(frequency, dma, pin, 255, pixelCount);
     }
 
     @Override
     public void setPixelColourRGB(int pixel, RGB colour) {
-        setPixelColourRGB(pixel, colour, false);
-    }
-
-    @Override
-    public void setPixelColourRGB(int pixel, RGB colour, boolean forceRGB) {
         if ( pixel < pixelCount && !colour.equals(getPixelRGB(pixel))) {
             dirty = true;
             RGB rgb = colour.withBrightness(masterBrightness);
-            if (forceRGB) {
+            if (colourMode==ColourMode.RGB) {
                 ws281x.setPixelColourRGB(pixel, rgb.getRed(), rgb.getGreen(), rgb.getBlue());
             } else {
                 ws281x.setPixelColourRGB(pixel, rgb.getGreen(), rgb.getRed(), rgb.getBlue());

@@ -27,23 +27,14 @@ public abstract class RangeSensor extends AbstractService {
 
     protected abstract long measure(int trigger, int echo);
 
-    public void addSensor(int trigger, int echo, int min, int max, Consumer<Double> callback) {
-        sensors.add(new Sensor(trigger, echo, min, max, callback));
+    public void addSensor(int trigger, int echo, Consumer<Double> callback) {
+        sensors.add(new Sensor(trigger, echo, callback));
     }
 
     private void measureAll() {
         sensors.forEach((s)->{
             if ( s.callback!=null ) {
-                double value = measure(s.trigger, s.echo);
-                double normalised = 0.0;
-                if (value <= s.min) {
-                    normalised = 0.0;
-                } else if (value >= s.max) {
-                    normalised = 1.0;
-                } else {
-                    normalised = (value - s.min) / (s.max - s.min);
-                }
-                s.callback.accept(normalised);
+                s.callback.accept((double)measure(s.trigger, s.echo));
             }
         });
     }
@@ -70,14 +61,10 @@ public abstract class RangeSensor extends AbstractService {
     protected static class Sensor {
         int trigger;
         int echo;
-        int min;
-        int max;
         Consumer<Double> callback;
-        Sensor(int trigger, int echo, int min, int max, Consumer<Double> callback) {
+        Sensor(int trigger, int echo, Consumer<Double> callback) {
             this.trigger = trigger;
             this.echo = echo;
-            this.min = min;
-            this.max = max;
             this.callback = callback;
         }
     }

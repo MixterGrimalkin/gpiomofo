@@ -104,8 +104,6 @@ void init(int r, int c) {
 
     pushTestPattern();
 
-    wiringPiSetup() ;
-
     pinMode(clockPin, OUTPUT);
     pinMode(store, OUTPUT);
     pinMode(output, OUTPUT);
@@ -189,6 +187,7 @@ JNIEXPORT void JNICALL Java_net_amarantha_gpiomofo_display_lightboard_NativeLigh
 
 int main (void) {
     printf("Starting LightBoard in Native Mode...\n");
+    wiringPiSetup() ;
     init(64, 256);
     return 0;
 }

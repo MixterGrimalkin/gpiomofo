@@ -3,13 +3,13 @@ package net.amarantha.gpiomofo.service.pixeltape;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
-import net.amarantha.utils.task.TaskService;
 import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.service.AbstractService;
+import net.amarantha.utils.task.TaskService;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class PixelTape extends AbstractService {
                 for (int i = 0; i < patternContents.length; i++) {
                     RGB rgb = patternContents[pattern.isReverse()?patternContents.length-i-1:i];
                     if (rgb != null) {
-                        neoPixel.setPixelColourRGB(start + i, rgb, pattern.isForceRGB());
+                        neoPixel.setPixelColourRGB(start + i, rgb);
                     }
                 }
             }

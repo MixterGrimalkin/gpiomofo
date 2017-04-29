@@ -3,16 +3,13 @@ package net.amarantha.gpiomofo.scenario;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.annotation.Named;
 import net.amarantha.gpiomofo.annotation.Parameter;
-import net.amarantha.gpiomofo.core.Constants;
-import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeSensorHCSR04;
-import net.amarantha.gpiomofo.service.pixeltape.matrix.Paddle;
-import net.amarantha.gpiomofo.trigger.RangeTrigger;
-import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.display.animation.AnimationService;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
+import net.amarantha.gpiomofo.service.pixeltape.matrix.Paddle;
+import net.amarantha.gpiomofo.trigger.ContinuousTrigger;
+import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.utils.colour.RGB;
-import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.service.Service;
 
 import java.util.HashMap;
@@ -21,7 +18,6 @@ import java.util.Map;
 import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
 
-@PropertyGroup("Greenpeace")
 public class GreenpeaceTunnel extends Scenario {
 
     @Inject private AnimationService animation;
@@ -36,7 +32,7 @@ public class GreenpeaceTunnel extends Scenario {
     @Named("PIR4") private Trigger pir4;
     @Named("PIR5") private Trigger pir5;
     @Named("GameOn") private Trigger switchMode;
-    @Named("Paddle1") private RangeTrigger paddle1;
+    @Named("Paddle1") private ContinuousTrigger paddle1;
 
     @Parameter("SpriteCount") private int spriteCount;
     @Parameter("TailLength") private int tailLength;
@@ -48,6 +44,7 @@ public class GreenpeaceTunnel extends Scenario {
     @Parameter("Colour3") private RGB colour3;
     @Parameter("Colour4") private RGB colour4;
     @Parameter("Colour5") private RGB colour5;
+    @Parameter("PaddleColour") private RGB paddleColour;
 
     private Map<Integer, RGB> colours = new HashMap<>();
 
@@ -96,13 +93,21 @@ public class GreenpeaceTunnel extends Scenario {
 
     @Override
     public void startup() {
+
+        System.out.println("STARTING");
         wide = surface.width() >= surface.height();
         step = wide ? surface.width() / colours.size() : surface.height() / colours.size();
+
         butterflies.setLingerTime(lingerTime);
         butterflies.init(spriteCount, colours, tailLength);
+
         paddle.setAxis(axis.equalsIgnoreCase("X") ? X : Y);
+        paddle.setPaddleColour(paddleColour);
+
         animation.start();
         animation.play(butterflies);
+
+        System.out.println("READY!");
     }
 
 }

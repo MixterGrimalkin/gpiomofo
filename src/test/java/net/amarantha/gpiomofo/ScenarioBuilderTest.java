@@ -6,16 +6,14 @@ import com.googlecode.guicebehave.Modules;
 import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
 import com.pi4j.io.gpio.PinPullResistance;
+import net.amarantha.gpiomofo.factory.ScenarioBuilder;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
+import net.amarantha.gpiomofo.scenario.ExampleScenario;
 import net.amarantha.gpiomofo.scenario.Scenario;
-import net.amarantha.gpiomofo.factory.ScenarioBuilder;
 import net.amarantha.gpiomofo.service.audio.AudioFile;
 import net.amarantha.gpiomofo.target.*;
 import net.amarantha.gpiomofo.trigger.*;
-import net.amarantha.gpiomofo.scenario.ExampleScenario;
-import net.amarantha.gpiomofo.target.AudioTarget;
-import net.amarantha.gpiomofo.target.ShellTarget;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.http.entity.HttpCommand;
 import net.amarantha.utils.http.entity.Param;
@@ -44,9 +42,9 @@ public class ScenarioBuilderTest extends TestBase {
     @Story
     public void testYamlOnly() {
 
-        given_scenario_$1("YamlOnlyScenario");
+        Scenario scenario = given_scenario_$1("YamlOnlyScenario");
 
-        then_scenario_is_a_$1_called_$2(Scenario.class, "YamlOnlyScenario");
+        then_scenario_is_a_$2_called_$3(scenario, Scenario.class, "YamlOnlyScenario");
 
         then_trigger_$1_does_not_exist("DoesNotExist");
 
@@ -147,8 +145,8 @@ public class ScenarioBuilderTest extends TestBase {
     @Story
     public void testYamlAndClass() {
 
-        given_scenario_$1("ExampleScenario");
-        ExampleScenario scenario = (ExampleScenario)then_scenario_is_a_$1_called_$2(ExampleScenario.class, "ExampleScenario");
+        ExampleScenario scenario = (ExampleScenario)given_scenario_$1("ExampleScenario");
+        then_scenario_is_a_$2_called_$3(scenario, ExampleScenario.class, "ExampleScenario");
 
         then_gpio_trigger_$1_is_on_pin_$2_resistance_$3_trigger_state_$4(scenario.testTrigger, 0, PULL_DOWN, true);
         then_gpio_target_$1_is_on_pin_$2_activating_on_$3(scenario.testTarget, 1, true);
@@ -163,14 +161,13 @@ public class ScenarioBuilderTest extends TestBase {
 
     }
 
-    void given_scenario_$1(String name) {
+    Scenario given_scenario_$1(String name) {
         props.setProperty("ScenariosDirectory", "test-scenarios");
         props.setProperty("Scenario", name);
-        builder.loadScenario();
+        return builder.loadScenario();
     }
 
-    Scenario then_scenario_is_a_$1_called_$2(Class<? extends Scenario> clazz, String name) {
-        Scenario scenario = builder.getScenario();
+    Scenario then_scenario_is_a_$2_called_$3(Scenario scenario, Class<? extends Scenario> clazz, String name) {
         assertNotNull(scenario);
         assertEquals(clazz, scenario.getClass());
         assertEquals(name, scenario.getName());

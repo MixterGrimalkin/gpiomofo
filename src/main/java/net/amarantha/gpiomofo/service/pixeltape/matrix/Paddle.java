@@ -16,6 +16,7 @@ public class Paddle extends Animation {
     private int axis = X;
     private int paddleSize = 5;
     private int fieldSize;
+    private RGB paddleColour;
 
     @Override
     public void start() {
@@ -36,12 +37,16 @@ public class Paddle extends Animation {
         delta = (target[axis] - position[axis])/5;
     }
 
+    public void setPaddleColour(RGB paddleColour) {
+        this.paddleColour = paddleColour;
+    }
+
     @Override
     public void refresh() {
         updatePosition();
         surface.clear();
         for ( int i=0; i<paddleSize; i++ ) {
-            surface.layer(0).draw(position[X]+(axis ==X?i:0), position[Y]+(axis ==Y?i:0), RGB.GREEN);
+            surface.layer(0).draw(position[X]+(axis ==X?i:0), position[Y]+(axis ==Y?i:0), paddleColour);
         }
     }
 

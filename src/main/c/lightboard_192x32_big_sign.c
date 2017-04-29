@@ -1,9 +1,9 @@
 #include <time.h>
 #include <stdio.h>
-#include <wiringPi.h>
-#include <jni.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <wiringPi.h>
+#include <jni.h>
 #include "net_amarantha_gpiomofo_display_lightboard_NativeLightBoard.h"
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
@@ -92,8 +92,6 @@ void init(int r, int c) {
     printf("[ - RaspPi native LightBoard %dx%d - ]\n", cols, rows);
 
     pushTestPattern();
-
-    wiringPiSetup() ;
 
 //    piHiPri(99);
 
@@ -189,6 +187,7 @@ JNIEXPORT void JNICALL Java_net_amarantha_gpiomofo_display_lightboard_NativeLigh
 
 int main (void) {
     printf("Starting LightBoard in Native Mode...\n");
+    wiringPiSetup() ;
     init(32, 192);
     return 0;
 }

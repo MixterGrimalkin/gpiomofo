@@ -9,7 +9,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import net.amarantha.gpiomofo.service.gui.Gui;
-import net.amarantha.utils.math.MathUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,13 +41,11 @@ public class RangeSensorGUI extends RangeSensor {
             window.setHeight(200);
         }
         sensors.forEach((sensor)->{
-            sliders.put(sensor.trigger+"-"+sensor.echo, new Slider(new ScrollBar(), sensor.min, sensor.max));
+            sliders.put(sensor.trigger+"-"+sensor.echo, new Slider(new ScrollBar()));
         });
         super.onStart();
         window.show();
     }
-
-
 
     @Override
     protected void init(int trigger, int echo) {
@@ -65,19 +62,15 @@ public class RangeSensorGUI extends RangeSensor {
     protected long measure(int trigger, int echo) {
         Slider slider = sliders.get(trigger+"-"+echo);
         if ( slider!=null ) {
-            return round((slider.scrollBar.getValue()/100.0)*(slider.max-slider.min)) + slider.min;
+            return round(slider.scrollBar.getValue());
         }
         return 0;
     }
 
     private static class Slider {
         ScrollBar scrollBar;
-        int min;
-        int max;
-        public Slider(ScrollBar scrollBar, int min, int max) {
+        public Slider(ScrollBar scrollBar) {
             this.scrollBar = scrollBar;
-            this.min = min;
-            this.max = max;
         }
     }
 }

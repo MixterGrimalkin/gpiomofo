@@ -9,6 +9,9 @@ import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.service.ServiceFactory;
 import net.amarantha.utils.time.Now;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static net.amarantha.gpiomofo.core.Constants.WITH_SERVER;
 import static net.amarantha.utils.shell.Utility.log;
 
@@ -47,12 +50,6 @@ public class Scenario {
     // Lifecycle //
     ///////////////
 
-    public void setupTriggers() {}
-
-    public void setupTargets() {}
-
-    public void setupLinks() {}
-
     public void setup() {}
 
     public void startup() {}
@@ -74,4 +71,64 @@ public class Scenario {
         return this;
     }
 
+    ///////////////
+    // Log Setup //
+    ///////////////
+
+    public void logSetup() {
+
+        log(true, " "+getName(), true);
+
+        log("Class:\n\t"+getClass().getName());
+        log("Configuration:\n\t"+(configFilename==null?"(none)":configFilename));
+
+        log("Parameters:");
+        if ( parameters.isEmpty() ) {
+            log("\t(none)");
+        } else {
+            parameters.forEach((key,value)->log("\t"+key+"="+value));
+        }
+
+        log("Triggers:");
+        if ( triggers.getAll().isEmpty() ) {
+            log("\t(none)");
+        } else {
+            triggers.getAll().forEach((trigger) ->
+                    log("\t" + trigger.getClass().getSimpleName().replaceAll("Trigger", "") + ": " + trigger.getName()));
+        }
+
+        log("Targets:");
+        if ( targets.getAll().isEmpty() ) {
+            log("\t(none)");
+        } else {
+            targets.getAll().forEach((target) ->
+                    log("\t" + target.getClass().getSimpleName().replaceAll("Target", "") + ": " + target.getName()));
+        }
+
+        log("Links:");
+        if ( links.getLinks().isEmpty() ) {
+            log("\t(none)");
+        } else {
+            links.getLinks().forEach((trig, targs) -> {
+                StringBuilder sb = new StringBuilder();
+                targs.forEach((targ)->sb.append("[").append(targ.getName()).append("]"));
+                log("\t["+trig.getName()+"]-->"+sb.toString());
+            });
+        }
+    }
+
+    private String configFilename;
+    private Map<String, String> parameters = new HashMap<>();
+
+    public void setConfigFilename(String configFilename) {
+        this.configFilename = configFilename;
+    }
+
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
+    }
 }

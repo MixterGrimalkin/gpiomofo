@@ -1,5 +1,7 @@
 package net.amarantha.gpiomofo.service.gpio.ultrasonic;
 
+import net.amarantha.gpiomofo.service.gpio.WiringPiSetup;
+
 public class RangeSensorHCSR04 extends RangeSensor {
 
     static {
@@ -8,6 +10,7 @@ public class RangeSensorHCSR04 extends RangeSensor {
 
     public RangeSensorHCSR04() {
         super("Range Sensor HC-SR04");
+        WiringPiSetup.init();
     }
 
     @Override

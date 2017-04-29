@@ -4,16 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.pi4j.io.gpio.PinPullResistance;
-import net.amarantha.gpiomofo.trigger.TouchTrigger;
-import net.amarantha.gpiomofo.trigger.TouchTriggerSet;
-import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeSensor;
 import net.amarantha.gpiomofo.trigger.*;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.service.ServiceFactory;
 import net.amarantha.utils.string.StringMap;
-
-import static net.amarantha.utils.reflection.ReflectionUtils.reflectiveSet;
-import static net.amarantha.utils.string.StringUtils.asMap;
 
 @Singleton
 public class TriggerFactory extends Factory<Trigger> {
@@ -100,15 +94,16 @@ public class TriggerFactory extends Factory<Trigger> {
     // OSC //
     /////////
 
-    public OscTrigger osc(int port, String address) {
-        return osc(getNextName("Osc"), port, address);
+    public OscTrigger osc(int port, String address, String data) {
+        return osc(getNextName("Osc"), port, address, data);
     }
 
-    public OscTrigger osc(String name, int port, String address) {
+    public OscTrigger osc(String name, int port, String address, String data) {
         return create(name, OscTrigger.class,
             new StringMap()
                 .add("port", port)
                 .add("address", address)
+                .add("data", data)
             .get()
         );
     }

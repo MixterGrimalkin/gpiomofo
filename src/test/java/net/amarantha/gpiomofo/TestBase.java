@@ -5,13 +5,11 @@ import com.googlecode.guicebehave.Expected;
 import net.amarantha.gpiomofo.factory.LinkFactory;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
+import net.amarantha.gpiomofo.service.gpio.GpioService;
+import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
 import net.amarantha.gpiomofo.target.*;
 import net.amarantha.gpiomofo.trigger.GpioTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.service.gpio.GpioService;
-import net.amarantha.gpiomofo.service.gpio.GpioServiceMock;
-import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeSensor;
-import net.amarantha.utils.task.TaskService;
 import net.amarantha.gpiomofo.webservice.TriggerResource;
 import net.amarantha.utils.http.HttpService;
 import net.amarantha.utils.http.HttpServiceMock;
@@ -25,12 +23,11 @@ import net.amarantha.utils.osc.entity.OscCommand;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.service.Service;
 import net.amarantha.utils.service.ServiceFactory;
+import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.time.Now;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-
-import java.util.ArrayList;
 
 import static com.pi4j.io.gpio.PinPullResistance.OFF;
 import static net.amarantha.utils.reflection.ReflectionUtils.reflectiveGet;
@@ -205,8 +202,8 @@ public class TestBase {
         return targets.http(on, off);
     }
 
-    Trigger given_osc_trigger(int port, String address) {
-        return triggers.osc(port, address);
+    Trigger given_osc_trigger(int port, String address, String data) {
+        return triggers.osc(port, address, data);
     }
 
     Target given_osc_target(OscCommand on) {
@@ -248,7 +245,7 @@ public class TestBase {
     }
 
     void when_fire_osc_command_$1(OscCommand command) {
-        ((OscServiceMock)osc).receive(command.getAddress(), new ArrayList<>() );
+        ((OscServiceMock)osc).receive(command.getAddress(), command.getArguments());
     }
 
     void when_time_is_$1(String time) {

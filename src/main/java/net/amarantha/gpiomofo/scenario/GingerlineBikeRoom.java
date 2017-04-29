@@ -1,10 +1,10 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.target.Target;
-import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.ChasePattern;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.IntensityFade;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.SlidingBars;
+import net.amarantha.gpiomofo.target.Target;
+import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.http.entity.HttpCommand;
 import net.amarantha.utils.osc.entity.OscCommand;
@@ -91,12 +91,12 @@ public class GingerlineBikeRoom extends Scenario {
 
         buttonChamber2Green = triggers.gpio("C2-Button-Green", 5, PULL_UP, false).setHoldTime(holdTime);
 
-        oscPixelTape0 = triggers.osc("Tape-0", 53000, "bike-lights-0");
-        oscPixelTape1 = triggers.osc("Tape-1", 53000, "bike-lights-1");
-        oscPixelTape2 = triggers.osc("Tape-2", 53000, "bike-lights-2");
-        oscPixelTape3 = triggers.osc("Tape-3", 53000, "bike-lights-3");
-        oscPixelTape4 = triggers.osc("Tape-4", 53000, "bike-lights-4");
-        oscPixelTapeExit = triggers.osc("Tape-5", 53000, "bike-exit");
+        oscPixelTape0 = triggers.osc("Tape-0", 53000, "bike-lights-0", "255");
+        oscPixelTape1 = triggers.osc("Tape-1", 53000, "bike-lights-1", "255");
+        oscPixelTape2 = triggers.osc("Tape-2", 53000, "bike-lights-2", "255");
+        oscPixelTape3 = triggers.osc("Tape-3", 53000, "bike-lights-3", "255");
+        oscPixelTape4 = triggers.osc("Tape-4", 53000, "bike-lights-4", "255");
+        oscPixelTapeExit = triggers.osc("Tape-5", 53000, "bike-exit", "255");
 
         buttonChamber3a = triggers.gpio("C3-Button-A", 6, PULL_UP, false).setHoldTime(holdTime);
         buttonChamber3b = triggers.gpio("C3-Button-B", 7, PULL_UP, false).setHoldTime(holdTime);

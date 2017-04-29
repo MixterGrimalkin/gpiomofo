@@ -9,14 +9,8 @@
 
 int TIMEOUT = 10000000;
 
-bool initialised = false;
-
 void init(int triggerPin, int echoPin) {
     printf("Setting up native HC-SR04...\n");
-    if ( !initialised ) {
-        wiringPiSetup() ;
-        initialised = true;
-    }
     pinMode(triggerPin, OUTPUT);
     pinMode(echoPin, INPUT);
     digitalWrite(triggerPin, LOW);
@@ -66,6 +60,7 @@ int main(int argc, char **argv) {
 
         printf("Trigger %d, Echo %d\n", trigger, echo);
 
+        wiringPiSetup();
         init(trigger, echo);
 
         printf("Starting sensor loop...\n");

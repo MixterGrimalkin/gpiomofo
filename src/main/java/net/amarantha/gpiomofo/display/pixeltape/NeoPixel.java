@@ -9,7 +9,7 @@ public interface NeoPixel {
     void allOff();
 
     void setPixelColourRGB(int pixel, RGB rgb);
-    void setPixelColourRGB(int pixel, RGB colour, boolean forceRGB);
+//    void setPixelColourRGB(int pixel, RGB colour, boolean forceRGB);
     void setPixelColourRGB(int pixel, int red, int green, int blue);
 
     RGB getPixelRGB(int pixel);

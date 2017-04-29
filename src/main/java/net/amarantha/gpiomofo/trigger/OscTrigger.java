@@ -10,10 +10,15 @@ public class OscTrigger extends Trigger {
 
     @Parameter("port")      private int port;
     @Parameter("address")   private String address;
+    @Parameter("data")    private String data;
 
     @Override
     public void enable() {
-        osc.onReceive(port, address, ((time, message) -> fire(true)));
+        osc.onReceive(port, address, ((time, args) -> {
+            if ( args!=null && !args.isEmpty() ) {
+                fire(args.get(0).equals(data));
+            }
+        }));
     }
 
 }

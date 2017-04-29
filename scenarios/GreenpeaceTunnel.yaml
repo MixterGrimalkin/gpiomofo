@@ -7,15 +7,18 @@ Parameters:
   Colour5: 255,0,255
   TailLength: 10
   PaddleAxis: Y
+  PaddleColour: 255,0,0
   LingerTime: 50
 
 Triggers:
   Paddle1:
-    type: Range
+    type: OscValue
+    port: 53000
+    address: pad
     triggerPin: 12
     echoPin: 13
-    min: 400
-    max: 13000
+    minValue: 0
+    maxValue: 100
   GameOn:
     type: Gpio
     pin: 9

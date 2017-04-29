@@ -1,12 +1,11 @@
 package net.amarantha.gpiomofo.scenario;
 
 import net.amarantha.gpiomofo.core.Constants;
-import net.amarantha.gpiomofo.display.pixeltape.NeoPixelGUI;
-import net.amarantha.gpiomofo.target.Target;
-import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.BrightnessRipple;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.CyclicFade;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.SolidColour;
+import net.amarantha.gpiomofo.target.Target;
+import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.http.entity.HttpCommand;
 import net.amarantha.utils.osc.entity.OscCommand;
@@ -88,19 +87,19 @@ public class GingerlineToyBoxRoom extends Scenario {
         button3 =       triggers.gpio("Button3", 5, PULL_UP, false).setHoldTime(holdTime);
         button4 =       triggers.gpio("Button4", 6, PULL_UP, false).setHoldTime(holdTime);
 
-        oscStop =       triggers.osc("Stop",            53000, "stop");
-        oscAmber =      triggers.osc("Amber",           53000, "amber");
-        oscBlue =       triggers.osc("Blue",            53000, "blue");
-        oscGreen =      triggers.osc("Green",           53000, "green");
-        oscPurple =     triggers.osc("Purple",          53000, "purple");
-        oscMix1 =       triggers.osc("Mix-1",           53000, "mix1");
-        oscMix2 =       triggers.osc("Mix-2",           53000, "mix2");
-        oscMix3 =       triggers.osc("Mix-3",           53000, "mix3");
-        oscSlowFade =   triggers.osc("Slow-Fade",       53000, "slow-fade");
-        oscFastFade =   triggers.osc("Fast-Fade",       53000, "fast-fade");
-        oscRippleFade = triggers.osc("Ripple-Fade",     53000, "ripple-fade");
-        oscKillFade =   triggers.osc("Kill-Fade",       53000, "kill-fade");
-        oscEndOfWorld = triggers.osc("End-Of-World",    53000, "end-of-world");
+        oscStop =       triggers.osc("Stop",            53000, "stop", "255");
+        oscAmber =      triggers.osc("Amber",           53000, "amber", "255");
+        oscBlue =       triggers.osc("Blue",            53000, "blue", "255");
+        oscGreen =      triggers.osc("Green",           53000, "green", "255");
+        oscPurple =     triggers.osc("Purple",          53000, "purple", "255");
+        oscMix1 =       triggers.osc("Mix-1",           53000, "mix1", "255");
+        oscMix2 =       triggers.osc("Mix-2",           53000, "mix2", "255");
+        oscMix3 =       triggers.osc("Mix-3",           53000, "mix3", "255");
+        oscSlowFade =   triggers.osc("Slow-Fade",       53000, "slow-fade", "255");
+        oscFastFade =   triggers.osc("Fast-Fade",       53000, "fast-fade", "255");
+        oscRippleFade = triggers.osc("Ripple-Fade",     53000, "ripple-fade", "255");
+        oscKillFade =   triggers.osc("Kill-Fade",       53000, "kill-fade", "255");
+        oscEndOfWorld = triggers.osc("End-Of-World",    53000, "end-of-world", "255");
 
         panicLights =   targets.osc(new OscCommand(lightingIp, lightingPort, "alarm/c5", 255));
         panicMonitor =  targets.http(new HttpCommand(POST, panicIp, panicPort, "gpiomofo/trigger", URL_PANIC_TOYBOX+"/fire", ""));

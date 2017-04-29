@@ -31,10 +31,10 @@ public class NeoPixelMock implements NeoPixel{
         pixels[pixel] = colour;
     }
 
-    @Override
-    public void setPixelColourRGB(int pixel, RGB colour, boolean forceRGB) {
-        pixels[pixel] = colour;
-    }
+//    @Override
+//    public void setPixelColourRGB(int pixel, RGB colour, boolean forceRGB) {
+//        pixels[pixel] = colour;
+//    }
 
     @Override
     public void setPixelColourRGB(int pixel, int red, int green, int blue) {

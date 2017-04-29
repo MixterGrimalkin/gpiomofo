@@ -122,11 +122,6 @@ public class NeoPixelGUI implements NeoPixel {
     }
 
     @Override
-    public void setPixelColourRGB(int pixel, RGB colour, boolean forceRGB) {
-        setPixelColourRGB(pixel, colour);
-    }
-
-    @Override
     public void setPixelColourRGB(int pixel, int red, int green, int blue) {
         setPixelColourRGB(pixel, new RGB(red, green, blue));
     }

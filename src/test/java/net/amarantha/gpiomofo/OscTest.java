@@ -45,9 +45,9 @@ public class OscTest extends TestBase {
     @Story
     public void test_osc_triggers() {
 
-        OscCommand command = new OscCommand("127.0.0.1", 55000, "myaddress");
+        OscCommand command = new OscCommand("127.0.0.1", 55000, "myaddress", "255");
 
-        Trigger trigger = given_osc_trigger(55000, "myaddress");
+        Trigger trigger = given_osc_trigger(55000, "myaddress", "255");
         Target target = given_target_on_pin_$1(0);
         given_link_between_$1_and_$2(trigger, target);
 

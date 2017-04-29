@@ -3,6 +3,7 @@ package net.amarantha.gpiomofo.core;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.factory.ScenarioBuilder;
+import net.amarantha.gpiomofo.scenario.Scenario;
 
 import java.util.Scanner;
 
@@ -13,6 +14,8 @@ public class GpioMofo {
 
     @Inject private ScenarioBuilder builder;
 
+    private Scenario scenario;
+
     private boolean simulation = false;
 
     public void startSimulation() {
@@ -21,7 +24,8 @@ public class GpioMofo {
     }
 
     public void start() {
-        builder.loadScenario().getScenario().start();
+        scenario = builder.loadScenario();
+        scenario.start();
         if ( !simulation ) {
             waitForEnter();
         }
@@ -35,7 +39,7 @@ public class GpioMofo {
     }
 
     public void stop() {
-        builder.getScenario().stop();
+        scenario.stop();
         System.exit(0);
     }
 

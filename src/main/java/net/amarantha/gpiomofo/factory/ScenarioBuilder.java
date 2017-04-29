@@ -40,29 +40,29 @@ public class ScenarioBuilder {
     @Inject private TargetFactory targets;
     @Inject private LinkFactory links;
 
-    private Scenario scenario;
+//    private Scenario scenario;
 
-    public Scenario getScenario() {
-        return scenario;
-    }
+//    public Scenario getScenario() {
+////        return scenario;
+////    }
 
     //////////
     // Load //
     //////////
 
-    public ScenarioBuilder loadScenario() {
+    public Scenario loadScenario() {
         return loadScenario(getScenarioName());
     }
 
-    public ScenarioBuilder loadScenario(String name) {
-        buildScenario(name);
+    public Scenario loadScenario(String name) {
+        Scenario scenario = buildScenario(name);
         services.injectServices(scenario);
         props.injectPropertiesOrExit(scenario);
-        buildComponentsFromConfig();
-        injectComponents();
+        buildComponentsFromConfig(scenario);
+        injectComponents(scenario);
         scenario.setup();
-        logScenarioSetup();
-        return this;
+        scenario.logSetup();
+        return scenario;
     }
 
     private String getScenarioName() {
@@ -83,7 +83,7 @@ public class ScenarioBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    private void buildScenario(String className) {
+    private Scenario buildScenario(String className) {
         Class<Scenario> clazz = ReflectionUtils.getClass(props.getString("ScenarioPackage", DEFAULT_SCENARIO_PACKAGE) + "." + className);
         if ( clazz==null ) {
             clazz = ReflectionUtils.getClass(DEFAULT_SCENARIO_PACKAGE + "." + className);
@@ -91,15 +91,16 @@ public class ScenarioBuilder {
                 clazz = Scenario.class;
             }
         }
-        scenario = injector.getInstance(clazz);
+        Scenario scenario = injector.getInstance(clazz);
         scenario.setName(className);
+        return scenario;
     }
 
     ///////////////
     // Injection //
     ///////////////
 
-    private void injectComponents() {
+    private void injectComponents(Scenario scenario) {
         iterateAnnotatedFields(scenario, Named.class,
             (field, annotation)->
                 reflectiveSet(scenario, field, annotation.value(),
@@ -119,16 +120,14 @@ public class ScenarioBuilder {
     // YAML Configuration //
     ////////////////////////
 
-    private String configFilename;
-
     @SuppressWarnings("unchecked")
-    private void buildComponentsFromConfig() {
+    private void buildComponentsFromConfig(Scenario scenario) {
         Map<String, Map> config = null;
         String filename = props.getString("ScenariosDirectory", "scenarios")+"/"+scenario.getName()+".yaml";
         try (FileReader reader =new FileReader(filename)) {
             YamlReader yaml = new YamlReader(reader);
             config = (Map<String, Map>) yaml.read();
-            configFilename = filename;
+            scenario.setConfigFilename(filename);
         } catch (FileNotFoundException e) {
             if ( scenario.getClass()==Scenario.class ) {
                 log("No configuration found for custom scenario '"+scenario.getName()+"'");
@@ -138,33 +137,23 @@ public class ScenarioBuilder {
             log("Could not read configuration.\n" + e.getMessage());
             System.exit(1);
         }
-        processConfig(config);
+        processConfig(scenario, config);
     }
 
-    private void processConfig(Map<String, Map> config) {
-
-        injectParameters(config);
-
+    private void processConfig(Scenario scenario, Map<String, Map> config) {
+        injectParameters(scenario, config);
         processTriggers(config);
         processCompositeTriggers(config);
-        scenario.setupTriggers();
-
         processTargets(config);
-        scenario.setupTargets();
-
         processLinks(config);
-        scenario.setupLinks();
-
     }
 
-    private Map<String, String> parameters = new HashMap<>();
-
-    @SuppressWarnings("unchecked")
-    private void injectParameters(Map<String, Map> config) {
+        @SuppressWarnings("unchecked")
+    private void injectParameters(Scenario scenario, Map<String, Map> config) {
         if ( config!=null && config.get("Parameters")!=null ) {
-            parameters = (HashMap<String, String>) config.get("Parameters");
+            scenario.setParameters((HashMap<String, String>) config.get("Parameters"));
             iterateAnnotatedFields(scenario, Parameter.class,
-                    (field,annotation)-> reflectiveSet(scenario, field, parameters.get(annotation.value()))
+                    (field,annotation)-> reflectiveSet(scenario, field, scenario.getParameters().get(annotation.value()))
             );
         }
     }
@@ -287,48 +276,6 @@ public class ScenarioBuilder {
     /////////////
     // Utility //
     /////////////
-
-    private void logScenarioSetup() {
-
-        log(true, " "+scenario.getName(), true);
-
-        log("Class:\n\t"+scenario.getClass().getName());
-        log("Configuration:\n\t"+(configFilename==null?"(none)":configFilename));
-
-        log("Parameters:");
-        if ( parameters.isEmpty() ) {
-            log("\t(none)");
-        } else {
-            parameters.forEach((key,value)->log("\t"+key+"="+value));
-        }
-
-        log("Triggers:");
-        if ( triggers.getAll().isEmpty() ) {
-            log("\t(none)");
-        } else {
-            triggers.getAll().forEach((trigger) ->
-                    log("\t" + trigger.getClass().getSimpleName().replaceAll("Trigger", "") + ": " + trigger.getName()));
-        }
-
-        log("Targets:");
-        if ( targets.getAll().isEmpty() ) {
-            log("\t(none)");
-        } else {
-            targets.getAll().forEach((target) ->
-                    log("\t" + target.getClass().getSimpleName().replaceAll("Target", "") + ": " + target.getName()));
-        }
-
-        log("Links:");
-        if ( links.getLinks().isEmpty() ) {
-            log("\t(none)");
-        } else {
-            links.getLinks().forEach((trig, targs) -> {
-                StringBuilder sb = new StringBuilder();
-                targs.forEach((targ)->sb.append("[").append(targ.getName()).append("]"));
-                log("\t["+trig.getName()+"]-->"+sb.toString());
-            });
-        }
-    }
 
     private void checkErrors(List<ScenarioBuilderException> errors ) {
         if ( !errors.isEmpty() ) {
