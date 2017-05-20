@@ -6,7 +6,7 @@ import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.display.animation.AnimationService;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
-import net.amarantha.gpiomofo.service.pixeltape.matrix.Paddle;
+import net.amarantha.gpiomofo.service.pixeltape.matrix.ButterPong;
 import net.amarantha.gpiomofo.trigger.ContinuousTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.utils.colour.RGB;
@@ -22,7 +22,7 @@ public class GreenpeaceTunnel extends Scenario {
 
     @Inject private AnimationService animation;
     @Inject private Butterflies butterflies;
-    @Inject private Paddle paddle;
+    @Inject private ButterPong butterPong;
 
     @Service private LightSurface surface;
 
@@ -33,6 +33,7 @@ public class GreenpeaceTunnel extends Scenario {
     @Named("PIR5") private Trigger pir5;
     @Named("GameOn") private Trigger switchMode;
     @Named("Paddle1") private ContinuousTrigger paddle1;
+    @Named("Paddle2") private ContinuousTrigger paddle2;
 
     @Parameter("SpriteCount") private int spriteCount;
     @Parameter("TailLength") private int tailLength;
@@ -68,12 +69,13 @@ public class GreenpeaceTunnel extends Scenario {
         pir4.onFire(callback(3));
         pir5.onFire(callback(4));
 
-        paddle1.onMeasure(paddle::setPosition);
+        paddle1.onMeasure((value) -> butterPong.setLeftPosition(value));
+        paddle2.onMeasure((value) -> butterPong.setRightPosition(value));
 
         switchMode.onFire((state)->{
             if ( state ) {
                 gameOn = !gameOn;
-                animation.play(gameOn ? paddle : butterflies);
+                animation.play(gameOn ? butterPong : butterflies);
             }
         });
 
@@ -94,20 +96,18 @@ public class GreenpeaceTunnel extends Scenario {
     @Override
     public void startup() {
 
-        System.out.println("STARTING");
         wide = surface.width() >= surface.height();
         step = wide ? surface.width() / colours.size() : surface.height() / colours.size();
 
         butterflies.setLingerTime(lingerTime);
         butterflies.init(spriteCount, colours, tailLength);
 
-        paddle.setAxis(axis.equalsIgnoreCase("X") ? X : Y);
-        paddle.setPaddleColour(paddleColour);
+        butterPong.setPaddleAxis(axis.equalsIgnoreCase("X") ? X : Y);
+        butterPong.setPaddleColour(paddleColour);
 
         animation.start();
         animation.play(butterflies);
 
-        System.out.println("READY!");
     }
 
 }

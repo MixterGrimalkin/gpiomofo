@@ -8,7 +8,7 @@ import java.util.List;
 public abstract class Animation {
 
     @Inject protected LightSurface surface;
-    @Inject protected SpriteFactory sprites;
+    @Inject protected OldSpriteFactory sprites;
 
     public abstract void start();
 
@@ -20,7 +20,7 @@ public abstract class Animation {
 
     public abstract void onFocusRemoved(List<Integer> focusIds);
 
-    private long refreshInterval = 100;
+    private long refreshInterval = 80;
 
     public void setRefreshInterval(long refreshInterval) {
         this.refreshInterval = refreshInterval;

@@ -1,156 +1,118 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
+import com.google.inject.Inject;
+import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.math.MathUtils;
 
-import java.util.List;
-
-import static java.lang.Math.PI;
-import static java.lang.Math.random;
 import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
-import static net.amarantha.utils.math.MathUtils.*;
+import static net.amarantha.utils.math.MathUtils.max;
+import static net.amarantha.utils.math.MathUtils.randomBetween;
+import static net.amarantha.utils.math.MathUtils.round;
 
-class Sprite {
+public abstract class Sprite {
 
-    private final int width;
-    private final int height;
-    private final int tailLength;
+    @Inject protected LightSurface surface;
 
-    int[][] tailPos;
-    RGB[] tailColours;
+    protected int[] minBound = {0, 0};
+    protected int[] maxBound = {0, 0};
 
-    private int[] bounds = {0, 0};
-    private double[] current = {0, 0};
-    private double[] target = {0, 0};
-    private double[] delta = {0, 0};
-    private double[] offset = {0, 0};
-    private double linearSpeed;
-    private double theta;
-    private double radius;
-    private double dTheta;
-    int[] real = {0, 0};
-    RGB colour;
-    int preferredFocus = 0;
+    protected int[] position = {0, 0};
 
-    Sprite(int preferredFocus, RGB colour, int width, int height, int tailLength) {
-        this.colour = colour;
-        this.preferredFocus = preferredFocus;
-        this.width = width;
-        this.height = height;
-        this.tailLength = tailLength;
-        bounds = new int[]{ width, height };
-        tailPos = new int[tailLength][2];
-        tailColours = new RGB[tailLength];
-        current[X] = width / 2;
-        current[Y] = height / 2;
-        theta = 0;
-        randomize(1.0);
-        updateDelta();
-        for (int i = 0; i < tailLength; i++) {
-            tailColours[i] = RGB.BLACK;
-            tailPos[i] = new int[]{-1, -1};
-        }
+    protected double[] exactPosition = {0.0, 0.0};
+    protected double[] linearDelta = {0.0, 0.0};
+
+    protected int layer = 0;
+    protected RGB colour = RGB.WHITE;
+
+    public void init() {
+        setBounds(0, 0, surface.width()-1, surface.height()-1);
     }
 
-    void render(LightSurface surface) {
+    public void setBounds(int minX, int minY, int maxX, int maxY) {
+        minBound[X] = minX;
+        minBound[Y] = minY;
+        maxBound[X] = maxX;
+        maxBound[Y] = maxY;
     }
 
-    void storeTail() {
-        if (tailLength > 0) {
-            for (int i = tailLength - 1; i > 0; i--) {
-                tailColours[i] = tailColours[i - 1].withBrightness(0.8 - (1.0 / tailLength));
-                tailPos[i] = tailPos[i - 1];
-            }
-            tailColours[0] = colour;
-            tailPos[0] = new int[]{real[X], real[Y]};
-        }
+    protected boolean inBounds(int x, int y) {
+        return inBoundsOnAxis(X, x) && inBoundsOnAxis(Y, y);
     }
 
-    void randomize(double probability) {
-        if (random() < probability) {
-            target[X] = randomBetween(0, width - 1);
-            target[Y] = randomBetween(0, height - 1);
-            linearSpeed = randomBetween(2.0, 25.0);
-            radius = randomBetween(0.0, 5.0);
-            dTheta = randomFlip(randomBetween(0.1, PI / 8));
-        }
+    protected boolean inBoundsOnAxis(int axis, int position) {
+        return position >= minBound[axis] && position <= maxBound[axis];
     }
 
-    void targetOn(int tx, int ty) {
-        target[X] = bound(0, width - 1, tx);
-        target[Y] = bound(0, height - 1, ty);
-        updateDelta();
-    }
-
-    void updateDelta() {
-        delta[X] = (target[X] - current[X]) / linearSpeed;
-        delta[Y] = (target[Y] - current[Y]) / linearSpeed;
-    }
-
-    void updateAxis(int axis) {
-        if (target[axis] != current[axis]) {
-            current[axis] += delta[axis];
-        }
-        if (current[axis] < 0) {
-            current[axis] = 0;
-            delta[axis] = -delta[axis];
-        } else if (current[axis] >= bounds[axis]) {
-            current[axis] = bounds[axis] - 1;
-            delta[axis] = -delta[axis];
-        }
-    }
-
-    int[] updatePosition(List<int[]> usedPositions) {
+    void updatePosition() {
         updateAxis(X);
         updateAxis(Y);
-        int newX = round(current[X] + (Math.sin(theta) * radius));
-        int newY = round(current[Y] + (Math.cos(theta) * radius));
-        if ( positionUsed(new int[]{newX, newY}, usedPositions) ) {
-//            randomize(1.0);
+    }
+
+    void setLinearDelta(double dX, double dY) {
+        linearDelta = new double[]{ dX, dY };
+    }
+
+    void setLinearDeltaAxis(int axis, double delta) {
+        linearDelta[axis] = delta;
+    }
+
+    void setAngularDelta(double angle, double delta) {
+        setLinearDeltaAxis(X, Math.sin(angle) * delta);
+        setLinearDeltaAxis(Y, Math.cos(angle) * delta);
+    }
+
+    synchronized void updateAxis(int axis) {
+        double newPos = exactPosition[axis] + linearDelta[axis];
+        if ( newPos <= minBound[axis] ) {
+            newPos = minBound[axis];
+            exactPosition[axis] = newPos;
+            position[axis] = round(exactPosition[axis]);
+            bounce(axis, false);
+        } else if ( newPos >= maxBound[axis] ) {
+            newPos = maxBound[axis];
+            exactPosition[axis] = newPos;
+            position[axis] = round(exactPosition[axis]);
+            bounce(axis, true);
         } else {
-            real[X] = newX;
-            real[Y] = newY;
+            exactPosition[axis] = newPos;
+            position[axis] = round(exactPosition[axis]);
         }
-        angularBounce(X);
-        angularBounce(Y);
-        updateAngle();
-        updateDelta();
-        storeTail();
-        return real;
     }
 
-    private boolean blockCollisions = false;
-
-    boolean positionUsed(int[] newPosition, List<int[]> usedPositions) {
-        if ( blockCollisions ) {
-            for (int[] position : usedPositions) {
-                if (position[X] == newPosition[X] && position[Y] == newPosition[Y]) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    synchronized void setPosition(int x, int y) {
+        position = new int[]{ x, y };
+        exactPosition = new double[]{ x, y };
     }
 
-    void angularBounce(int axis) {
-        if ( real[axis] < 0 ) {
-            real[axis] = 0;
-            dTheta = -dTheta;
-        } else  if ( real[axis] >= bounds[axis] ) {
-            real[axis] = bounds[axis] - 1;
-            dTheta = -dTheta;
-        }
+    void setPositionAxis(int axis, int pos) {
+        exactPosition[axis] = position[axis] = pos;
 
     }
 
-    void updateAngle() {
-        theta += dTheta;
-        if (theta < 0.0) {
-            theta = 2 * PI;
-        } else if (theta > 2 * PI) {
-            theta = 0.0;
-        }
+    protected void bounce(int axis, boolean max) {
+        linearDelta[axis] = -linearDelta[axis];
     }
+
+    protected void render() {
+        surface.layer(layer).draw(position[X], position[Y], colour);
+    }
+
+
+    public void setLayer(int layer) {
+        this.layer = layer;
+    }
+
+    public void setColour(RGB colour) {
+        this.colour = colour;
+    }
+
+
+
+
+
+
 
 }

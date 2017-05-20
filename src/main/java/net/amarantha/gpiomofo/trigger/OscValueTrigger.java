@@ -15,7 +15,9 @@ public class OscValueTrigger extends ContinuousTrigger {
     public void enable() {
         osc.onReceive(port, address, (date, args) -> {
             if ( !args.isEmpty() ) {
-                fireCallbacks(((Integer)args.get(0)).doubleValue());
+                try {
+                    fireCallbacks(((Integer) args.get(0)).doubleValue());
+                } catch ( Exception ignored ) {}
             }
         });
     }

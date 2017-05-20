@@ -128,4 +128,8 @@ public class LightSurface extends AbstractService {
         return width;
     }
 
+    public int[] size() {
+        return new int[] { width, height };
+    }
+
 }

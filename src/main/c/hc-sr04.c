@@ -10,7 +10,7 @@
 int TIMEOUT = 10000000;
 
 void init(int triggerPin, int echoPin) {
-    printf("Setting up native HC-SR04...\n");
+    printf("Initialising HC-SR04 (trig=%d/echo=%d)...\n", triggerPin, echoPin);
     pinMode(triggerPin, OUTPUT);
     pinMode(echoPin, INPUT);
     digitalWrite(triggerPin, LOW);

@@ -1,5 +1,6 @@
 package net.amarantha.gpiomofo.display.entity;
 
+import net.amarantha.gpiomofo.core.Constants;
 import net.amarantha.utils.colour.RGB;
 
 import static java.lang.Math.max;
@@ -82,6 +83,14 @@ public class Pattern {
     public Pattern pen(RGB penColour) {
         this.penColour = penColour;
         return this;
+    }
+
+    public Pattern draw(int[] point) {
+        return draw(point, penColour);
+    }
+
+    public Pattern draw(int[] point, RGB colour) {
+        return draw(point[Constants.X], point[Constants.Y], colour);
     }
 
     public Pattern draw(int x, int y) {

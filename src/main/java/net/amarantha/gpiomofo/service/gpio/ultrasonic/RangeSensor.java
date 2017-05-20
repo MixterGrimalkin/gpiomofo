@@ -17,7 +17,7 @@ public abstract class RangeSensor extends AbstractService {
 
     private Timer scanTimer;
 
-    @Property("Refresh") private int refreshInterval = 20;
+    @Property("Refresh") private int refreshInterval = 50;
 
     public RangeSensor(String name) {
         super(name);

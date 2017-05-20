@@ -1,5 +1,7 @@
 package net.amarantha.gpiomofo.display.lightboard;
 
+import net.amarantha.gpiomofo.service.gpio.WiringPiSetup;
+
 import static net.amarantha.utils.shell.Utility.log;
 
 public class NativeLightBoard extends NativeLightboardWrapper {
@@ -10,6 +12,7 @@ public class NativeLightBoard extends NativeLightboardWrapper {
     @Override
     public void init(int width, int height) {
         log("Starting Native LightBoard...");
+        WiringPiSetup.init();
         initNative(this.height = height, this.width = width);
     }
 

@@ -29,14 +29,12 @@ public class NeoPixelWS281X implements NeoPixel {
     public void init(int pixelCount) {
         log("Starting Native WS281x NeoPixel...");
         props.injectPropertiesOrExit(this, (type, value)->{
-            System.out.println(value);
             if (type==ColourMode.class) {
                 return ColourMode.valueOf(value);
             } else {
                 return null;
             }
         });
-        System.out.println("actual="+colourMode);
         this.pixelCount = pixelCount;
         ws281x = new WS281x(frequency, dma, pin, 255, pixelCount);
     }

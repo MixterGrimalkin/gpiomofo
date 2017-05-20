@@ -1,0 +1,31 @@
+Triggers:
+  Paddle1:
+    type: Range
+    triggerPin: 4
+    echoPin: 29
+    minValue: 300
+    maxValue: 1100
+  Paddle2:
+    type: Range
+    triggerPin: 15
+    echoPin: 26
+    minValue: 300
+    maxValue: 1100
+
+Targets:
+  LBPaddle1:
+    type: OscValue
+    command: 192.168.0.71:53000/pad1
+    minValue: 0
+    maxValue: 255
+  LBPaddle2:
+    type: OscValue
+    command: 192.168.0.71:53000/pad2
+    minValue: 0
+    maxValue: 255
+
+Links:
+  Paddle1:
+    - LBPaddle1
+  Paddle2:
+    - LBPaddle2

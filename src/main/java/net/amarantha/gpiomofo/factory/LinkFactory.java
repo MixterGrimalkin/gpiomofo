@@ -22,6 +22,7 @@ public class LinkFactory {
 
     public LinkFactory link(Trigger trigger, Target... targets) {
         if ( trigger instanceof ContinuousTrigger && targets[0] instanceof OscValueTarget ) {
+            System.out.println("CONTINUOUS");
             linkContinuous((ContinuousTrigger)trigger, (OscValueTarget)targets[0]);
         } else {
             for (Target target : targets) {

@@ -12,13 +12,21 @@ Parameters:
 
 Triggers:
   Paddle1:
-    type: OscValue
+    type: Range
+    triggerPin: 1
+    echoPin: 2
     port: 53000
-    address: pad
-    triggerPin: 12
-    echoPin: 13
+    address: pad1
     minValue: 0
-    maxValue: 100
+    maxValue: 255
+  Paddle2:
+    type: Range
+    triggerPin: 3
+    echoPin: 4
+    port: 53000
+    address: pad2
+    minValue: 0
+    maxValue: 255
   GameOn:
     type: Gpio
     pin: 9
@@ -26,27 +34,27 @@ Triggers:
     triggerState: true
   PIR1:
     type: Gpio
-    pin: 0
+    pin: 10
     resistance: PULL_DOWN
     triggerState: true
   PIR2:
     type: Gpio
-    pin: 1
+    pin: 11
     resistance: PULL_DOWN
     triggerState: true
   PIR3:
     type: Gpio
-    pin: 2
+    pin: 12
     resistance: PULL_DOWN
     triggerState: true
   PIR4:
     type: Gpio
-    pin: 3
+    pin: 13
     resistance: PULL_DOWN
     triggerState: true
   PIR5:
     type: Gpio
-    pin: 4
+    pin: 14
     resistance: PULL_DOWN
     triggerState: true
 

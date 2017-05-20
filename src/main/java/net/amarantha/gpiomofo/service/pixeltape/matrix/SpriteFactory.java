@@ -1,42 +1,25 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.display.lightboard.LightSurface;
-import net.amarantha.utils.colour.RGB;
+import com.google.inject.Injector;
+import net.amarantha.utils.properties.PropertiesService;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class SpriteFactory {
 
-    @Inject private LightSurface surface;
+    @Inject private Injector injector;
+    @Inject private PropertiesService props;
 
-    private List<Sprite> sprites = new ArrayList<>();
+    private List<Sprite> sprites = new LinkedList<>();
 
-    private int tailLength;
-
-    public SpriteFactory setTailLength(int tailLength) {
-        this.tailLength = tailLength;
-        return this;
-    }
-
-    public int tailLength() {
-        return tailLength;
-    }
-
-    public Sprite create(int group, RGB colour) {
-        Sprite sprite = new Sprite(group, colour, surface.width(), surface.height(), tailLength);
+    public <T extends Sprite> T make(Class<T> clazz) {
+        T sprite = injector.getInstance(clazz);
+        props.injectPropertiesOrExit(sprite);
         sprites.add(sprite);
+        sprite.init();
         return sprite;
-    }
-
-    public List<Sprite> get() {
-        return sprites;
-    }
-
-    public void forEach(Consumer<Sprite> action) {
-        sprites.forEach(action);
     }
 
 }

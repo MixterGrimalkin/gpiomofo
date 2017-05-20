@@ -1,72 +1,28 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
-import net.amarantha.utils.colour.RGB;
+import com.google.inject.Inject;
 
-import java.util.List;
+class Paddle extends Sprite {
 
-import static net.amarantha.gpiomofo.core.Constants.X;
-import static net.amarantha.gpiomofo.core.Constants.Y;
-import static net.amarantha.utils.math.MathUtils.round;
+    @Inject private ButterPong game;
 
-public class Paddle extends Animation {
+    int positionAlongWall;
 
-    private int delta;
-    private int[] position = {0,0};
-    private int[] target = {0,0};
-    private int axis = X;
-    private int paddleSize = 5;
-    private int fieldSize;
-    private RGB paddleColour;
+    void setPlane(int positionAlongWall) {
+        this.positionAlongWall = positionAlongWall;
+    }
 
-    @Override
-    public void start() {
-        fieldSize = axis ==X ? surface.width() : surface.height();
+    void moveTo(int position) {
+        setPositionAxis(game.getPaddleAxis(), position);
     }
 
     @Override
-    public void stop() {
-
-    }
-
-    public void setAxis(int axis) {
-        this.axis = axis;
-    }
-
-    public void setPosition(double value) {
-        target[axis] = round(value*(fieldSize-paddleSize));
-        delta = (target[axis] - position[axis])/5;
-    }
-
-    public void setPaddleColour(RGB paddleColour) {
-        this.paddleColour = paddleColour;
-    }
-
-    @Override
-    public void refresh() {
-        updatePosition();
-        surface.clear();
-        for ( int i=0; i<paddleSize; i++ ) {
-            surface.layer(0).draw(position[X]+(axis ==X?i:0), position[Y]+(axis ==Y?i:0), paddleColour);
+    protected void render() {
+        for ( int i=0; i<game.getPaddleSize(); i++ ) {
+            int[] point = new int[2];
+            point[game.getWallAxis()] = positionAlongWall;
+            point[game.getPaddleAxis()] = position[game.getPaddleAxis()] + i;
+            surface.layer(layer).draw(point, colour);
         }
-    }
-
-    private void updatePosition() {
-        position[axis] = target[axis];
-//        if ( ( delta > 0 && position[axis] >= target[axis] ) || ( delta < 0 && position[axis] <= target[axis] ) ) {
-//            position[axis] = target[axis];
-//            delta = 0;
-//        } else {
-//            position[axis] += delta;
-//        }
-    }
-
-    @Override
-    public void onFocusAdded(int focusId) {
-
-    }
-
-    @Override
-    public void onFocusRemoved(List<Integer> focusIds) {
-
     }
 }

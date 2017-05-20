@@ -1,0 +1,27 @@
+Display 0
+
+A0 - 0
+A1 - 2
+A2 - 3
+A3 - 4
+R1 - 5
+R2 - 6
+G1 - 7
+G2 - 21
+Clock - 22
+Latch - 23
+Enable - 25
+
+Display 1
+
+A0 - 26
+A1 - 27
+A2 - 28
+A3 - 29
+R1 - 8
+R2 - 9
+G1 - 10
+G2 - 11
+Clock - 12
+Latch - 13
+Enable - 14

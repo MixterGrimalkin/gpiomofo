@@ -88,9 +88,9 @@ public class Butterflies extends Animation {
         if (foci.isEmpty()) {
             randomize();
         } else {
-            sprites.forEach((sprite) -> {
-                Integer[] target = randomFocus(sprite);
-                sprite.targetOn(
+            sprites.forEach((oldSprite) -> {
+                Integer[] target = randomFocus(oldSprite);
+                oldSprite.targetOn(
                         target[X] + randomFlip(randomBetween(0, targetJitter[X])),
                         target[Y] + randomFlip(randomBetween(0, targetJitter[Y]))
                 );
@@ -98,10 +98,10 @@ public class Butterflies extends Animation {
         }
     }
 
-    public Integer[] randomFocus(Sprite sprite) {
+    public Integer[] randomFocus(OldSprite oldSprite) {
         List<Integer[]> coords = new ArrayList<>(foci.values());
-        if (foci.keySet().contains(sprite.preferredFocus)) {
-            return foci.get(sprite.preferredFocus);
+        if (foci.keySet().contains(oldSprite.preferredFocus)) {
+            return foci.get(oldSprite.preferredFocus);
         } else {
             return coords.get(randomBetween(0, coords.size() - 1));
 
