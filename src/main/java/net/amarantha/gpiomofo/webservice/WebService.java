@@ -12,6 +12,7 @@ import java.net.URI;
 
 import static net.amarantha.gpiomofo.core.Constants.LOCAL_IP;
 import static net.amarantha.gpiomofo.core.Constants.LOG_HTTP;
+import static net.amarantha.utils.properties.PropertiesService.isArgumentPresent;
 
 @Singleton
 public class WebService {
@@ -29,12 +30,12 @@ public class WebService {
 
         System.out.println("Starting Web Server...");
 
-        String ip = props.isArgumentPresent(LOCAL_IP) ? "127.0.0.1" : props.getIp().trim();
+        String ip = isArgumentPresent(LOCAL_IP) ? "127.0.0.1" : props.getIp().trim();
         String fullUri = "http://" + ip + ":8001/gpiomofo/";
 
         try {
             final ResourceConfig rc = new ResourceConfig().packages("net.amarantha.gpiomofo.webservice");
-            if ( props.isArgumentPresent(LOG_HTTP)) {
+            if ( isArgumentPresent(LOG_HTTP)) {
                 rc.register(LoggingFilter.class);
             }
             server = GrizzlyHttpServerFactory.createHttpServer(URI.create(fullUri), rc);

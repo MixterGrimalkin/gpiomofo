@@ -12,7 +12,7 @@ public class OldSpriteFactory {
 
     @Inject private LightSurface surface;
 
-    private List<OldSprite> oldSprites = new ArrayList<>();
+    private List<Butterfly> oldSprites = new ArrayList<>();
 
     private int tailLength;
 
@@ -25,17 +25,17 @@ public class OldSpriteFactory {
         return tailLength;
     }
 
-    public OldSprite create(int group, RGB colour) {
-        OldSprite oldSprite = new OldSprite(group, colour, surface.width(), surface.height(), tailLength);
+    public Butterfly create(int group, RGB colour) {
+        Butterfly oldSprite = new Butterfly(group, colour, surface.width(), surface.height(), tailLength);
         oldSprites.add(oldSprite);
         return oldSprite;
     }
 
-    public List<OldSprite> get() {
+    public List<Butterfly> get() {
         return oldSprites;
     }
 
-    public void forEach(Consumer<OldSprite> action) {
+    public void forEach(Consumer<Butterfly> action) {
         oldSprites.forEach(action);
     }
 

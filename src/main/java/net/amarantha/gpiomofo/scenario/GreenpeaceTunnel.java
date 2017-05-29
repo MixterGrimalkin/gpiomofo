@@ -69,8 +69,8 @@ public class GreenpeaceTunnel extends Scenario {
         pir4.onFire(callback(3));
         pir5.onFire(callback(4));
 
-        paddle1.onMeasure((value) -> butterPong.setLeftPosition(value));
-        paddle2.onMeasure((value) -> butterPong.setRightPosition(value));
+        paddle1.onMeasure(butterPong::setLeftPosition);
+        paddle2.onMeasure(butterPong::setRightPosition);
 
         switchMode.onFire((state)->{
             if ( state ) {

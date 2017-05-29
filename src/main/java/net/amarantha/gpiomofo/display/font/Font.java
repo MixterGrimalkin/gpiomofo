@@ -34,7 +34,7 @@ public class Font {
         }
     }
 
-    public void loadFont(String filename) {
+    public Font loadFont(String filename) {
         try {
             String fontFile = new String(Files.readAllBytes(Paths.get(filename)));
             String[] lines = fontFile.split("\n");
@@ -64,6 +64,7 @@ public class Font {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return this;
     }
 
 //    public final void registerPattern(char key, boolean[][] bits) {
@@ -164,7 +165,7 @@ public class Font {
         }
         int cols = getStringWidth(str);
         int rows = getStringHeight(str);
-        Pattern result = new Pattern(rows, cols);
+        Pattern result = new Pattern(cols, rows);
         String[] lines = str.split("\n");
         if ( lines.length==1 ) {
             int cursorX = 0;

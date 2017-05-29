@@ -64,7 +64,7 @@ public class TestBase {
         now.setOffset(0L);
         tasks.reset();
         services.startAll();
-        props.setProperty("HttpAsyncTargets", "false");
+        props.set("HttpAsyncTargets", "false");
     }
 
     @After
@@ -223,7 +223,7 @@ public class TestBase {
     }
 
     void given_property_$1_equals_$2(String key, String value) {
-        props.setProperty(key, value);
+        props.set(key, value);
     }
 
     //////////

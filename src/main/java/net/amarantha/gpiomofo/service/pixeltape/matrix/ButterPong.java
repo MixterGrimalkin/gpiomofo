@@ -2,7 +2,7 @@ package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.amarantha.gpiomofo.display.entity.Pattern;
+import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.*;
 import net.amarantha.utils.colour.RGB;
 
 import java.util.*;
@@ -16,7 +16,7 @@ import static net.amarantha.utils.math.MathUtils.round;
 @Singleton
 public class ButterPong extends Animation {
 
-    @Inject private SpriteFactory sprites;
+    @Inject private SpriteField field;
 
     private int delta;
 
@@ -25,7 +25,7 @@ public class ButterPong extends Animation {
 
 
 
-    private int paddleSize = 11;
+    private int paddleSize = 4;
     private RGB paddleColour;
 
     private Map<Integer, Paddle> paddles = new HashMap<>();
@@ -64,31 +64,85 @@ public class ButterPong extends Animation {
 
     @Override
     public void start() {
-        ball = sprites.make(Ball.class);
+
+        surface.clear();
+        final Sprite explosion =
+                field.make(Explosion.class)
+                        .setSparkCount(150)
+                        .setSpeed(0.1, 4.0)
+                        .addColours(RGB.RED, RGB.YELLOW)
+                        .setLayer(1);
+
+        ball = field.make(Ball.class);
+        ball.setLayer(2);
         ball.setColour(RGB.YELLOW);
-        leftPaddle = sprites.make(Paddle.class);
+        ball.show();
+        ball.onBounce((axis, max)->{
+            if ( axis==wallAxis ) {
+                Paddle p = max ? rightPaddle : leftPaddle;
+                if ( ball.position(paddleAxis) >= p.position(paddleAxis)
+                        && ball.position(paddleAxis) < p.position(paddleAxis) + paddleSize) {
+                } else {
+                    if ( isBallInPlay() ) {
+                        ballInPlay = false;
+                        ball.hide();
+                        ball.setLinearDelta(0, 0);
+                        explosion.setColour(max ? RGB.RED : RGB.GREEN);
+                        explosion.setPosition(ball.position());
+                        explosion.reset();
+                        explosion.show();
+                        System.out.println("BOOM!");
+                        new Timer().schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                ball.show();
+                                playRound();
+                            }
+                        }, 3500);
+                    }
+                }
+            }
+        });
+
+        leftPaddle = field.make(Paddle.class);
         leftPaddle.setColour(RGB.RED);
         leftPaddle.setPlane(0);
-        rightPaddle = sprites.make(Paddle.class);
+        leftPaddle.setLayer(2);
+        leftPaddle.show();
+
+        rightPaddle = field.make(Paddle.class);
         rightPaddle.setPlane(surface.size()[wallAxis]-1);
         rightPaddle.setColour(RGB.GREEN);
+        rightPaddle.setLayer(2);
+        rightPaddle.show();
+
+        field.setRefresh(100);
+        field.start();
+
         playRound();
     }
 
     @Override
     public void stop() {
-
+        ball.hide();
+        leftPaddle.hide();
+        rightPaddle.hide();
+        field.stop();
     }
 
     private boolean ballInPlay = false;
 
-    void playRound() {
+    public void playRound() {
+        field.resume();
         ballInPlay = false;
         ball.reset();
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                ball.start();
+                System.out.println("BEGIN!");
+                ball.show();
+                ball.setLinearDeltaAxis(paddleAxis, randomFlip(randomBetween(1.0, 2.0)));
+                ball.setLinearDeltaAxis(wallAxis, randomFlip(randomBetween(1.0, 2.0)));
                 ballInPlay = true;
             }
         }, 2000);
@@ -118,13 +172,12 @@ public class ButterPong extends Animation {
 
     @Override
     public void refresh() {
-        surface.clear();
-        if ( ball!=null && leftPaddle!=null && rightPaddle!=null ) {
-            ball.updatePosition();
-            ball.render();
-            leftPaddle.render();
-            rightPaddle.render();
-        }
+//        if ( ball!=null && leftPaddle!=null && rightPaddle!=null ) {
+//            ball.updatePosition();
+//            ball.render();
+//            leftPaddle.render();
+//            rightPaddle.render();
+//        }
     }
 
     @Override

@@ -71,7 +71,8 @@ public class LightSurface extends AbstractService {
     public Pattern composite() {
         Pattern result = new Pattern(width, height, false);
         result.eachPixel((x,y,c)->{
-            for (int i = layerCount -1; i>=0; i-- ) {
+            for (int i = 0; i < layerCount; i++ ) {
+//            for (int i = layerCount -1; i>=0; i-- ) {
                 RGB rgb = layers[i].rgb(x, y);
                 if ( rgb!=null ) {
                     result.draw(x,y,rgb);

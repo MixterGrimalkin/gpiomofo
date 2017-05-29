@@ -1,6 +1,6 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
-import net.amarantha.gpiomofo.display.lightboard.LightSurface;
+import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.Sprite;
 import net.amarantha.utils.colour.RGB;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
 import static net.amarantha.utils.math.MathUtils.*;
 
-class OldSprite {
+class Butterfly extends Sprite {
 
     private final int width;
     private final int height;
@@ -33,7 +33,7 @@ class OldSprite {
     RGB colour;
     int preferredFocus = 0;
 
-    OldSprite(int preferredFocus, RGB colour, int width, int height, int tailLength) {
+    Butterfly(int preferredFocus, RGB colour, int width, int height, int tailLength) {
         this.colour = colour;
         this.preferredFocus = preferredFocus;
         this.width = width;
@@ -51,9 +51,6 @@ class OldSprite {
             tailColours[i] = RGB.BLACK;
             tailPos[i] = new int[]{-1, -1};
         }
-    }
-
-    void render(LightSurface surface) {
     }
 
     void storeTail() {
@@ -88,7 +85,7 @@ class OldSprite {
         delta[Y] = (target[Y] - current[Y]) / linearSpeed;
     }
 
-    void updateAxis(int axis) {
+    public void updateAxis(int axis) {
         if (target[axis] != current[axis]) {
             current[axis] += delta[axis];
         }
@@ -99,6 +96,11 @@ class OldSprite {
             current[axis] = bounds[axis] - 1;
             delta[axis] = -delta[axis];
         }
+    }
+
+    @Override
+    public void doRender() {
+
     }
 
     int[] updatePosition(List<int[]> usedPositions) {

@@ -32,7 +32,7 @@ public class Gui {
 
         this.props = props;
 
-        File logoFile = new File(props.getString("Gui/LogoFile", "/home/grimalkin/code/gpiomofo/gpiomofo-logo.png"));
+        File logoFile = new File(props.getStringOrDefault("Gui", "LogoFile", "/home/grimalkin/code/gpiomofo/gpiomofo-logo.png"));
         Image logo = new Image(logoFile.toURI().toString());
         double width = logo.getWidth();
         double height = logo.getHeight();
@@ -86,7 +86,7 @@ public class Gui {
     }
 
     private String makePropName(String title) {
-        return "Gui/Window-"+title.replaceAll(" ", "-");
+        return "Window-"+title.replaceAll(" ", "-");
     }
 
     private String makePropString(String title) {
@@ -95,11 +95,11 @@ public class Gui {
     }
 
     private void savePosition(String title) {
-        props.setProperty(makePropName(title), makePropString(title));
+        props.set("Gui", makePropName(title), makePropString(title));
     }
 
     private void restorePosition(String title) {
-        String options = props.getString(makePropName(title), makePropString(title));
+        String options = props.getStringOrDefault("Gui", makePropName(title), makePropString(title));
         String[] pieces = options.split(",");
         if ( pieces.length==2 ) {
             try {

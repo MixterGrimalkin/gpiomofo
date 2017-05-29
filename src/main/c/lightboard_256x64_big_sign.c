@@ -14,21 +14,29 @@ int cols = 0;
 bool currentFrame[3][64][256];
 bool nextFrame[3][64][256];
 
-int clockPin = 0;
-int store = 1;
-int output = 2;
-int data1R = 3;
-int data2R = 4;
-int data3R = 25;
-int data4R = 26;
-int data1G = 5;
-int data2G = 6;
-int data3G = 27;
-int data4G = 28;
-int addr0 = 21;
-int addr1 = 22;
-int addr2 = 23;
-int addr3 = 24;
+int addr0 = 0;
+int addr1 = 2;
+int addr2 = 3;
+int addr3 = 4;
+int data1R = 5;
+int data2R = 6;
+int data1G = 7;
+int data2G = 21;
+int clockPin = 22;
+int store = 23;
+int output = 25;
+int data3R = 8;
+int data4R = 9;
+int data3G = 10;
+int data4G = 11;
+
+int addr0_2 = 26;
+int addr1_2 = 27;
+int addr2_2 = 28;
+int addr3_2 = 29;
+int clockPin_2 = 12;
+int store_2 = 13;
+int output_2 = 14;
 
 bool paused = false;
 
@@ -55,6 +63,7 @@ void sendSerialString(bool red1[], bool green1[], bool red2[], bool green2[], bo
     for (col = 0; col < cols ; col++) {
         delayMicroseconds(CLOCK_DELAY);
         digitalWrite(clockPin, LOW);
+        digitalWrite(clockPin_2, LOW);
         digitalWrite(data1R, !red1[col] );
         digitalWrite(data1G, !green1[col] );
         digitalWrite(data2R, !red2[col] );
@@ -65,6 +74,7 @@ void sendSerialString(bool red1[], bool green1[], bool red2[], bool green2[], bo
         digitalWrite(data4G, !green4[col] );
         delayMicroseconds(CLOCK_DELAY);
         digitalWrite(clockPin, HIGH);
+        digitalWrite(clockPin_2, HIGH);
     }
 }
 
@@ -73,6 +83,10 @@ void decodeRowAddress(int row) {
     digitalWrite(addr1, CHECK_BIT(row, 1)!=0);
     digitalWrite(addr2, CHECK_BIT(row, 2)!=0);
     digitalWrite(addr3, CHECK_BIT(row, 3)!=0);
+    digitalWrite(addr0_2, CHECK_BIT(row, 0)!=0);
+    digitalWrite(addr1_2, CHECK_BIT(row, 1)!=0);
+    digitalWrite(addr2_2, CHECK_BIT(row, 2)!=0);
+    digitalWrite(addr3_2, CHECK_BIT(row, 3)!=0);
 }
 
 void push() {
@@ -85,12 +99,16 @@ void push() {
                              currentFrame[0][row + (rows/2)], currentFrame[1][row + (rows/2)],
                              currentFrame[0][row + ((3*rows)/4)], currentFrame[1][row + ((3*rows)/4)]);
             digitalWrite(store, HIGH);
+            digitalWrite(store_2, HIGH);
             digitalWrite(output, HIGH);
+            digitalWrite(output_2, HIGH);
             delayMicroseconds(CLOCK_DELAY*1);
             decodeRowAddress(row);
             delayMicroseconds(CLOCK_DELAY*1);
             digitalWrite(output, LOW);
+            digitalWrite(output_2, LOW);
             digitalWrite(store, LOW);
+            digitalWrite(store_2, LOW);
         }
     }
 }
@@ -119,6 +137,14 @@ void init(int r, int c) {
     pinMode(addr1, OUTPUT);
     pinMode(addr2, OUTPUT);
     pinMode(addr3, OUTPUT);
+
+    pinMode(clockPin_2, OUTPUT);
+    pinMode(store_2, OUTPUT);
+    pinMode(output_2, OUTPUT);
+    pinMode(addr0_2, OUTPUT);
+    pinMode(addr1_2, OUTPUT);
+    pinMode(addr2_2, OUTPUT);
+    pinMode(addr3_2, OUTPUT);
 
     for ( ;; ) {
         push();

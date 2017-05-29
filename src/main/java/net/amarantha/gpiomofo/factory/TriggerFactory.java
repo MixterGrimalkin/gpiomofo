@@ -14,7 +14,6 @@ public class TriggerFactory extends Factory<Trigger> {
 
     @Inject private Injector injector;
     @Inject private ServiceFactory services;
-    @Inject private PropertiesService props;
 
     public TriggerFactory() {
         super("Trigger");

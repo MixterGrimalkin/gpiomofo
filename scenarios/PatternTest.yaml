@@ -1,7 +1,7 @@
 
 Triggers:
-  PIR1:
-    type: Http
+  Test:
+    type: Gpio
     pin: 22
     resistance: PULL_DOWN
     triggerState: true

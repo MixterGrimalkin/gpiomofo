@@ -21,7 +21,6 @@ public class PixelTape extends AbstractService {
     private List<PixelTapeTarget> patterns = new LinkedList<>();
     private int totalPixels;
 
-    @Inject private PropertiesService props;
     @Inject private NeoPixel neoPixel;
     @Inject private TaskService tasks;
 

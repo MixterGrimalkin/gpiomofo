@@ -1,10 +1,10 @@
 Parameters:
-  SpriteCount: 100
+  SpriteCount: 20
   Colour1: 255,0,0
   Colour2: 0,255,0
   Colour3: 0,0,255
   Colour4: 255,255,0
-  Colour5: 255,0,255
+  Colour5: 255,125,0
   TailLength: 10
   PaddleAxis: Y
   PaddleColour: 255,0,0
@@ -18,7 +18,7 @@ Triggers:
     port: 53000
     address: pad1
     minValue: 0
-    maxValue: 255
+    maxValue: 100
   Paddle2:
     type: Range
     triggerPin: 3
@@ -26,7 +26,7 @@ Triggers:
     port: 53000
     address: pad2
     minValue: 0
-    maxValue: 255
+    maxValue: 100
   GameOn:
     type: Gpio
     pin: 9

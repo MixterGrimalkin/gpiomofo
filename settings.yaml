@@ -1,0 +1,56 @@
+LightBoardGUI: 
+   OnlyOnOff: false
+   LedSize: 2
+   RefreshInterval: 60
+   Spacing: 0
+   OnlyRedGreen: false
+Services: 
+   MidiDevice: USB Uno MIDI Interface
+PixelTape: 
+   TapeRefresh: 5
+General: 
+   ScenariosDirectory: scenarios
+   Refresh: 50
+   TriggerPackage: net.amarantha.gpiomofo.trigger
+   PinScanInterval: 10
+   TargetPackage: net.amarantha.gpiomofo.target
+   HttpAsyncTargets: true
+   ScenarioPackage: net.amarantha.gpiomofo.scenario
+   Scenario: GreenpeaceTunnel
+LightSurface: 
+   LayerCount: 10
+   BoardClass: net.amarantha.gpiomofo.display.lightboard.NeoPixelBoard
+   Height: 32
+   Width: 192
+Gingerline: 
+   LightingServerIP: 192.168.42.100
+   C5-Amber: 255,80,0
+   C0-BackgroundColour: 255,105,25
+   LightingServerOscPort: 7700
+   C3-Colour: 65,255,0
+   C5-Green: 10,255,10
+   PanicIP: 192.168.42.105
+   MediaServerOscPort: 53000
+   PanicPort: 8001
+   ButtonHoldTime: 100
+   C0-Colour3: 255,40,0
+   C0-Colour2: 255,40,0
+   C0-Colour1: 255,10,0
+   C5-Blue: 40,40,255
+   C0-Colour4: 255,10,0
+   MediaServerIP: 192.168.42.99
+   C5-Purple: 210,50,200
+Gui: 
+   Window-Output-GPIO: 20.0,20.0
+   Window-Range-Sensor: 303.0,617.0
+   Window-LightBoard: 1285.0,148.0
+   Window-NeoPixel: 536.0,333.0
+   LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
+   Window-Input-GPIO: 191.0,164.0
+   Window-GpioMofo: 1118.0,71.0
+NeoPixelGUI: 
+   Spacer: 0
+   LedSize: 2
+NeoPixelBoard: 
+   RowsFirst: true
+   LoopBack: false

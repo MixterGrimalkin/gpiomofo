@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static net.amarantha.gpiomofo.core.Constants.WITH_SERVER;
+import static net.amarantha.utils.properties.PropertiesService.isArgumentPresent;
 import static net.amarantha.utils.shell.Utility.log;
 
 public class Scenario {
@@ -21,7 +22,6 @@ public class Scenario {
     @Inject protected TargetFactory targets;
     @Inject protected LinkFactory links;
 
-    @Inject private PropertiesService props;
     @Inject private ServiceFactory services;
     @Inject private WebService web;
     @Inject private Now now;
@@ -30,7 +30,7 @@ public class Scenario {
         log(true, " Starting Up... ", true);
         services.startAll();
         startup();
-        if ( props.isArgumentPresent(WITH_SERVER) ) {
+        if ( isArgumentPresent(WITH_SERVER) ) {
             web.start();
         }
         log(true, now.time().toString() + ": Ready");
@@ -38,7 +38,7 @@ public class Scenario {
 
     public final void stop() {
         log(true, " Shutting Down... ", true);
-        if ( props.isArgumentPresent(WITH_SERVER) ) {
+        if ( isArgumentPresent(WITH_SERVER) ) {
             web.stop();
         }
         shutdown();

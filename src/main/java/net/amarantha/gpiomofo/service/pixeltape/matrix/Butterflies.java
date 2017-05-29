@@ -98,7 +98,7 @@ public class Butterflies extends Animation {
         }
     }
 
-    public Integer[] randomFocus(OldSprite oldSprite) {
+    public Integer[] randomFocus(Butterfly oldSprite) {
         List<Integer[]> coords = new ArrayList<>(foci.values());
         if (foci.keySet().contains(oldSprite.preferredFocus)) {
             return foci.get(oldSprite.preferredFocus);

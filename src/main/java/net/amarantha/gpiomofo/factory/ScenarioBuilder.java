@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static net.amarantha.gpiomofo.core.Constants.SCENARIO;
+import static net.amarantha.utils.properties.PropertiesService.getArgumentValue;
 import static net.amarantha.utils.reflection.ReflectionUtils.iterateAnnotatedFields;
 import static net.amarantha.utils.reflection.ReflectionUtils.reflectiveSet;
 import static net.amarantha.utils.shell.Utility.log;
@@ -40,12 +41,6 @@ public class ScenarioBuilder {
     @Inject private TargetFactory targets;
     @Inject private LinkFactory links;
 
-//    private Scenario scenario;
-
-//    public Scenario getScenario() {
-////        return scenario;
-////    }
-
     //////////
     // Load //
     //////////
@@ -58,6 +53,7 @@ public class ScenarioBuilder {
         Scenario scenario = buildScenario(name);
         services.injectServices(scenario);
         props.injectPropertiesOrExit(scenario);
+
         buildComponentsFromConfig(scenario);
         injectComponents(scenario);
         scenario.setup();
@@ -68,13 +64,13 @@ public class ScenarioBuilder {
     private String getScenarioName() {
         String scenarioName = "";
         try {
-            String commandLineClassName = props.getArgumentValue(SCENARIO);
+            String commandLineClassName = getArgumentValue(SCENARIO);
             if (commandLineClassName == null) {
                 scenarioName = props.getString("Scenario");
             } else {
                 scenarioName = commandLineClassName;
             }
-            props.getString("Scenario", scenarioName);
+            props.getStringOrDefault("Scenario", scenarioName);
         } catch (PropertyNotFoundException e) {
             System.out.println("No Scenario specified\n\nSee: gpiomofo.sh -help\n");
             System.exit(1);
@@ -84,7 +80,7 @@ public class ScenarioBuilder {
 
     @SuppressWarnings("unchecked")
     private Scenario buildScenario(String className) {
-        Class<Scenario> clazz = ReflectionUtils.getClass(props.getString("ScenarioPackage", DEFAULT_SCENARIO_PACKAGE) + "." + className);
+        Class<Scenario> clazz = ReflectionUtils.getClass(props.getStringOrDefault("ScenarioPackage", DEFAULT_SCENARIO_PACKAGE) + "." + className);
         if ( clazz==null ) {
             clazz = ReflectionUtils.getClass(DEFAULT_SCENARIO_PACKAGE + "." + className);
             if ( clazz==null ) {
@@ -123,7 +119,7 @@ public class ScenarioBuilder {
     @SuppressWarnings("unchecked")
     private void buildComponentsFromConfig(Scenario scenario) {
         Map<String, Map> config = null;
-        String filename = props.getString("ScenariosDirectory", "scenarios")+"/"+scenario.getName()+".yaml";
+        String filename = props.getStringOrDefault("ScenariosDirectory", "scenarios")+"/"+scenario.getName()+".yaml";
         try (FileReader reader =new FileReader(filename)) {
             YamlReader yaml = new YamlReader(reader);
             config = (Map<String, Map>) yaml.read();
@@ -190,7 +186,7 @@ public class ScenarioBuilder {
 
     private void buildTrigger(String name, Map<String, String> config) throws ScenarioBuilderException {
         String type = config.get("type");
-        Class<Trigger> triggerClass = ReflectionUtils.getClass(props.getString("TriggerPackage", DEFAULT_TRIGGER_PACKAGE)+"."+type+"Trigger");
+        Class<Trigger> triggerClass = ReflectionUtils.getClass(props.getStringOrDefault("TriggerPackage", DEFAULT_TRIGGER_PACKAGE)+"."+type+"Trigger");
         if ( triggerClass==null ) {
             triggerClass = ReflectionUtils.getClass(DEFAULT_TRIGGER_PACKAGE+"."+type+"Trigger");
             if ( triggerClass==null ) {
@@ -243,7 +239,7 @@ public class ScenarioBuilder {
 
     private void buildTarget(String name, Map<String, String> config) throws ScenarioBuilderException {
         String type = config.get("type");
-        Class<Target> targetClass = ReflectionUtils.getClass(props.getString("TargetPackage", DEFAULT_TARGET_PACKAGE)+"."+type+"Target");
+        Class<Target> targetClass = ReflectionUtils.getClass(props.getStringOrDefault("TargetPackage", DEFAULT_TARGET_PACKAGE)+"."+type+"Target");
         if ( targetClass==null ) {
             targetClass = ReflectionUtils.getClass(DEFAULT_TARGET_PACKAGE+"."+type+"Target");
             if ( targetClass==null ) {

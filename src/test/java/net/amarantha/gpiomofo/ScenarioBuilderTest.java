@@ -162,8 +162,8 @@ public class ScenarioBuilderTest extends TestBase {
     }
 
     Scenario given_scenario_$1(String name) {
-        props.setProperty("ScenariosDirectory", "test-scenarios");
-        props.setProperty("Scenario", name);
+        props.set("ScenariosDirectory", "test-scenarios");
+        props.set("Scenario", name);
         return builder.loadScenario();
     }
 
