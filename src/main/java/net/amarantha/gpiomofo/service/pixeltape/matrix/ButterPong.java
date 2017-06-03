@@ -25,7 +25,7 @@ public class ButterPong extends Animation {
 
 
 
-    private int paddleSize = 4;
+    private int paddleSize = 8;
     private RGB paddleColour;
 
     private Map<Integer, Paddle> paddles = new HashMap<>();
@@ -141,8 +141,8 @@ public class ButterPong extends Animation {
             public void run() {
                 System.out.println("BEGIN!");
                 ball.show();
-                ball.setLinearDeltaAxis(paddleAxis, randomFlip(randomBetween(1.0, 2.0)));
-                ball.setLinearDeltaAxis(wallAxis, randomFlip(randomBetween(1.0, 2.0)));
+                ball.setLinearDeltaAxis(paddleAxis, randomFlip(randomBetween(5.0, 6.0)));
+                ball.setLinearDeltaAxis(wallAxis, randomFlip(randomBetween(5.0, 11.0)));
                 ballInPlay = true;
             }
         }, 2000);

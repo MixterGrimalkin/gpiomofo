@@ -17,6 +17,10 @@ import static net.amarantha.gpiomofo.display.entity.AlignH.RIGHT;
 
 public class Font {
 
+    public static Font fromFile(String filename) {
+        return new Font().loadFont("fonts/"+filename);
+    }
+
     public final static char NL = '\n';
     public final static char OPEN_TAG = '{';
     public final static char CLOSE_TAG = '}';

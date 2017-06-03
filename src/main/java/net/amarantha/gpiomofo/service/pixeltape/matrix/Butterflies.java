@@ -53,7 +53,8 @@ public class Butterflies extends Animation {
         }
         List<int[]> usedPositions = new ArrayList<>(sprites.get().size());
         sprites.forEach((s) -> usedPositions.add(s.updatePosition(usedPositions)));
-        surface.clear();
+        surface.layer(background).clear();
+        surface.layer(foreground).clear();
         sprites.forEach(s -> {
             for (int i = 0; i < sprites.tailLength(); i++) {
                 surface.layer(background).draw(s.tailPos[i][X], s.tailPos[i][Y], s.tailColours[i]);

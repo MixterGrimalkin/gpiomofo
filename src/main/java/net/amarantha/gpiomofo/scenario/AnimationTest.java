@@ -47,7 +47,7 @@ public class AnimationTest extends Scenario {
 
     private List<Sprite> balls = new LinkedList<>();
 
-    private int ballCount = 5;
+    private int ballCount = 2;
 
     @Override
     public void startup() {

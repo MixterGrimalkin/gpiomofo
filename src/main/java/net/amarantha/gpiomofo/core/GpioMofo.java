@@ -43,4 +43,7 @@ public class GpioMofo {
         System.exit(0);
     }
 
+    public Scenario getScenario() {
+        return scenario;
+    }
 }

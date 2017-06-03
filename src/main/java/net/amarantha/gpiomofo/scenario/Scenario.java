@@ -8,6 +8,7 @@ import net.amarantha.gpiomofo.webservice.WebService;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.service.ServiceFactory;
 import net.amarantha.utils.time.Now;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,18 @@ public class Scenario {
         shutdown();
         services.stopAll();
         log(true, " So long, and thanks for all the fish! ", true);
+    }
+
+    /////////
+    // API //
+    /////////
+
+    public Map<String, String> getApiTemplate() {
+        return new HashMap<>();
+    }
+
+    public void incomingApiCall(Map<String, String> json) {
+
     }
 
     ///////////////

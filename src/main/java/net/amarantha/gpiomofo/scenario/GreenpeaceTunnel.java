@@ -9,6 +9,7 @@ import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.ButterPong;
 import net.amarantha.gpiomofo.trigger.ContinuousTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.webservice.WebService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.service.Service;
 
@@ -54,6 +55,8 @@ public class GreenpeaceTunnel extends Scenario {
 
     private boolean gameOn = false;
 
+    @Inject private WebService http;
+
     @Override
     public void setup() {
 
@@ -71,6 +74,16 @@ public class GreenpeaceTunnel extends Scenario {
 
         paddle1.onMeasure(butterPong::setLeftPosition);
         paddle2.onMeasure(butterPong::setRightPosition);
+
+        http.onGet("butterflies", (p)->{
+            animation.play(butterflies);
+            gameOn = false;
+            return "Fluttering\n";
+        }).onGet("bong", (p)->{
+            animation.play(butterPong);
+            gameOn = true;
+            return "Ponging!\n";
+        });
 
         switchMode.onFire((state)->{
             if ( state ) {

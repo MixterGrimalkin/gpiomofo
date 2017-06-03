@@ -3,13 +3,15 @@ package net.amarantha.gpiomofo.webservice;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
 import net.amarantha.gpiomofo.trigger.Trigger;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collection;
+import java.util.List;
 
 @Path("trigger")
 public class TriggerResource extends Resource {
@@ -21,6 +23,21 @@ public class TriggerResource extends Resource {
     @Inject
     public TriggerResource(TriggerFactory triggers) {
         TriggerResource.triggers = triggers;
+    }
+
+    @GET
+    @Path("list")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listTriggers() {
+        try {
+            JSONArray ja = new JSONArray();
+            triggers.getAll().forEach((t)->ja.put(t.getName()));
+            JSONObject obj = new JSONObject();
+            obj.put("triggers", ja);
+            return ok(obj.toString());
+        } catch (JSONException e) {
+            return error(e.getMessage());
+        }
     }
 
     @POST
