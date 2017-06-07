@@ -11,6 +11,8 @@ import net.amarantha.utils.time.Now;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import static net.amarantha.gpiomofo.core.Constants.WITH_SERVER;
@@ -51,11 +53,11 @@ public class Scenario {
     // API //
     /////////
 
-    public Map<String, String> getApiTemplate() {
-        return new HashMap<>();
+    public List<ApiParam> getApiTemplate() {
+        return new LinkedList<>();
     }
 
-    public void incomingApiCall(Map<String, String> json) {
+    public void incomingApiCall(Map<String, String> params) {
 
     }
 

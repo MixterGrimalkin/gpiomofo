@@ -43,11 +43,11 @@ Gingerline:
 Gui: 
    Window-Output-GPIO: 20.0,20.0
    Window-Range-Sensor: 1555.0,469.0
-   Window-LightBoard: 1964.0,503.0
+   Window-LightBoard: 2231.0,629.0
    Window-NeoPixel: 1751.0,354.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
-   Window-Input-GPIO: 2577.0,490.0
-   Window-GpioMofo: 2504.0,159.0
+   Window-Input-GPIO: 154.0,105.0
+   Window-GpioMofo: 8604.0,77.0
 NeoPixelGUI: 
    Spacer: 0
    LedSize: 2

@@ -13,10 +13,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TestBench extends Scenario {
 
@@ -33,21 +30,24 @@ public class TestBench extends Scenario {
     private Font textFont = Font.fromFile("SimpleFont.fnt");
 
     @Override
-    public Map<String, String> getApiTemplate() {
-        return
-            new StringMap()
-                .add("heading", "Event name")
-                .add("date", "Date and Time")
-                .add("description", "Description")
-            .get();
+    public List<ApiParam> getApiTemplate() {
+        List<ApiParam> result = new LinkedList<>();
+        result.add(new ApiParam("heading", "Event Name", lastHeading));
+        result.add(new ApiParam("date", "Date/Time", lastDate));
+        result.add(new ApiParam("description", "Details", lastDescription));
+        return result;
     }
+
+    private String lastHeading = "";
+    private String lastDate = "";
+    private String lastDescription = "";
 
     @Override
     public void incomingApiCall(Map<String, String> params) {
         surface.layer(7).clear();
-        surface.layer(7).draw(10, 0, headingFont.renderString(params.get("heading")));
-        surface.layer(7).draw(10, 17, dateFont.renderString(params.get("date")));
-        surface.layer(7).draw(10, 24, textFont.renderString(params.get("description")));
+        surface.layer(7).draw(10, 0, headingFont.renderString(lastHeading = params.get("heading")));
+        surface.layer(7).draw(10, 17, dateFont.renderString(lastDate = params.get("date")));
+        surface.layer(7).draw(10, 24, textFont.renderString(lastDescription = params.get("description")));
     }
 
     @Override
