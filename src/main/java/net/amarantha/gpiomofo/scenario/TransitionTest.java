@@ -26,8 +26,8 @@ public class TransitionTest extends Scenario {
         Ball ball = sprites.make(Ball.class);
         ball.setSize(3).setColour(RGB.RED).setLinearDelta(3, 1).setLayer(7).show();
 
-        Butterfly butterfly = sprites.make(Butterfly.class);
-        butterfly.setColour(RGB.GREEN).show();
+//        Butterfly butterfly = sprites.make(Butterfly.class);
+//        butterfly.setColour(RGB.GREEN).show();
 
 
         sprites.setRefresh(50).start();
