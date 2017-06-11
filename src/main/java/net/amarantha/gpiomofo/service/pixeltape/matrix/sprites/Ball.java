@@ -7,6 +7,8 @@ import static net.amarantha.gpiomofo.core.Constants.Y;
 
 public class Ball extends Sprite {
 
+//    private
+
     @Override
     public void reset() {
         setLinearDelta(0, 0);

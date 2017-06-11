@@ -11,7 +11,7 @@ import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
 import static net.amarantha.utils.math.MathUtils.*;
 
-class Butterfly extends Sprite {
+public class Butterfly extends Sprite {
 
     private final int width;
     private final int height;
@@ -85,6 +85,7 @@ class Butterfly extends Sprite {
         delta[Y] = (target[Y] - current[Y]) / linearSpeed;
     }
 
+    @Override
     public void updateAxis(int axis) {
         if (target[axis] != current[axis]) {
             current[axis] += delta[axis];

@@ -76,8 +76,9 @@ public abstract class Sprite {
         return position >= minBound[axis] && position <= maxBound[axis];
     }
 
-    public void setLinearDelta(double dX, double dY) {
+    public Sprite setLinearDelta(double dX, double dY) {
         linearDelta = new double[]{ dX, dY };
+        return this;
     }
 
     public double[] getLinearDelta() {

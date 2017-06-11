@@ -160,32 +160,45 @@ public class Font {
     }
 
     public final Pattern renderString(String str) {
-        return renderString(str, AlignH.LEFT);
+        return renderString(str, AlignH.LEFT, null);
+    }
+
+    public final Pattern renderString(String str, RGB colour) {
+        return renderString(str, AlignH.LEFT, colour);
     }
 
     public final Pattern renderString(String str, AlignH align) {
+        return renderString(str, align, null);
+    }
+
+    public final Pattern renderString(String str, AlignH align, RGB overrideColour) {
         if ( str==null || str.isEmpty() ) {
             return new Pattern(1,1);
         }
         int cols = getStringWidth(str);
         int rows = getStringHeight(str);
-        Pattern result = new Pattern(cols, rows);
+        Pattern result = new Pattern(cols, rows, true);
+        if ( overrideColour!=null ) {
+            result.pen(overrideColour);
+        }
         String[] lines = str.split("\n");
         if ( lines.length==1 ) {
             int cursorX = 0;
             boolean inTag = false;
-            boolean penMode = false;
+            boolean penMode = overrideColour!=null;
             String tag = "";
             for ( int c=0; c<str.length(); c++ ) {
                 char chr = str.charAt(c);
                 if ( inTag ) {
                     if ( chr==CLOSE_TAG ) {
-                        if ( RED_STR.equals(tag) ) {
-                            result.pen(new RGB(255,0,0));
-                        } else if ( GREEN_STR.equals(tag) ) {
-                            result.pen(new RGB(0,255,0));
-                        } else if ( YELLOW_STR.equals(tag) ) {
-                            result.pen(new RGB(255,255,0));
+                        if ( overrideColour==null ) {
+                            if (RED_STR.equals(tag)) {
+                                result.pen(new RGB(255, 0, 0));
+                            } else if (GREEN_STR.equals(tag)) {
+                                result.pen(new RGB(0, 255, 0));
+                            } else if (YELLOW_STR.equals(tag)) {
+                                result.pen(new RGB(255, 255, 0));
+                            }
                         }
                         tag = "";
                         inTag = false;
@@ -202,7 +215,9 @@ public class Font {
                             for (int row = 0; row < pattern.getHeight(); row++) {
                                 for (int col = 0; col < pattern.getWidth(); col++) {
                                     if ( penMode ) {
-                                        result.draw(col + cursorX, row, pattern.rgb(col, row));
+                                        if (pattern.rgb(col, row) != null) {
+                                            result.draw(col + cursorX, row);
+                                        }
                                     } else {
                                         result.draw(col + cursorX, row, pattern.rgb(col, row));
                                     }

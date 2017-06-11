@@ -103,8 +103,9 @@ public class SpriteField {
         running = true;
     }
 
-    public void setRefresh(long refreshInterval) {
+    public SpriteField setRefresh(long refreshInterval) {
         this.refreshInterval = refreshInterval;
+        return this;
     }
 
     private long refreshInterval = 10;

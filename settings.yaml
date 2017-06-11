@@ -16,12 +16,12 @@ General:
    TargetPackage: net.amarantha.gpiomofo.target
    HttpAsyncTargets: true
    ScenarioPackage: net.amarantha.gpiomofo.scenario
-   Scenario: TestBench
+   Scenario: TransitionTest
 LightSurface: 
    LayerCount: 10
    BoardClass: net.amarantha.gpiomofo.display.lightboard.LightBoardGUI
-   Height: 32
-   Width: 192
+   Height: 64
+   Width: 256
 Gingerline: 
    LightingServerIP: 192.168.42.100
    C5-Amber: 255,80,0
@@ -43,11 +43,11 @@ Gingerline:
 Gui: 
    Window-Output-GPIO: 20.0,20.0
    Window-Range-Sensor: 1555.0,469.0
-   Window-LightBoard: 2231.0,629.0
+   Window-LightBoard: 136.0,590.0
    Window-NeoPixel: 1751.0,354.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
    Window-Input-GPIO: 154.0,105.0
-   Window-GpioMofo: 8604.0,77.0
+   Window-GpioMofo: 747.0,347.0
 NeoPixelGUI: 
    Spacer: 0
    LedSize: 2
