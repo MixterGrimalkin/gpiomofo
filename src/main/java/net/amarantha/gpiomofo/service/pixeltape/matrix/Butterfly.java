@@ -1,5 +1,7 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
+import com.google.inject.Inject;
+import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.Sprite;
 import net.amarantha.utils.colour.RGB;
 
@@ -30,8 +32,13 @@ public class Butterfly extends Sprite {
     private double radius;
     private double dTheta;
     int[] real = {0, 0};
-    RGB colour;
+    RGB colour = RGB.WHITE;
     int preferredFocus = 0;
+
+    @Inject
+    public Butterfly(LightSurface surface) {
+        this(0, RGB.WHITE, surface.width(), surface.height(), 5);
+    }
 
     Butterfly(int preferredFocus, RGB colour, int width, int height, int tailLength) {
         this.colour = colour;
@@ -51,6 +58,11 @@ public class Butterfly extends Sprite {
             tailColours[i] = RGB.BLACK;
             tailPos[i] = new int[]{-1, -1};
         }
+    }
+
+    @Override
+    public void start() {
+        randomize(1.0);
     }
 
     void storeTail() {
@@ -85,7 +97,7 @@ public class Butterfly extends Sprite {
         delta[Y] = (target[Y] - current[Y]) / linearSpeed;
     }
 
-    @Override
+//    @Override
     public void updateAxis(int axis) {
         if (target[axis] != current[axis]) {
             current[axis] += delta[axis];
@@ -99,9 +111,15 @@ public class Butterfly extends Sprite {
         }
     }
 
-    @Override
-    public void doRender() {
+    private int foreground = 1;
+    private int background = 0;
 
+//    @Override
+    public void doRender() {
+        for ( int i=0; i<tailLength; i++ ) {
+//            surface.layer(background).draw(tailPos[i][X], tailPos[i][Y], tailColours[i]);
+        }
+//        surface.layer(foreground).draw(real[X], real[Y], colour);
     }
 
     int[] updatePosition(List<int[]> usedPositions) {

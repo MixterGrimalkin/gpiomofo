@@ -23,8 +23,8 @@ public class TransitionTest extends Scenario {
 
         Font font = Font.fromFile("SimpleFont.fnt");
 
-        Ball ball = sprites.make(Ball.class);
-        ball.setSize(3).setColour(RGB.RED).setLinearDelta(3, 1).setLayer(7).show();
+//        Ball ball = sprites.make(Ball.class);
+//        ball.setSize(3).setColour(RGB.RED).setLinearDelta(3, 1).setLayer(7).show();
 
 //        Butterfly butterfly = sprites.make(Butterfly.class);
 //        butterfly.setColour(RGB.GREEN).show();

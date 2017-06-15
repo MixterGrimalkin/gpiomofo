@@ -85,8 +85,8 @@ public class SpriteField {
     }
 
     public int[] commonCentre(Sprite s1, Sprite s2) {
-        int x = Math.abs(s1.position(X) - s2.position(X));
-        int y = Math.abs(s1.position(Y) - s2.position(Y));
+        int x = Math.abs(s1.getCentre().xInt() - s2.getCentre().xInt());
+        int y = Math.abs(s1.getCentre().yInt() - s2.getCentre().yInt());
         return new int[]{ x, y };
     }
 

@@ -18,4 +18,8 @@ public class Region {
         bottom = top + height - 1;
     }
 
+    public boolean contains(Point p) {
+        return p.xInt() >= left && p.xInt() <= right && p.yInt() >= top && p.yInt() <= bottom;
+    }
+
 }

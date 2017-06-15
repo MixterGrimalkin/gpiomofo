@@ -27,21 +27,21 @@ public class AnimationTest extends Scenario {
     @Inject private SpriteField field;
 
     private Ball makeBall(RGB colour) {
-        Ball ball = field.make(Ball.class, 0);
-        ball.setSize(2).setColour(RGB.GREEN).setLayer(2);
-        Sprite sparker =
-                field.make(Explosion.class)
-                        .setSparkCount(12)
-                        .addColours(colour)
-                        .setLayer(1);
-        ball.show();
-        ball.reset();
-        ball.onBounce((axis,max)->{
-            sparker.setPosition(ball.position());
-            sparker.reset();
-            sparker.show();
-        });
-        ball.setAngularDelta(PI/2, 1.0);
+        Ball ball = null;//field.make(Ball.class, 0);
+//        ball.setSize(2).setColour(RGB.GREEN).setLayer(2);
+//        Sprite sparker =
+//                field.make(Explosion.class)
+//                        .setSparkCount(12)
+//                        .addColours(colour)
+//                        .setLayer(1);
+//        ball.show();
+//        ball.reset();
+//        ball.onBounce((axis,max)->{
+//            sparker.setPosition(ball.position());
+//            sparker.reset();
+//            sparker.show();
+//        });
+//        ball.setAngularDelta(PI/2, 1.0);
         return ball;
     }
 
@@ -53,38 +53,38 @@ public class AnimationTest extends Scenario {
     public void startup() {
 
         for ( int i=0; i<ballCount; i++ ) {
-            balls.add(makeBall(randomBetween(0,10)>5 ? RGB.RED : RGB.YELLOW ));
+//            balls.add(makeBall(randomBetween(0,10)>5 ? RGB.RED : RGB.YELLOW ));
         }
 
-        Sprite collideSparker =
-                field.make(Explosion.class)
-                        .setSparkCount(35)
-                        .addColours(RGB.GREEN)
-                        .setLayer(1);
+//        Sprite collideSparker =
+//                field.make(Explosion.class)
+//                        .setSparkCount(35)
+//                        .addColours(RGB.GREEN)
+//                        .setLayer(1);
+//
+//        field.onCollide((s1, s2)->{
+//            double[] delta1 = s1.getLinearDelta();
+//            double[] delta2 = s2.getLinearDelta();
+//            s1.setLinearDelta(-delta1[X], -delta1[Y]);
+//            s2.setLinearDelta(-delta2[X], -delta2[Y]);
+//            collideSparker.setPosition(s1.position());
+//            collideSparker.reset();
+//            collideSparker.show();
+//            balls.forEach((ball)->{
+//                ball.setAngularDelta(randomBetween(0, 2*PI), randomBetween(7.0, 9.0));
+//            });
+//        });
 
-        field.onCollide((s1, s2)->{
-            double[] delta1 = s1.getLinearDelta();
-            double[] delta2 = s2.getLinearDelta();
-            s1.setLinearDelta(-delta1[X], -delta1[Y]);
-            s2.setLinearDelta(-delta2[X], -delta2[Y]);
-            collideSparker.setPosition(s1.position());
-            collideSparker.reset();
-            collideSparker.show();
-            balls.forEach((ball)->{
-                ball.setAngularDelta(randomBetween(0, 2*PI), randomBetween(7.0, 9.0));
-            });
-        });
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                balls.forEach((ball)->{
-                    if ( randomBetween(0,10) < 5 ) {
-                        ball.setAngularDelta(randomBetween(0, 2*PI), randomBetween(1.0, 4.0));
-                    }
-                });
-            }
-        }, 0, 3000);
+//        new Timer().schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                balls.forEach((ball)->{
+//                    if ( randomBetween(0,10) < 5 ) {
+//                        ball.setAngularDelta(randomBetween(0, 2*PI), randomBetween(1.0, 4.0));
+//                    }
+//                });
+//            }
+//        }, 0, 3000);
 
 
         field.setRefresh(50);

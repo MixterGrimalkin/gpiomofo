@@ -14,16 +14,16 @@ public class Paddle extends Sprite {
     }
 
     public void moveTo(int position) {
-        setPositionAxis(game.getPaddleAxis(), position);
+//        setPositionAxis(game.getPaddleAxis(), position);
     }
 
-    @Override
-    public void doRender() {
-        for ( int i=0; i<game.getPaddleSize(); i++ ) {
-            int[] point = new int[2];
-            point[game.getWallAxis()] = positionAlongWall;
-            point[game.getPaddleAxis()] = position(game.getPaddleAxis()) + i;
-            surface.layer(layer).draw(point, colour);
-        }
-    }
+//    @Override
+//    public void doRender() {
+//        for ( int i=0; i<game.getPaddleSize(); i++ ) {
+//            int[] point = new int[2];
+//            point[game.getWallAxis()] = positionAlongWall;
+////            point[game.getPaddleAxis()] = position(game.getPaddleAxis()) + i;
+////            surface.layer(layer).draw(point, colour);
+//        }
+//    }
 }
