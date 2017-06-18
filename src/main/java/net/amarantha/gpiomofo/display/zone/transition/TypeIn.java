@@ -20,10 +20,10 @@ public class TypeIn extends AbstractTransition {
 
     @Override
     public void animate(double progress) {
-        zone.clear();
+        clear();
         for ( int i = 0; i <= currentLetter; i++ ) {
             Letter l = letters.get(i);
-            zone.drawPattern(zone.getRestX()+l.x, zone.getRestY()+l.y, l.pattern);
+            draw(getRestX()+l.x, getRestY()+l.y, l.pattern);
         }
         currentLetter++;
     }

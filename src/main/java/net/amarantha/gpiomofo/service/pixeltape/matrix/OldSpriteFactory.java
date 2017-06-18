@@ -27,6 +27,7 @@ public class OldSpriteFactory {
 
     public Butterfly create(int group, RGB colour) {
         Butterfly oldSprite = new Butterfly(group, colour, surface.width(), surface.height(), tailLength);
+        oldSprite.setSurface(surface);
         oldSprites.add(oldSprite);
         return oldSprite;
     }

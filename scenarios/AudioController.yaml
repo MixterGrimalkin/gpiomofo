@@ -1,0 +1,38 @@
+Triggers:
+  Background:
+    type: Gpio
+    pin: 10
+    resistance: PULL_DOWN
+    triggerState: true
+  FlutterIn:
+    type: Gpio
+    pin: 11
+    resistance: PULL_DOWN
+    triggerState: true
+  FlutterOut:
+    type: Gpio
+    pin: 12
+    resistance: PULL_DOWN
+    triggerState: true
+
+Targets:
+  Background:
+    type: Osc
+    onCommand: 192.168.1.101:53000/ambient-background/loop
+    offCommand: 192.168.1.101:53000/ambient-background/stop
+  FlutterIn:
+    type: Osc
+    onCommand: 192.168.1.101:53000/flute-flutter-in/play
+    offCommand: 192.168.1.101:53000/flute-flutter-in/stop
+  FlutterOut:
+    type: Osc
+    onCommand: 192.168.1.101:53000/flute-flutter-out/play
+    offCommand: 192.168.1.101:53000/flute-flutter-out/stop
+
+Links:
+  Background:
+  - Background
+  FlutterIn:
+  - FlutterIn
+  FlutterOut:
+  - FlutterOut

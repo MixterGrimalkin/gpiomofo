@@ -6,8 +6,28 @@ LightBoardGUI:
    OnlyRedGreen: true
 Services: 
    MidiDevice: USB Uno MIDI Interface
+CrashingBlocks: 
+   MedOSC: 192.168.1.101:53000/med|255
+   MaxSpeed: 3.0
+   HighOSC: 192.168.1.101:53000/high|255
+   MinSpeed: 0.5
+   ExplosionColours: 
+   - 220,20,0
+   - 20,0,220
+   - 0,20,220
+   - 0,220,20
+   LowOSC: 192.168.1.101:53000/low|255
+   CrashOSC: 192.168.1.101:53000/crash|255
+   Balls: 2
+   BallColour: 255,200,0
 PixelTape: 
    TapeRefresh: 10
+AudioPlayer: 
+   Port: 53000
+   Files: 
+   - ambient-background
+   - flute-flutter-in
+   - flute-flutter-out
 General: 
    ScenariosDirectory: scenarios
    Refresh: 50
@@ -16,12 +36,12 @@ General:
    TargetPackage: net.amarantha.gpiomofo.target
    HttpAsyncTargets: true
    ScenarioPackage: net.amarantha.gpiomofo.scenario
-   Scenario: TransitionTest
+   Scenario: MessageBoard
 LightSurface: 
    LayerCount: 10
    BoardClass: net.amarantha.gpiomofo.display.lightboard.LightBoardGUI
-   Height: 64
-   Width: 256
+   Height: 32
+   Width: 192
 Gingerline: 
    LightingServerIP: 192.168.42.100
    C5-Amber: 255,80,0
@@ -42,15 +62,21 @@ Gingerline:
    C5-Purple: 210,50,200
 Gui: 
    Window-Output-GPIO: 20.0,20.0
-   Window-Range-Sensor: 1555.0,469.0
-   Window-LightBoard: 136.0,590.0
+   Window-Range-Sensor: 139.0,289.0
+   Window-LightBoard: 0.0,212.0
    Window-NeoPixel: 1751.0,354.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
-   Window-Input-GPIO: 154.0,105.0
-   Window-GpioMofo: 747.0,347.0
+   Window-Input-GPIO: 61.0,46.0
+   Window-GpioMofo: 828.0,565.0
 NeoPixelGUI: 
    Spacer: 0
    LedSize: 2
 NeoPixelBoard: 
    RowsFirst: true
    LoopBack: false
+Butterflies: 
+   FlutterInSound: flute-flutter-in
+   AudioPlayerIP: 192.168.1.101
+   AudioPlayerPort: 53000
+   BackgroundSound: ambient-background
+   FlutterOutSound: flute-flutter-out

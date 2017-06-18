@@ -130,7 +130,7 @@ public abstract class AbstractZone {
         } else {
             surface.layer(canvasLayer).clearRegion(region);
             if (inTransition != null) {
-                inTransition.transition(this, this::display, onInAt, onInAtProgress);
+                inTransition.transition(getPattern(), this::display, onInAt, onInAtProgress);
                 direction = Transitioning.IN;
             } else {
                 display();
@@ -156,7 +156,7 @@ public abstract class AbstractZone {
 
     public final AbstractZone out() {
         if ( outTransition!=null ) {
-            outTransition.transition(this, this::end, onOutAt, onOutAtProgress);
+            outTransition.transition(getPattern(), this::end, onOutAt, onOutAtProgress);
             direction = Transitioning.OUT;
         } else {
             end();

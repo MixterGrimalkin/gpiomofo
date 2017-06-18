@@ -4,9 +4,12 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.annotation.Named;
 import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.display.animation.AnimationService;
+import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
+import net.amarantha.gpiomofo.service.audio.AudioFile;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.ButterPong;
+import net.amarantha.gpiomofo.service.pixeltape.matrix.CrashingBlocks;
 import net.amarantha.gpiomofo.trigger.ContinuousTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.webservice.WebService;
@@ -24,6 +27,7 @@ public class GreenpeaceTunnel extends Scenario {
     @Inject private AnimationService animation;
     @Inject private Butterflies butterflies;
     @Inject private ButterPong butterPong;
+    @Inject private CrashingBlocks blocks;
 
     @Service private LightSurface surface;
 
@@ -76,6 +80,9 @@ public class GreenpeaceTunnel extends Scenario {
         paddle2.onMeasure(butterPong::setRightPosition);
 
         http.onGet("butterflies", (p)->{
+            surface.clear();
+            butterflies.reset();
+            offsetMask(RGB.BLACK);
             animation.play(butterflies);
             gameOn = false;
             return "Fluttering\n";
@@ -83,6 +90,12 @@ public class GreenpeaceTunnel extends Scenario {
             animation.play(butterPong);
             gameOn = true;
             return "Ponging!\n";
+        }).onGet("blocks", (p)->{
+            surface.clear();
+            clearMask();
+            animation.play(blocks);
+            gameOn = true;
+            return "Crashing!\n";
         });
 
         switchMode.onFire((state)->{
@@ -91,6 +104,8 @@ public class GreenpeaceTunnel extends Scenario {
                 animation.play(gameOn ? butterPong : butterflies);
             }
         });
+
+
 
     }
 
@@ -118,9 +133,35 @@ public class GreenpeaceTunnel extends Scenario {
         butterPong.setPaddleAxis(axis.equalsIgnoreCase("X") ? X : Y);
         butterPong.setPaddleColour(paddleColour);
 
+        blocks.init();
+
         animation.start();
         animation.play(butterflies);
 
+        offsetMask(RGB.BLACK);
+
+    }
+
+    private int maskLayer = 8;
+
+    private void clearMask() {
+        surface.layer(maskLayer).clear();
+    }
+
+    private void offsetMask(RGB colour) {
+        Pattern mask = new Pattern(surface.width(), surface.height(), true);
+        mask.eachPixel((x,y,rgb)->{
+            if ( x%2==0 ) {
+                if ( y%2==0 ) {
+                    mask.draw(x, y, colour);
+                }
+            } else {
+                if ( y%2==1 ) {
+                    mask.draw(x, y, colour);
+                }
+            }
+        });
+        surface.layer(maskLayer).draw(0,0,mask);
     }
 
 }

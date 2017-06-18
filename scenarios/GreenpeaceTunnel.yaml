@@ -1,10 +1,10 @@
 Parameters:
-  SpriteCount: 50
-  Colour1: 255,0,0
-  Colour2: 0,255,0
-  Colour3: 0,0,255
-  Colour4: 255,255,0
-  Colour5: 255,125,0
+  SpriteCount: 30
+  Colour1: 192,65,0
+  Colour2: 65,20,200
+  Colour3: 205,62,0
+  Colour4: 65,0,150
+  Colour5: 192,65,0
   TailLength: 10
   PaddleAxis: Y
   PaddleColour: 255,0,0

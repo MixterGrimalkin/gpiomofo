@@ -22,22 +22,22 @@ public abstract class Explode extends AbstractTransition {
     public void animate(double progress) {
         int xSpacing = spacing;
         int ySpacing = spacing;
-        if ( zone.getPattern()!=null ) {
-            Pattern exploded = new Pattern(zone.getPattern().getHeight() * (ySpacing + 1), zone.getPattern().getWidth() * (xSpacing + 1));
-            for (int r = 0; r < zone.getPattern().getHeight(); r++) {
-                for (int c = 0; c < zone.getPattern().getWidth(); c++) {
+        if ( getPattern()!=null ) {
+            Pattern exploded = new Pattern(getPattern().getHeight() * (ySpacing + 1), getPattern().getWidth() * (xSpacing + 1));
+            for (int r = 0; r < getPattern().getHeight(); r++) {
+                for (int c = 0; c < getPattern().getWidth(); c++) {
                     int xJitter = 0;//(int)Math.round((Math.random()-0.5) * (spacing/3));
                     int yJitter = 0;//(int)Math.round((Math.random()-0.5) * (spacing/3));
                     int x = r * (ySpacing + 1) + xJitter;
                     int y = c * (xSpacing + 1) + yJitter;
-                    RGB colour = zone.getPattern().rgb(r, c);
+                    RGB colour = getPattern().rgb(r, c);
                     exploded.draw(x, y, colour);
                 }
             }
-            int explodedX = zone.getRestX() + (zone.getPattern().getWidth() / 2) - (exploded.getWidth() / 2);
-            int explodedY = zone.getRestY() + (zone.getPattern().getHeight() / 2) - (exploded.getHeight() / 2);
-            zone.clear();
-            zone.drawPattern(explodedX, explodedY, exploded);
+            int explodedX = getRestX() + (getPattern().getWidth() / 2) - (exploded.getWidth() / 2);
+            int explodedY = getRestY() + (getPattern().getHeight() / 2) - (exploded.getHeight() / 2);
+            clear();
+            draw(explodedX, explodedY, exploded);
         }
         updateSpacing();
     }

@@ -1,5 +1,7 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
+import com.google.inject.Inject;
+import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.Sprite;
 import net.amarantha.utils.colour.RGB;
 
@@ -17,6 +19,8 @@ public class Butterfly extends Sprite {
     private final int height;
     private final int tailLength;
 
+
+
     int[][] tailPos;
     RGB[] tailColours;
 
@@ -32,6 +36,11 @@ public class Butterfly extends Sprite {
     int[] real = {0, 0};
     RGB colour;
     int preferredFocus = 0;
+
+    @Inject
+    public Butterfly(LightSurface surface) {
+        this(0, RGB.GREEN, surface.width(), surface.height(), 5);
+    }
 
     Butterfly(int preferredFocus, RGB colour, int width, int height, int tailLength) {
         this.colour = colour;

@@ -4,32 +4,32 @@ public class RainIn extends AbstractTransition {
 
     @Override
     public void reset() {
-        currentRow = zone.getPattern().getHeight() - 1;
+        currentRow = getPattern().getHeight() - 1;
         currentRandomLimit = 0.6;
         minRandomLimit = 0.0;
         fallStart = 0;
-        fallStartDelta = (zone.getRestY() / zone.getPattern().getHeight()) * 0.6;
-        randomLimitDelta = ((currentRandomLimit - minRandomLimit) / (zone.getPattern().getHeight())) * 1.1 ;
+        fallStartDelta = (getRestY() / getPattern().getHeight()) * 0.6;
+        randomLimitDelta = ((currentRandomLimit - minRandomLimit) / (getPattern().getHeight())) * 1.1 ;
     }
 
     @Override
     public int getNumberOfSteps() {
-        return zone.getPattern().getHeight();
+        return getPattern().getHeight();
     }
 
     @Override
     public void animate(double progress) {
-        zone.clear();
-        for (int r = (int)fallStart; r < zone.getRestY()+zone.getPattern().getHeight(); r++ ) {
-            if ( r < (zone.getRestY()+currentRow) ) {
-                for (int c = 0; c < zone.getPattern().getWidth(); c++) {
+        clear();
+        for (int r = (int)fallStart; r < getRestY()+getPattern().getHeight(); r++ ) {
+            if ( r < (getRestY()+currentRow) ) {
+                for (int c = 0; c < getPattern().getWidth(); c++) {
                     if ( Math.random() <= currentRandomLimit) {
-                        zone.drawPoint(c + zone.getRestX(), r, zone.getPattern().rgb(currentRow, c));
+                        draw(c + getRestX(), r, getPattern().rgb(currentRow, c));
                     }
                 }
             } else {
-                for (int c = 0; c < zone.getPattern().getWidth(); c++) {
-                    zone.drawPoint(c+zone.getRestX(), r, zone.getPattern().rgb(r-zone.getRestY(), c));
+                for (int c = 0; c < getPattern().getWidth(); c++) {
+                    draw(c+getRestX(), r, getPattern().rgb(r-getRestY(), c));
                 }
             }
         }

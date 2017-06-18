@@ -1,7 +1,13 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
 import com.google.inject.Inject;
+import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.Sprite;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.osc.OscService;
+import net.amarantha.utils.osc.entity.OscCommand;
+import net.amarantha.utils.properties.PropertiesService;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.time.TimeGuard;
 
 import java.util.*;
@@ -11,9 +17,22 @@ import static net.amarantha.gpiomofo.core.Constants.Y;
 import static net.amarantha.utils.math.MathUtils.randomBetween;
 import static net.amarantha.utils.math.MathUtils.randomFlip;
 
+@PropertyGroup("Butterflies")
 public class Butterflies extends Animation {
 
+    @Inject private PropertiesService props;
+    @Inject private OscService osc;
     @Inject private TimeGuard guard;
+
+    @Property("AudioPlayerIP") private String playerIp;
+    @Property("AudioPlayerPort") private int playerPort;
+    @Property("FlutterInSound") private String flutterInSoundFilename;
+    @Property("FlutterOutSound") private String flutterOutSoundFilename;
+    @Property("BackgroundSound") private String backgroundSoundFilename;
+    private OscCommand backgroundSoundStart;
+    private OscCommand backgroundSoundStop;
+    private OscCommand flutterInSound;
+    private OscCommand flutterOutSound;
 
     private Map<Integer, RGB> colours;
 
@@ -21,25 +40,38 @@ public class Butterflies extends Animation {
 
     public void init(int spriteCount, Map<Integer, RGB> colours, int tailLength) {
         this.colours = colours;
+        props.injectPropertiesOrExit(this);
         boolean wide = surface.width() >= surface.height();
         targetJitter = new int[]{surface.width() / (wide ? colours.size()*2 : 2), surface.height() / (wide ? 2 : colours.size()*2 )};
         sprites.setTailLength(tailLength);
         for (int i = 0; i < colours.size(); i++) {
             for (int j = 0; j < spriteCount / colours.size(); j++) {
-                sprites.create(i, colours.get(i));
+                sprites.create(i, colours.get(i)).init();
             }
         }
+        backgroundSoundStart = new OscCommand(playerIp, playerPort, backgroundSoundFilename+"/loop");
+        backgroundSoundStop = new OscCommand(playerIp, playerPort, backgroundSoundFilename+"/stop");
+        flutterInSound = new OscCommand(playerIp, playerPort, flutterInSoundFilename+"/play");
+        flutterOutSound = new OscCommand(playerIp, playerPort, flutterOutSoundFilename+"/play");
+        reset();
         randomize();
+    }
+
+    public void reset() {
+        sprites.forEach((s)->{
+            s.reset();
+        });
     }
 
     @Override
     public void start() {
-
+        osc.send(backgroundSoundStart);
     }
 
     @Override
     public void stop() {
-
+        osc.send(backgroundSoundStop);
+        sprites.forEach(Sprite::reset);
     }
 
     private int foreground = 1;
@@ -65,15 +97,17 @@ public class Butterflies extends Animation {
         });
     }
 
+
     @Override
     public void onFocusAdded(int focusId) {
+        osc.send(flutterInSound);
         targetSprites();
     }
 
     @Override
     public void onFocusRemoved(List<Integer> focusIds) {
+        osc.send(flutterOutSound);
         targetSprites();
-
     }
 
     public void targetOn(int x, int y) {

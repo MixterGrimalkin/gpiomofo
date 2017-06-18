@@ -15,7 +15,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.util.*;
 
-public class TestBench extends Scenario {
+public class MessageBoard extends Scenario {
 
     @Service private LightSurface surface;
 

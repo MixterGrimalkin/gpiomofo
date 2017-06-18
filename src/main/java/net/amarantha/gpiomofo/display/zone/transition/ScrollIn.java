@@ -7,28 +7,28 @@ public class ScrollIn extends Scroll {
         long steps = getNumberOfSteps();
         switch (edge) {
             case LEFT:
-                x = -zone.getPattern().getWidth();
-                y = zone.getRestY();
-                deltaX = speed!=null ? speed : Math.ceil((zone.getRestX() - x) / steps);
+                x = -getPattern().getWidth();
+                y = getRestY();
+                deltaX = speed!=null ? speed : Math.ceil((getRestX() - x) / steps);
                 deltaY = 0;
                 break;
             case RIGHT:
-                x = zone.getWidth();
-                y = zone.getRestY();
-                deltaX = speed!=null ? -speed : Math.floor((x - zone.getRestX()) / -steps);
+                x = getWidth();
+                y = getRestY();
+                deltaX = speed!=null ? -speed : Math.floor((x - getRestX()) / -steps);
                 deltaY = 0;
                 break;
             case TOP:
-                x = zone.getRestX();
-                y = -zone.getPattern().getHeight();
+                x = getRestX();
+                y = -getPattern().getHeight();
                 deltaX = 0;
-                deltaY = speed!=null ? speed : Math.ceil((zone.getRestY() - y) / steps);
+                deltaY = speed!=null ? speed : Math.ceil((getRestY() - y) / steps);
                 break;
             case BOTTOM:
-                x = zone.getRestX();
-                y = zone.getHeight();
+                x = getRestX();
+                y = getHeight();
                 deltaX = 0;
-                deltaY = speed!=null ? -speed : Math.floor((y - zone.getRestY()) / -steps);
+                deltaY = speed!=null ? -speed : Math.floor((y - getRestY()) / -steps);
                 break;
             case NONE:
                 break;
@@ -39,13 +39,13 @@ public class ScrollIn extends Scroll {
     protected boolean isComplete() {
         switch (edge){
             case LEFT:
-                return x >= zone.getRestX();
+                return x >= getRestX();
             case RIGHT:
-                return x <= zone.getRestX();
+                return x <= getRestX();
             case TOP:
-                return y >= zone.getRestY();
+                return y >= getRestY();
             case BOTTOM:
-                return y <= zone.getRestY();
+                return y <= getRestY();
             case NONE:
                 break;
         }
