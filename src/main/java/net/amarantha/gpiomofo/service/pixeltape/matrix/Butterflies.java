@@ -24,6 +24,12 @@ public class Butterflies extends Animation {
     @Inject private OscService osc;
     @Inject private TimeGuard guard;
 
+    private boolean useAudio = true;
+
+    public void setUseAudio(boolean useAudio) {
+        this.useAudio = useAudio;
+    }
+
     @Property("AudioPlayerIP") private String playerIp;
     @Property("AudioPlayerPort") private int playerPort;
     @Property("FlutterInSound") private String flutterInSoundFilename;
@@ -75,7 +81,9 @@ public class Butterflies extends Animation {
     @Override
     public void stop() {
         audioActive = false;
-        osc.send(backgroundSoundStop);
+        if ( useAudio ) {
+            osc.send(backgroundSoundStop);
+        }
         sprites.forEach(Sprite::reset);
     }
 
@@ -111,7 +119,7 @@ public class Butterflies extends Animation {
     @Override
     public void onFocusAdded(int focusId) {
         targetSprites();
-        if ( audioActive ) {
+        if ( useAudio && audioActive ) {
             if (focusId == 2) {
                 osc.send(centreFlutter);
             } else {
@@ -137,7 +145,7 @@ public class Butterflies extends Animation {
     private void targetSprites() {
         if (foci.isEmpty()) {
             randomize();
-            if ( audioActive ) {
+            if ( useAudio && audioActive ) {
                 osc.send(exitSound);
             }
         } else {

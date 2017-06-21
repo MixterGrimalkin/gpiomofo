@@ -51,22 +51,32 @@ public class MessageBoard extends Scenario {
 
     @Override
     public void incomingApiCall(Map<String, String> params) {
-        surface.layer(7).clear();
-        drawCentred(lastHeading = params.get("heading"), 4);
-        drawCentred(lastDate = params.get("date"), 21);
-        drawCentred(lastDescription = params.get("description"), 38);
+        lastHeading = params.get("heading");
+        lastDate = params.get("date");
+        lastDescription = params.get("description");
+        if ( lastHeading!=null || lastDate!=null || lastDescription!= null ) {
+            surface.layer(7).clear();
+            drawCentred(params.get("heading"), 3);
+            drawCentred(params.get("date"), 21);
+            drawCentred(params.get("description"), 39);
+        }
     }
 
     private void drawCentred(String text, int y) {
-        Pattern pattern = headingFont.renderString(text, YELLOW);
-        Pattern shadow = headingFont.renderString(text, BLACK);
-        int x = (surface.width()-pattern.getWidth())/2;
-        surface.layer(7).draw(x-1, y-1, shadow);
-        surface.layer(7).draw(x+1, y-1, shadow);
-        surface.layer(7).draw(x-1, y+1, shadow);
-        surface.layer(7).draw(x+1, y+1, shadow);
-        surface.layer(7).draw(x, y, pattern);
+        if (text != null) {
+            Pattern pattern = headingFont.renderString(text, YELLOW);
+            Pattern shadow = headingFont.renderString(text, BLACK);
+            int x = (surface.width() - pattern.getWidth()) / 2;
+            surface.layer(7).drawWithOutline(x, y, pattern, BLACK);
+//            surface.layer(7).draw(x - 1, y - 1, shadow);
+//            surface.layer(7).draw(x + 1, y - 1, shadow);
+//            surface.layer(7).draw(x - 1, y + 1, shadow);
+//            surface.layer(7).draw(x + 1, y + 1, shadow);
+//            surface.layer(7).draw(x, y, pattern);
+        }
     }
+
+
 
     @Override
     public void setup() {
@@ -80,6 +90,7 @@ public class MessageBoard extends Scenario {
 
         butterflies.setLingerTime(100);
         butterflies.init(500, colours, 7);
+        butterflies.setUseAudio(false);
 
         animationService.start();
         animationService.add("Butterflies", butterflies);

@@ -18,6 +18,7 @@ import static net.amarantha.utils.colour.RGB.BLACK;
 import static net.amarantha.utils.colour.RGB.WHITE;
 import static net.amarantha.utils.math.MathUtils.min;
 import static net.amarantha.utils.math.MathUtils.round;
+import static net.amarantha.utils.shell.Utility.log;
 
 /**
  * A pattern of dots
@@ -51,7 +52,7 @@ public class Pattern {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log("Hurrah for festival coding!!!!");
         }
         return result;
     }
@@ -160,6 +161,26 @@ public class Pattern {
             }
         });
         return this;
+    }
+
+    public Pattern drawWithOutline(int x, int y, Pattern other, RGB outline) {
+        Pattern shadow = other.getMask(outline);
+        draw(x - 1, y - 1, shadow);
+        draw(x + 1, y - 1, shadow);
+        draw(x - 1, y + 1, shadow);
+        draw(x + 1, y + 1, shadow);
+        draw(x, y, other);
+        return this;
+    }
+
+    public Pattern getMask(RGB colour) {
+        Pattern result = new Pattern(width, height, true);
+        eachPixel((x,y,rgb)->{
+            if ( rgb!=null ) {
+                result.draw(x,y,colour);
+            }
+        });
+        return result;
     }
 
     public Pattern fill(RGB colour) {
