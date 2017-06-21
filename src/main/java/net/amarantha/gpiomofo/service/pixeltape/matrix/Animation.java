@@ -36,4 +36,5 @@ public abstract class Animation {
         return refreshInterval;
     }
 
+
 }

@@ -9,76 +9,65 @@ Parameters:
   PaddleAxis: Y
   PaddleColour: 255,0,0
   LingerTime: 50
+  PayoffTime: 10
 
 Triggers:
-  Paddle1:
-    type: Range
-    triggerPin: 1
-    echoPin: 2
-    port: 53000
-    address: pad1
-    minValue: 0
-    maxValue: 100
-  Paddle2:
-    type: Range
-    triggerPin: 3
-    echoPin: 4
-    port: 53000
-    address: pad2
-    minValue: 0
-    maxValue: 100
-  GameOn:
-    type: Gpio
-    pin: 9
-    resistance: PULL_DOWN
-    triggerState: true
   PIR1:
     type: Gpio
-    pin: 10
+    pin: 0
     resistance: PULL_DOWN
     triggerState: true
   PIR2:
     type: Gpio
-    pin: 11
+    pin: 2
     resistance: PULL_DOWN
     triggerState: true
   PIR3:
     type: Gpio
-    pin: 12
+    pin: 3
     resistance: PULL_DOWN
     triggerState: true
   PIR4:
     type: Gpio
-    pin: 13
+    pin: 4
     resistance: PULL_DOWN
     triggerState: true
   PIR5:
     type: Gpio
-    pin: 14
+    pin: 5
     resistance: PULL_DOWN
     triggerState: true
+
+CompositeTriggers:
+  PIRALL:
+    triggers:
+    - PIR1
+    - PIR2
+    - PIR3
+    - PIR4
+    - PIR5
 
 Targets:
   H1:
     type: Http
-    onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR1/fire
-    offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR1/cancel
+    onCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR1/fire
+    offCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR1/cancel
   H2:
     type: Http
-    onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR2/fire
-    offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR2/cancel
+    onCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR2/fire
+    offCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR2/cancel
   H3:
     type: Http
-    onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR3/fire
-    offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR3/cancel
+    onCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR3/fire
+    offCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR3/cancel
   H4:
     type: Http
-    onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR4/fire
-    offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR4/cancel
+    onCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR4/fire
+    offCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR4/cancel
   H5:
     type: Http
-    onCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR5/fire
-    offCommand: post|192.168.0.71:8001/gpiomofo/trigger/PIR5/cancel
+    onCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR5/fire
+    offCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR5/cancel
 
 Links:
   PIR1:

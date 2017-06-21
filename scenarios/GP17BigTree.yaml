@@ -1,27 +1,16 @@
 Triggers:
-  Zapper1:
-    type: Gpio
-    pin: 1
-    resistance: PULL_DOWN
-    triggerState: true
-  Zapper2:
-    type: Gpio
-    pin: 2
-    resistance: PULL_DOWN
-    triggerState: true
+  Zapper:
+    type: Osc
+    address: zap
+    port: 53000
+    data: 255
 
 Targets:
-  Command1:
-    type: Http
-    onCommand: POST|10.0.0.1:8080/command1On
-    offCommand: POST|10.0.0.1:8080/command1Off
-  Command2:
-    type: Http
-    onCommand: POST|10.0.0.1:8080/command2On
-    offCommand: POST|10.0.0.1:8080/command2Off
+  Zapper:
+    type: Gpio
+    pin: 0
+    activeState: true
 
 Links:
-  Zapper1:
-  - Command1
-  Zapper2:
-  - Command2
+  Zapper:
+  - Zapper

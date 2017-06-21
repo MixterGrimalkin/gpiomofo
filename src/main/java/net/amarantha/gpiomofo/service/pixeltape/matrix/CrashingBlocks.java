@@ -27,43 +27,29 @@ public class CrashingBlocks extends Animation {
 
     @Inject private OscService osc;
 
+    @Property("AudioPlayerIP") private String playerIp;
+    @Property("AudioPlayerPort") private int playerPort;
     @Property("MinSpeed") private double minSpeed = 0.5;
     @Property("MaxSpeed") private double maxSpeed = 3.0;
     @Property("Balls") private int ballCount;
     @Property("BallColour") private RGB ballColour;
-    @Property("LowOSC") private OscCommand lowOsc;
-    @Property("MedOSC") private OscCommand medOsc;
-    @Property("HighOSC") private OscCommand highOsc;
-    @Property("CrashOSC") private OscCommand crashOsc;
+    @Property("BackgroundSound") private String backgroundSoundFilename;
+    private OscCommand backgroundSoundPlay;
+    private OscCommand backgroundSoundStop;
 
     private List<RGB> explosionColours;
 
-    private List<OscCommand> dingCommands = new ArrayList<>();
-    @Inject
-    private PropertiesService props;
-
-    private int polyphony = 1;
-    private int soundsPlaying = 0;
-    private boolean explosionPlaying = false;
+    @Inject private PropertiesService props;
 
     @Override
     public void init() {
 
-
-//        dingSounds.add(high);
-//        dingSounds.add(med);
-//        dingSounds.add(low);
-//
-//        explosion.onPlaybackFinished(() -> {
-//            explosionPlaying= false;
-//        });
-
         try {
             props.injectProperties(this);
-            dingCommands.add(highOsc);
-            dingCommands.add(lowOsc);
-            dingCommands.add(medOsc);
             explosionColours = props.getRgbList("CrashingBlocks", "ExplosionColours");
+
+            backgroundSoundPlay = new OscCommand(playerIp, playerPort, backgroundSoundFilename+"/loop");
+            backgroundSoundStop = new OscCommand(playerIp, playerPort, backgroundSoundFilename+"/stop");
 
             for (int i = 0; i < ballCount; i++) {
                 balls.add(makeBall());
@@ -76,11 +62,6 @@ public class CrashingBlocks extends Animation {
                             .setLayer(1);
 
             field.onCollide((s1, s2) -> {
-//                if ( !explosionPlaying ) {
-//                    explosionPlaying = true;
-//                    explosion.play();
-//                }
-                osc.send(crashOsc);
                 double[] delta1 = s1.getLinearDelta();
                 double[] delta2 = s2.getLinearDelta();
                 s1.setLinearDelta(-delta1[X], -delta1[Y]);
@@ -111,29 +92,17 @@ public class CrashingBlocks extends Animation {
         }
     }
 
-    private AudioFile addSound(String filename) {
-        AudioFile audio = new AudioFile(filename);
-        audio.onPlaybackFinished(()->soundsPlaying--);
-        return audio;
-    }
-
-    private void playSound(AudioFile audio) {
-        if ( soundsPlaying < polyphony ) {
-            audio.play();
-            soundsPlaying++;
-        }
-    }
-
     @Override
     public void start() {
+        osc.send(backgroundSoundPlay);
         field.start();
 
     }
 
     @Override
     public void stop() {
+        osc.send(backgroundSoundStop);
         field.stop();
-
     }
 
     @Override
@@ -152,8 +121,6 @@ public class CrashingBlocks extends Animation {
         ball.show();
         ball.reset();
         ball.onBounce((axis, max) -> {
-//            playSound(randomFrom(dingSounds));
-            osc.send(randomFrom(dingCommands));
             sparker.setPosition(ball.position());
             double[] ballDelta = ball.getLinearDelta();
             double averageDelta = (ballDelta[X] + ballDelta[Y])/2.0;
@@ -164,15 +131,6 @@ public class CrashingBlocks extends Animation {
         ball.setAngularDelta(PI / 2, 1.0);
         return ball;
     }
-
-    private List<AudioFile> dingSounds = new ArrayList<>();
-    private AudioFile low = addSound("audio/low.mp3");
-    private AudioFile med = addSound("audio/med.mp3");
-    private AudioFile high = addSound("audio/high.mp3");
-    private AudioFile explosion = addSound("audio/organchord.mp3");
-
-
-
 
     private List<Sprite> balls = new LinkedList<>();
 

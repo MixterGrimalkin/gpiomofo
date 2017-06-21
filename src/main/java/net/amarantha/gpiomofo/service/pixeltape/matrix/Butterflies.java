@@ -31,12 +31,14 @@ public class Butterflies extends Animation {
     @Property("BackgroundSound") private String backgroundSoundFilename;
     private OscCommand backgroundSoundStart;
     private OscCommand backgroundSoundStop;
-    private OscCommand flutterInSound;
-    private OscCommand flutterOutSound;
 
     private Map<Integer, RGB> colours;
 
     private int[] targetJitter;
+
+    public void setTargetJitter(int[] targetJitter) {
+        this.targetJitter = targetJitter;
+    }
 
     public void init(int spriteCount, Map<Integer, RGB> colours, int tailLength) {
         this.colours = colours;
@@ -51,8 +53,9 @@ public class Butterflies extends Animation {
         }
         backgroundSoundStart = new OscCommand(playerIp, playerPort, backgroundSoundFilename+"/loop");
         backgroundSoundStop = new OscCommand(playerIp, playerPort, backgroundSoundFilename+"/stop");
-        flutterInSound = new OscCommand(playerIp, playerPort, flutterInSoundFilename+"/play");
-        flutterOutSound = new OscCommand(playerIp, playerPort, flutterOutSoundFilename+"/play");
+        tentFlutter = new OscCommand(playerIp, playerPort, "windy-tent/play");
+        centreFlutter = new OscCommand(playerIp, playerPort, "centre-sound/play");
+        exitSound = new OscCommand(playerIp, playerPort, "exit-sound/play");
         reset();
         randomize();
     }
@@ -65,17 +68,19 @@ public class Butterflies extends Animation {
 
     @Override
     public void start() {
+        audioActive = true;
         osc.send(backgroundSoundStart);
     }
 
     @Override
     public void stop() {
+        audioActive = false;
         osc.send(backgroundSoundStop);
         sprites.forEach(Sprite::reset);
     }
 
-    private int foreground = 1;
-    private int background = 0;
+    private int foreground = 2;
+    private int background = 1;
 
     @Override
     public void refresh() {
@@ -97,16 +102,26 @@ public class Butterflies extends Animation {
         });
     }
 
+    private OscCommand tentFlutter;
+    private OscCommand centreFlutter;
+    private OscCommand exitSound;
+
+    private boolean audioActive = false;
 
     @Override
     public void onFocusAdded(int focusId) {
-        osc.send(flutterInSound);
         targetSprites();
+        if ( audioActive ) {
+            if (focusId == 2) {
+                osc.send(centreFlutter);
+            } else {
+                osc.send(tentFlutter);
+            }
+        }
     }
 
     @Override
     public void onFocusRemoved(List<Integer> focusIds) {
-        osc.send(flutterOutSound);
         targetSprites();
     }
 
@@ -122,6 +137,9 @@ public class Butterflies extends Animation {
     private void targetSprites() {
         if (foci.isEmpty()) {
             randomize();
+            if ( audioActive ) {
+                osc.send(exitSound);
+            }
         } else {
             sprites.forEach((oldSprite) -> {
                 Integer[] target = randomFocus(oldSprite);

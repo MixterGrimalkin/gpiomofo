@@ -36,9 +36,15 @@ public class AudioPlayer extends Scenario {
         try {
             props.injectProperties(this);
             List<String> filenames = props.getStringList("AudioPlayer","Files");
-            filenames.forEach((filename)->{
-                log("Audio File '"+filename+"' available");
-                audioFiles.put(filename, new AudioFile("audio/"+filename+".mp3"));
+            filenames.forEach((fn)->{
+                String[] split = fn.split(",");
+                String filename = split[0];
+                AudioFile audioFile = new AudioFile("audio/"+filename+".mp3");
+                if ( split.length>1 ) {
+                    audioFile.setPolyphony(Integer.parseInt(split[1]));
+                }
+                log("Audio File '"+filename+"' available (polyphony "+audioFile.getPolyphony()+")");
+                audioFiles.put(filename, audioFile);
                 osc.onReceive(port, filename+"/play", (date, args) -> {
                     log("Play '"+filename+"'");
                     AudioFile af = audioFiles.get(filename);
