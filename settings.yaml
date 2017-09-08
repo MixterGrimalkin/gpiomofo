@@ -23,8 +23,9 @@ AudioPlayer:
    - flutter-out
    - rise0,1
 NeoPixelGUI: 
-   Spacer: 0
-   LedSize: 2
+   Spacer: 30
+   CustomLayout: scenarios/TestCustomLayout.layout
+   LedSize: 10
 NeoPixelBoard: 
    RowsFirst: true
    LoopBack: false
@@ -58,12 +59,12 @@ General:
    TargetPackage: net.amarantha.gpiomofo.target
    HttpAsyncTargets: true
    ScenarioPackage: net.amarantha.gpiomofo.scenario
-   Scenario: MessageBoard
+   Scenario: TestCustomLayout
 LightSurface: 
    LayerCount: 10
-   BoardClass: net.amarantha.gpiomofo.display.lightboard.LightBoardGUI
-   Height: 64
-   Width: 256
+   BoardClass: net.amarantha.gpiomofo.display.lightboard.NeoPixelBoard
+   Height: 3
+   Width: 3
 Gingerline: 
    LightingServerIP: 192.168.42.100
    C5-Amber: 255,80,0
@@ -85,8 +86,8 @@ Gingerline:
 Gui: 
    Window-Output-GPIO: 191.0,139.0
    Window-Range-Sensor: 139.0,289.0
-   Window-LightBoard: 334.0,69.0
-   Window-NeoPixel: 1751.0,354.0
+   Window-LightBoard: 1792.0,327.0
+   Window-NeoPixel: 84.0,466.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
    Window-Input-GPIO: 61.0,46.0
    Window-GpioMofo: 803.0,559.0

@@ -10,13 +10,19 @@ import javafx.stage.Stage;
 import net.amarantha.gpiomofo.core.GpioMofo;
 import net.amarantha.gpiomofo.service.gui.Gui;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.file.FileService;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.time.TimeGuard;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.lang.Integer.parseInt;
 import static javafx.scene.paint.Color.color;
 import static net.amarantha.gpiomofo.core.Constants.neoPixelGUIWidths;
+import static net.amarantha.utils.math.MathUtils.round;
 import static net.amarantha.utils.shell.Utility.log;
 
 @PropertyGroup("NeoPixelGUI")
@@ -29,9 +35,11 @@ public class NeoPixelGUI implements NeoPixel {
     @Inject private Gui gui;
     @Inject private GpioMofo application;
     @Inject private PropertiesService props;
+    @Inject private FileService files;
 
     @Property("LedSize") private int radius = 5;
     @Property("Spacer") private int spacer = 2;
+    @Property("CustomLayout") private String customLayoutFilename;
 
     private Circle[] pixels;
     private RGB[] colours;
@@ -44,12 +52,51 @@ public class NeoPixelGUI implements NeoPixel {
         this.defaultWidth = defaultWidth;
     }
 
+    private Map<Integer, int[]> customLayout;
+
+    private void loadCustomLayout() {
+        customLayout = new HashMap<>();
+        String data = files.readFromFile(customLayoutFilename);
+        String[] rows = data.split("\n");
+        for ( int i=0; i<rows.length; i++ ) {
+            String[] coords = rows[i].split(",");
+            if ( coords.length==2 ) {
+                customLayout.put(i, new int[]{ parseInt(coords[0]), parseInt(coords[1])});
+            }
+        }
+        if ( customLayout.isEmpty() ) {
+            customLayout = null;
+        }
+    }
+
+    private void saveCustomLayout() {
+        StringBuilder sb = new StringBuilder();
+        customLayout.forEach((p, point)-> sb.append(point[0]).append(",").append(point[1]).append("\n"));
+        files.writeToFile(customLayoutFilename, sb.toString());
+    }
+
+    private void addPixelDragHandler(Circle pixel, final int pixelNumber) {
+        pixel.setOnMousePressed((event -> {
+            System.out.println("Pixel: " + pixelNumber);
+        }));
+        pixel.setOnMouseReleased(event -> {
+            saveCustomLayout();
+        });
+        pixel.setOnMouseDragged((event -> {
+            pixel.setCenterX(event.getX());
+            pixel.setCenterY(event.getY());
+            customLayout.put(pixelNumber, new int[]{round(event.getX()),round(event.getY())});
+        }));
+    }
+
     @Override
     public void init(final int pixelCount) {
 
         log("Starting GUI NeoPixel...");
 
         props.injectPropertiesOrExit(this);
+
+        loadCustomLayout();
 
         this.pixelCount = pixelCount;
         pixels = new Circle[pixelCount];
@@ -78,6 +125,15 @@ public class NeoPixelGUI implements NeoPixel {
             pixels[p] = pixel;
             int left = margin + radius + ((2* radius)+ spacer)*x;
             int top = margin + radius + ((2* radius)+ spacer)*y;
+            if ( customLayout!=null ) {
+                if (p < customLayout.size()) {
+                    left = customLayout.get(p)[0];
+                    top = customLayout.get(p)[1];
+                } else {
+                    customLayout.put(p, new int[]{left, top});
+                }
+                addPixelDragHandler(pixel, p);
+            }
             pixel.setCenterX(left);
             pixel.setCenterY(top);
             tape.getChildren().add(pixel);
@@ -151,7 +207,9 @@ public class NeoPixelGUI implements NeoPixel {
 
     @Override
     public void close() {
-
+        if ( customLayout!=null ) {
+            saveCustomLayout();
+        }
     }
 
     @Override

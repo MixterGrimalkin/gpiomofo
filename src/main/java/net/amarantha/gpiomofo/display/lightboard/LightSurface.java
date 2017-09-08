@@ -78,6 +78,7 @@ public class LightSurface extends AbstractService {
 
     @Override
     protected void onStop() {
+        board.shutdown();
     }
 
     private Map<Integer, RGB> colouriseLayers = new HashMap<>();
