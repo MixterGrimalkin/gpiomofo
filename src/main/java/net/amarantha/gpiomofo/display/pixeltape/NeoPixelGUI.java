@@ -22,6 +22,7 @@ import java.util.Map;
 import static java.lang.Integer.parseInt;
 import static javafx.scene.paint.Color.color;
 import static net.amarantha.gpiomofo.core.Constants.neoPixelGUIWidths;
+import static net.amarantha.utils.math.MathUtils.max;
 import static net.amarantha.utils.math.MathUtils.round;
 import static net.amarantha.utils.shell.Utility.log;
 
@@ -55,37 +56,55 @@ public class NeoPixelGUI implements NeoPixel {
     private Map<Integer, int[]> customLayout;
 
     private void loadCustomLayout() {
-        customLayout = new HashMap<>();
-        String data = files.readFromFile(customLayoutFilename);
-        String[] rows = data.split("\n");
-        for ( int i=0; i<rows.length; i++ ) {
-            String[] coords = rows[i].split(",");
-            if ( coords.length==2 ) {
-                customLayout.put(i, new int[]{ parseInt(coords[0]), parseInt(coords[1])});
+        if ( files.exists(customLayoutFilename) ) {
+            customLayout = new HashMap<>();
+            String data = files.readFromFile(customLayoutFilename);
+            String[] rows = data.split("\n");
+            for (int i = 0; i < rows.length; i++) {
+                String[] coords = rows[i].split(",");
+                if (coords.length == 2) {
+                    customLayout.put(i, new int[]{parseInt(coords[0]), parseInt(coords[1])});
+                } else if ( coords.length == 3 ) {
+                    customLayout.put(i, new int[]{parseInt(coords[0]), parseInt(coords[1]), parseInt(coords[2])});
+                }
             }
-        }
-        if ( customLayout.isEmpty() ) {
-            customLayout = null;
         }
     }
 
     private void saveCustomLayout() {
-        StringBuilder sb = new StringBuilder();
-        customLayout.forEach((p, point)-> sb.append(point[0]).append(",").append(point[1]).append("\n"));
-        files.writeToFile(customLayoutFilename, sb.toString());
+        if ( customLayout!=null ) {
+            StringBuilder sb = new StringBuilder();
+            customLayout.forEach((p, point) -> {
+                sb.append(point[0]).append(",").append(point[1]);
+                if ( point.length>2 ) sb.append(",").append(point[2]);
+                sb.append("\n");
+            });
+            files.writeToFile(customLayoutFilename, sb.toString());
+        }
     }
 
-    private void addPixelDragHandler(Circle pixel, final int pixelNumber) {
+    private void addPixelMouseHandler(Circle pixel, final int pixelNumber) {
         pixel.setOnMousePressed((event -> {
             System.out.println("Pixel: " + pixelNumber);
+            int[] currentLayout = customLayout.get(pixelNumber);
+            if ( event.isControlDown() ) {
+                int newRadius = (int)(pixel.getRadius() + (event.isShiftDown() ? -5 : 5));
+                if ( newRadius > 0 ) {
+                    pixel.setRadius(newRadius);
+                    customLayout.put(pixelNumber, new int[]{currentLayout[0], currentLayout[1], newRadius});
+                    saveCustomLayout();
+                }
+            }
         }));
+        pixel.setOnMouseClicked(event->{
+        });
         pixel.setOnMouseReleased(event -> {
             saveCustomLayout();
         });
         pixel.setOnMouseDragged((event -> {
             pixel.setCenterX(event.getX());
             pixel.setCenterY(event.getY());
-            customLayout.put(pixelNumber, new int[]{round(event.getX()),round(event.getY())});
+            customLayout.put(pixelNumber, new int[]{round(event.getX()), round(event.getY()), round(pixel.getRadius())});
         }));
     }
 
@@ -114,25 +133,29 @@ public class NeoPixelGUI implements NeoPixel {
         int y = 0;
         int p = 0;
         int maxWidth = 0;
-        while ( p < pixelCount ) {
-            int widthCheck = y >= neoPixelGUIWidths.length ? defaultWidth : neoPixelGUIWidths[y] ;
+        while (p < pixelCount) {
+            int widthCheck = y >= neoPixelGUIWidths.length ? defaultWidth : neoPixelGUIWidths[y];
             maxWidth = Math.max(maxWidth, widthCheck);
-            if ( x >= widthCheck ) {
+            if (x >= widthCheck) {
                 x = 0;
                 y++;
             }
             Circle pixel = new Circle(radius, color(0, 0, 0));
             pixels[p] = pixel;
-            int left = margin + radius + ((2* radius)+ spacer)*x;
-            int top = margin + radius + ((2* radius)+ spacer)*y;
-            if ( customLayout!=null ) {
+            int left = margin + radius + ((2 * radius) + spacer) * x;
+            int top = margin + radius + ((2 * radius) + spacer) * y;
+            if (customLayout != null) {
                 if (p < customLayout.size()) {
-                    left = customLayout.get(p)[0];
-                    top = customLayout.get(p)[1];
+                    int[] layout = customLayout.get(p);
+                    left = layout[0];
+                    top = layout[1];
+                    if ( layout.length > 2 ) {
+                        pixel.setRadius(layout[2]);
+                    }
                 } else {
-                    customLayout.put(p, new int[]{left, top});
+                    customLayout.put(p, new int[]{left, top, radius});
                 }
-                addPixelDragHandler(pixel, p);
+                addPixelMouseHandler(pixel, p);
             }
             pixel.setCenterX(left);
             pixel.setCenterY(top);
@@ -141,9 +164,11 @@ public class NeoPixelGUI implements NeoPixel {
             p++;
         }
 
+        saveCustomLayout();
+
         // RIGHT-CLICK => reset UI window (because it messes up all the time - bug in JaxaFX maybe???)
         pane.setOnMouseClicked((e) -> {
-            if ( e.getButton()== MouseButton.SECONDARY ) {
+            if (e.getButton() == MouseButton.SECONDARY) {
                 stage.hide();
                 stage = new Stage();
                 init(pixelCount);
@@ -158,8 +183,17 @@ public class NeoPixelGUI implements NeoPixel {
 
 
         stage = gui.addStage("NeoPixel");
-        width = (2*margin)+(radius *2*maxWidth)+(spacer *(maxWidth-1));
-        height = (2*margin)+(radius *2*(y+1))+(spacer *(y));
+        if ( customLayout==null ) {
+            width = (2 * margin) + (radius * 2 * maxWidth) + (spacer * (maxWidth - 1));
+            height = (2 * margin) + (radius * 2 * (y + 1)) + (spacer * (y));
+        } else {
+            width = 0;
+            height = 0;
+            customLayout.forEach((k,point)->{
+                width = max(width, point[0]+(point.length>2?point[2]:radius)+spacer);
+                height = max(height, point[1]+(point.length>2?point[2]:radius)+spacer);
+            });
+        }
         stage.setScene(new Scene(pane, width, height));
         stage.show();
 
@@ -172,7 +206,7 @@ public class NeoPixelGUI implements NeoPixel {
 
     @Override
     public void setPixelColourRGB(int pixel, RGB rgb) {
-        if ( pixel < pixelCount ) {
+        if (pixel < pixelCount) {
             colours[pixel] = rgb;
         }
     }
@@ -193,11 +227,11 @@ public class NeoPixelGUI implements NeoPixel {
 
     @Override
     public void render() {
-        guard.every(refreshInterval, "render", ()->{
+        guard.every(refreshInterval, "render", () -> {
             for (int i = 0; i < pixels.length; i++) {
-                if ( colours[i]!=null ) {
+                if (colours[i] != null) {
                     RGB rgb = colours[i].withBrightness(masterBrightness);
-                    if (pixels[i]!=null ) {
+                    if (pixels[i] != null) {
                         pixels[i].setFill(color(rgb.getRed() / 255.0, rgb.getGreen() / 255.0, rgb.getBlue() / 255.0));
                     }
                 }
@@ -207,15 +241,15 @@ public class NeoPixelGUI implements NeoPixel {
 
     @Override
     public void close() {
-        if ( customLayout!=null ) {
+        if (customLayout != null) {
             saveCustomLayout();
         }
     }
 
     @Override
     public void allOff() {
-        for ( int i=0; i<pixelCount; i++ ) {
-            colours[i] = new RGB(0,0,0);
+        for (int i = 0; i < pixelCount; i++) {
+            colours[i] = new RGB(0, 0, 0);
         }
     }
 
