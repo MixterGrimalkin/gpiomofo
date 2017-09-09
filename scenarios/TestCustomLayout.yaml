@@ -1,3 +1,26 @@
 Triggers:
-  Dummy:
-    type: Http
+  Star1:
+    type: Gpio
+    pin: 1
+    resistance: PULL_DOWN
+    triggerState: true
+  Star2:
+    type: Gpio
+    pin: 2
+    resistance: PULL_DOWN
+    triggerState: true
+  Star3:
+    type: Gpio
+    pin: 3
+    resistance: PULL_DOWN
+    triggerState: true
+  Star4:
+    type: Gpio
+    pin: 4
+    resistance: PULL_DOWN
+    triggerState: true
+  Star5:
+    type: Gpio
+    pin: 5
+    resistance: PULL_DOWN
+    triggerState: true
