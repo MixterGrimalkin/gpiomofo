@@ -22,6 +22,13 @@
             <version>2.0.0</version>
         </dependency>
 
+        <!-- AWS IoT -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-iot-device-sdk-java</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
         <!-- JPG Manipulation -->
         <dependency>
             <groupId>org.imgscalr</groupId>
@@ -60,6 +67,21 @@
             <version>0.7</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/guice-behave-0.7.jar</systemPath>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Guice Behave -->
+        <dependency>
+            <groupId>com.googlecode.guicebehave</groupId>
+            <artifactId>rxtx</artifactId>
+            <version>0.7</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/RXTXcomm.jar</systemPath>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

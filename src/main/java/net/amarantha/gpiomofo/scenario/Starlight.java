@@ -1,7 +1,9 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
+import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.annotation.Named;
+import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.trigger.Trigger.TriggerCallback;
@@ -13,36 +15,77 @@ import net.amarantha.utils.time.TimeGuard;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
+import static java.lang.Integer.parseInt;
 import static net.amarantha.utils.colour.RGB.YELLOW;
-import static net.amarantha.utils.math.MathUtils.round;
 
-public class TestCustomLayout extends Scenario {
+public class Starlight extends Scenario {
 
     @Inject private NeoPixel neoPixel;
 
     @Service private TaskService tasks;
 
-    @Named("Star1") private Trigger star1;
-    @Named("Star2") private Trigger star2;
-    @Named("Star3") private Trigger star3;
-    @Named("Star4") private Trigger star4;
-    @Named("Star5") private Trigger star5;
+    @Parameter("PixelCount") private int pixelCount;
+    @Parameter("StarTriggers") private String starTriggerStr;
+    @Parameter("StarPixels") private String starPixelStr;
+    @Parameter("RingPixels") private String ringPixelStr;
 
-    private int[] rings = { 1, 7, 13, 19, 25 };
-    private int[] stars = { 0, 6, 12, 18, 24 };
-    private int[] connectors = { 2, 3, 4, 5, 8, 9, 10, 11, 14, 15, 16, 17, 20, 21, 22, 23 };
+    private int[] stars;
+    private int[] rings;
+
+    private static class Pixel {
+        int number;
+        double current;
+        double max;
+        double min;
+        double delta;
+        boolean bounce;
+        Pixel(int number, double current, double max, double min, double delta, boolean bounce) {
+            this.number = number;
+            this.current = current;
+            this.max = max;
+            this.min = min;
+            this.delta = delta;
+            this.bounce = bounce;
+        }
+        void applyDelta() {
+            current += delta;
+            if ( current >= max ) {
+                current = max;
+                if ( bounce ) {
+                    delta *= -1;
+                }
+            } else if ( current <= min ) {
+                current = min;
+                if ( bounce ) {
+                    delta *= -1;
+                }
+            }
+        }
+    }
 
     @Override
     public void setup() {
 
-        neoPixel.init(size);
+        String[] pinsStrs = starTriggerStr.split(",");
+        String[] starStrs = starPixelStr.split(",");
+        String[] ringStrs = ringPixelStr.split(",");
+        if ( pinsStrs.length!=starStrs.length || starStrs.length!=ringStrs.length ) {
+            System.out.println("StarTriggers, StarPixels and RingPixels must all be the same length!");
+            System.exit(1);
+        }
 
-        star1.onFire(starCallback(0));
-        star2.onFire(starCallback(1));
-        star3.onFire(starCallback(2));
-        star4.onFire(starCallback(3));
-        star5.onFire(starCallback(4));
+        stars = new int[pinsStrs.length];
+        rings = new int[pinsStrs.length];
 
+        for ( int i=0; i<pinsStrs.length; i++ ) {
+            Trigger t = triggers.gpio(parseInt(pinsStrs[i].trim()), PULL_DOWN, true);
+            t.onFire(starCallback(i));
+            stars[i] = parseInt(starStrs[i].trim());
+            rings[i] = parseInt(ringStrs[i].trim());
+        }
+
+        neoPixel.init(pixelCount);
 
     }
 
@@ -54,7 +97,6 @@ public class TestCustomLayout extends Scenario {
                 pulsingStars.remove((Object)number);
                 neoPixel.setPixelColourRGB(stars[number], RGB.BLACK);
             }
-//            starPulseInterval = round(200.0 / pulsingStars.size());
             starPulseDelta = ((double)pulsingStars.size()/(double)stars.length)*0.6;
         };
     }
@@ -98,9 +140,9 @@ public class TestCustomLayout extends Scenario {
             }
 
             // Connectors fade in/out
-            for ( int i=0; i<connectors.length; i++ ) {
-                neoPixel.setPixelColourRGB(connectors[i], ringColour.withBrightness(ringBrightness));
-            }
+//            for ( int i=0; i<connectors.length; i++ ) {
+//                neoPixel.setPixelColourRGB(connectors[i], ringColour.withBrightness(ringBrightness));
+//            }
 
             // Pulse stars
             guard.every(starPulseInterval, "StarPulse", () -> {

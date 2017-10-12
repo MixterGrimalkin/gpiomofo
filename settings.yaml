@@ -90,4 +90,4 @@ Gui:
    Window-NeoPixel: 1525.0,243.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
    Window-Input-GPIO: 2297.0,216.0
-   Window-GpioMofo: 803.0,559.0
+   Window-GpioMofo: 789.0,542.0

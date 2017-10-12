@@ -1,0 +1,15 @@
+Parameters:
+  PixelCount: 26
+  StarTriggers: 1,2,3,4,5
+  PinResistance: PULL_DOWN
+  TriggerState: true
+  StarPixels: 0,6,12,18,24
+  RingPixels: 1,7,13,19,25
+
+
+Triggers:
+  Dummy:
+    type: Gpio
+    pin: 1
+    resistance: PULL_DOWN
+    triggerState: true
