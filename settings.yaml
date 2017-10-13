@@ -59,7 +59,7 @@ General:
    TargetPackage: net.amarantha.gpiomofo.target
    HttpAsyncTargets: true
    ScenarioPackage: net.amarantha.gpiomofo.scenario
-   Scenario: TestCustomLayout
+   Scenario: Starlight
 LightSurface: 
    LayerCount: 10
    BoardClass: net.amarantha.gpiomofo.display.lightboard.NeoPixelBoard

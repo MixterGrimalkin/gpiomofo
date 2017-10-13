@@ -103,27 +103,27 @@ public class TestCustomLayout extends Scenario {
             }
 
             // Pulse stars
-            guard.every(starPulseInterval, "StarPulse", () -> {
-                if ( pulsingStars.size()==stars.length ) {
-                    ringBrightnessDelta = 0.02;
-                    starPulseBrightness = 1.0;
-                    starPulseDelta = 0.0;
-                } else {
-                    ringBrightnessDelta = -0.05;
-                    starPulseBrightness += starPulseDelta;
-                    if (starPulseBrightness >= 1.0) {
-                        starPulseBrightness = 1.0;
-                        starPulseDelta = -starPulseDelta;
-                    }
-                    if (starPulseBrightness <= 0.0) {
-                        starPulseBrightness = 0.0;
-                        starPulseDelta = -starPulseDelta;
-                    }
-                }
-                pulsingStars.forEach((star)->{
-                    neoPixel.setPixelColourRGB(stars[star], RGB.WHITE.withBrightness(starPulseBrightness));
-                });
-            });
+//            guard.every(starPulseInterval, "StarPulse", () -> {
+//                if ( pulsingStars.size()==stars.length ) {
+//                    ringBrightnessDelta = 0.02;
+//                    starPulseBrightness = 1.0;
+//                    starPulseDelta = 0.0;
+//                } else {
+//                    ringBrightnessDelta = -0.05;
+//                    starPulseBrightness += starPulseDelta;
+//                    if (starPulseBrightness >= 1.0) {
+//                        starPulseBrightness = 1.0;
+//                        starPulseDelta = -starPulseDelta;
+//                    }
+//                    if (starPulseBrightness <= 0.0) {
+//                        starPulseBrightness = 0.0;
+//                        starPulseDelta = -starPulseDelta;
+//                    }
+//                }
+//                pulsingStars.forEach((star)->{
+//                    neoPixel.setPixelColourRGB(stars[star], RGB.WHITE.withBrightness(starPulseBrightness));
+//                });
+//            });
 
 
             neoPixel.render();

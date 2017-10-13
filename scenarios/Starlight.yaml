@@ -3,8 +3,11 @@ Parameters:
   StarTriggers: 1,2,3,4,5
   PinResistance: PULL_DOWN
   TriggerState: true
-  StarPixels: 0,6,12,18,24
-  RingPixels: 1,7,13,19,25
+  RingColour: 255,255,100
+  RingPixels: 0,6,12,18,24
+  StarColour: 255,255,255
+  StarPixels: 1,7,13,19,25
+  ConnectorColour: 200,200,255
 
 
 Triggers:
