@@ -1,4 +1,4 @@
-package net.amarantha.gpiomofo;
+package net.amarantha.gpiomofo.display.dmx;
 /**
  * Enttec DMX pro driver
  * requires the rxtx libraries (ie to talk to serial port)
@@ -8,12 +8,10 @@ package net.amarantha.gpiomofo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
@@ -21,6 +19,7 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
+import net.amarantha.gpiomofo.Monitor;
 
 public class Dmx
         implements SerialPortEventListener{
@@ -46,8 +45,6 @@ public class Dmx
 
     // standalone test
     public static void main(String[] argx){
-        System.out.println("Hello!");
-
         Dmx D = new Dmx();
         if(D.open("COM3")){
             D.getSerialNumber();
@@ -124,6 +121,7 @@ public class Dmx
                 port = (SerialPort) comPort;
                 port.setSerialPortParams(57600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
                 port.addEventListener(this);
+                // This causes seg fault in native code ffs
 //                (new Thread(new SerialReader(port.getInputStream()))).start();
                 if(monitor){  System.out.println("port is:"+port); }
                 isOpen= true;

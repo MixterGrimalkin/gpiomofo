@@ -45,7 +45,7 @@ public class NeoPixelBoard implements LightBoard {
     public void update(RGB[][] data) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                neoPixel.setPixelColourRGB(getPixelNumber(x, y), data[x][y]);
+                neoPixel.setPixel(getPixelNumber(x, y), data[x][y]);
             }
         }
         neoPixel.render();

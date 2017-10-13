@@ -27,11 +27,9 @@ import static net.amarantha.utils.math.MathUtils.round;
 import static net.amarantha.utils.shell.Utility.log;
 
 @PropertyGroup("NeoPixelGUI")
-public class NeoPixelGUI implements NeoPixel {
+public class NeoPixelGUI extends AbstractNeoPixel {
 
     public static int defaultWidth = 25;
-
-    private int pixelCount;
 
     @Inject private Gui gui;
     @Inject private GpioMofo application;
@@ -42,10 +40,7 @@ public class NeoPixelGUI implements NeoPixel {
     @Property("Spacer") private int spacer = 2;
     @Property("CustomLayout") private String customLayoutFilename;
 
-    private Circle[] pixels;
-    private RGB[] colours;
-
-    private double masterBrightness = 1.0;
+    private Circle[] circles;
 
     private Group tape;
 
@@ -112,14 +107,13 @@ public class NeoPixelGUI implements NeoPixel {
     public void init(final int pixelCount) {
 
         log("Starting GUI NeoPixel...");
+        super.init(pixelCount);
 
         props.injectPropertiesOrExit(this);
 
         loadCustomLayout();
 
-        this.pixelCount = pixelCount;
-        pixels = new Circle[pixelCount];
-        colours = new RGB[pixelCount];
+        circles = new Circle[pixelCount];
 
         // Build UI components
         final Pane pane = new Pane();
@@ -141,7 +135,7 @@ public class NeoPixelGUI implements NeoPixel {
                 y++;
             }
             Circle pixel = new Circle(radius, color(0, 0, 0));
-            pixels[p] = pixel;
+            circles[p] = pixel;
             int left = margin + radius + ((2 * radius) + spacer) * x;
             int top = margin + radius + ((2 * radius) + spacer) * y;
             if (customLayout != null) {
@@ -204,35 +198,19 @@ public class NeoPixelGUI implements NeoPixel {
 
     private Stage stage;
 
-    @Override
-    public void setPixelColourRGB(int pixel, RGB rgb) {
-        if (pixel < pixelCount) {
-            colours[pixel] = rgb;
-        }
-    }
-
-    @Override
-    public void setPixelColourRGB(int pixel, int red, int green, int blue) {
-        setPixelColourRGB(pixel, new RGB(red, green, blue));
-    }
-
-    @Override
-    public RGB getPixelRGB(int pixel) {
-        return colours[pixel];
-    }
-
     @Inject private TimeGuard guard;
 
     private long refreshInterval = 100;
 
     @Override
     public void render() {
+        super.render();
         guard.every(refreshInterval, "render", () -> {
-            for (int i = 0; i < pixels.length; i++) {
-                if (colours[i] != null) {
-                    RGB rgb = colours[i].withBrightness(masterBrightness);
-                    if (pixels[i] != null) {
-                        pixels[i].setFill(color(rgb.getRed() / 255.0, rgb.getGreen() / 255.0, rgb.getBlue() / 255.0));
+            for (int i = 0; i < circles.length; i++) {
+                if (getPixel(i) != null) {
+                    RGB rgb = getPixel(i).withBrightness(getMasterBrightness());
+                    if (circles[i] != null) {
+                        circles[i].setFill(color(rgb.getRed() / 255.0, rgb.getGreen() / 255.0, rgb.getBlue() / 255.0));
                     }
                 }
             }
@@ -246,20 +224,4 @@ public class NeoPixelGUI implements NeoPixel {
         }
     }
 
-    @Override
-    public void allOff() {
-        for (int i = 0; i < pixelCount; i++) {
-            colours[i] = new RGB(0, 0, 0);
-        }
-    }
-
-    @Override
-    public void setMasterBrightness(double brightness) {
-        masterBrightness = brightness;
-    }
-
-    @Override
-    public double getMasterBrightness() {
-        return masterBrightness;
-    }
 }

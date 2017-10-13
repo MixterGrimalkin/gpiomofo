@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.amarantha.utils.colour.RGB.YELLOW;
-import static net.amarantha.utils.math.MathUtils.round;
 
 public class TestCustomLayout extends Scenario {
 
@@ -47,16 +46,17 @@ public class TestCustomLayout extends Scenario {
     }
 
     private TriggerCallback starCallback(int number) {
-        return (state) -> {
-            if ( state ) {
-                pulsingStars.add(number);
-            } else {
-                pulsingStars.remove((Object)number);
-                neoPixel.setPixelColourRGB(stars[number], RGB.BLACK);
-            }
-//            starPulseInterval = round(200.0 / pulsingStars.size());
-            starPulseDelta = ((double)pulsingStars.size()/(double)stars.length)*0.6;
-        };
+        return null;
+//        return (state) -> {
+//            if ( state ) {
+////                pulsingStars.add(number);
+//            } else {
+//                pulsingStars.remove((Object)number);
+//                neoPixel.setPixel(stars[number], RGB.BLACK);
+//            }
+////            starPulseInterval = round(200.0 / pulsingStars.size());
+//            starPulseDelta = ((double)pulsingStars.size()/(double)stars.length)*0.6;
+//        };
     }
 
 
@@ -94,12 +94,12 @@ public class TestCustomLayout extends Scenario {
                 ringBrightnessDelta = 0.0;
             }
             for ( int i=0; i<rings.length; i++ ) {
-                neoPixel.setPixelColourRGB(rings[i], ringColour.withBrightness(ringBrightness));
+                neoPixel.setPixel(rings[i], ringColour.withBrightness(ringBrightness));
             }
 
             // Connectors fade in/out
             for ( int i=0; i<connectors.length; i++ ) {
-                neoPixel.setPixelColourRGB(connectors[i], ringColour.withBrightness(ringBrightness));
+                neoPixel.setPixel(connectors[i], ringColour.withBrightness(ringBrightness));
             }
 
             // Pulse stars
@@ -121,7 +121,7 @@ public class TestCustomLayout extends Scenario {
 //                    }
 //                }
 //                pulsingStars.forEach((star)->{
-//                    neoPixel.setPixelColourRGB(stars[star], RGB.WHITE.withBrightness(starPulseBrightness));
+//                    neoPixel.setPixel(stars[star], RGB.WHITE.withBrightness(starPulseBrightness));
 //                });
 //            });
 
@@ -133,7 +133,7 @@ public class TestCustomLayout extends Scenario {
 
     private void fill(int[] points, RGB colour) {
         for ( int i=0; i<points.length; i++ ) {
-            neoPixel.setPixelColourRGB(points[i], colour);
+            neoPixel.setPixel(points[i], colour);
         }
     }
 

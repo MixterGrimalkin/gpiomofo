@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.target.PixelTapeTarget;
 import net.amarantha.utils.colour.RGB;
-import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.service.AbstractService;
@@ -44,7 +43,7 @@ public class PixelTape extends AbstractService {
     public void onStart() {
         neoPixel.init(totalPixels);
         for ( int i=0; i<15; i++) {
-            neoPixel.setPixelColourRGB(i, 0, 255, 0);
+            neoPixel.setPixel(i, 0, 255, 0);
         }
         neoPixel.render();
         tasks.addRepeatingTask(this, tapeRefresh, this::render);
@@ -63,7 +62,7 @@ public class PixelTape extends AbstractService {
                 for (int i = 0; i < patternContents.length; i++) {
                     RGB rgb = patternContents[pattern.isReverse()?patternContents.length-i-1:i];
                     if (rgb != null) {
-                        neoPixel.setPixelColourRGB(start + i, rgb);
+                        neoPixel.setPixel(start + i, rgb);
                     }
                 }
             }
@@ -84,12 +83,12 @@ public class PixelTape extends AbstractService {
 
     public void setAll(RGB colour) {
         for ( int i=0; i<totalPixels; i++ ) {
-            neoPixel.setPixelColourRGB(i, colour);
+            neoPixel.setPixel(i, colour);
         }
     }
 
     public RGB getPixel(int pixel) {
-        return neoPixel.getPixelRGB(pixel);
+        return neoPixel.getPixel(pixel);
     }
 
 }

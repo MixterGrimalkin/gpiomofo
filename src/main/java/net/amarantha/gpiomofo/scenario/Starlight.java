@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
-import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.service.dmx.DmxService;
 import net.amarantha.gpiomofo.trigger.Trigger.TriggerCallback;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.service.Service;
@@ -14,53 +14,43 @@ import net.amarantha.utils.time.TimeGuard;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.pi4j.io.gpio.PinPullResistance.PULL_DOWN;
 import static java.lang.Integer.parseInt;
 
 public class Starlight extends Scenario {
 
-    @Inject private NeoPixel neoPixel;
-
     @Service private TaskService tasks;
+    @Service private DmxService dmx;
+
+    @Inject private NeoPixel neoPixel;
+    @Inject private TimeGuard guard;
 
     @Parameter("PixelCount") private int pixelCount;
     @Parameter("StarTriggers") private String starTriggerStr;
     @Parameter("StarPixels") private String starPixelStr;
     @Parameter("RingPixels") private String ringPixelStr;
-
-    private List<Integer> pulsingRings = new ArrayList<>();
-
-
-    private double starBrightnessDelta = 0.0;
     @Parameter("RingColour") private RGB ringColour;
     @Parameter("StarColour") private RGB starColour;
     @Parameter("ConnectorColour") private RGB connectorColour;
-    private double starBrightness = 0.0;
-
     @Parameter("PinResistance") private String resistanceStr;
-    private PinPullResistance resistance;
     @Parameter("TriggerState") private boolean triggerState;
-
-    private int ringPulseInterval = 100;
-    private double ringBrightness = 0.0;
-    private double ringDelta = 0.2;
-
-    private int p = 0;
-    private int size = 26;
-
-    @Inject private TimeGuard guard;
 
     private int[] stars;
     private int[] rings;
     private int[] connectors;
 
+    private List<Integer> pulsingRings = new ArrayList<>();
+
+    private int ringPulseInterval = 100;
+    private double ringBrightness = 0.0;
+    private double ringDelta = 0.2;
+
+    private double starBrightnessDelta = 0.0;
+    private double starBrightness = 0.0;
+
     @Override
     public void setup() {
 
-        System.out.println(triggerState);
-        System.out.println(resistanceStr);
-        resistance = PinPullResistance.valueOf(resistanceStr);
-        System.out.println(resistance);
+        PinPullResistance resistance = PinPullResistance.valueOf(resistanceStr);
 
         String[] pinsStrs = starTriggerStr.split(",");
         String[] starStrs = starPixelStr.split(",");
@@ -72,21 +62,27 @@ public class Starlight extends Scenario {
 
         stars = new int[pinsStrs.length];
         rings = new int[pinsStrs.length];
+        connectors = new int[pixelCount-(stars.length+rings.length)];
 
         for ( int i=0; i<pinsStrs.length; i++ ) {
-            Trigger t = triggers.gpio(parseInt(pinsStrs[i].trim()), resistance, triggerState);
-            t.onFire(starCallback(i));
             stars[i] = parseInt(starStrs[i].trim());
             rings[i] = parseInt(ringStrs[i].trim());
+            triggers.gpio(
+                    parseInt(pinsStrs[i].trim()),
+                    resistance,
+                    triggerState
+            ).onFire(starCallback(i));
+            neoPixel.intercept(rings[i], dmx.rgbDevice(i*6).getInterceptor());
+            neoPixel.intercept(stars[i], dmx.rgbDevice((i*6)+3).getInterceptor());
         }
 
-        connectors = new int[pixelCount-(stars.length+rings.length)];
         int j = 0;
         for ( int i=0; i<pixelCount; i++ ) {
             if ( !arrayContains(stars, i) && !arrayContains(rings, i) ) {
                 connectors[j++] = i;
             }
         }
+
 
         neoPixel.init(pixelCount);
 
@@ -107,13 +103,11 @@ public class Starlight extends Scenario {
                 pulsingRings.add(number);
             } else {
                 pulsingRings.remove((Object)number);
-                neoPixel.setPixelColourRGB(rings[number], RGB.BLACK);
+                neoPixel.setPixel(rings[number], RGB.BLACK);
             }
             ringDelta = ((double) pulsingRings.size()/(double)rings.length)*0.6;
         };
     }
-
-
 
     @Override
     public void startup() {
@@ -131,12 +125,12 @@ public class Starlight extends Scenario {
                 starBrightnessDelta = 0.0;
             }
             for ( int i=0; i<stars.length; i++ ) {
-                neoPixel.setPixelColourRGB(stars[i], starColour.withBrightness(starBrightness));
+                neoPixel.setPixel(stars[i], starColour.withBrightness(starBrightness));
             }
 
             // Connectors fade in/out
             for ( int i=0; i<connectors.length; i++ ) {
-                neoPixel.setPixelColourRGB(connectors[i], connectorColour.withBrightness(starBrightness));
+                neoPixel.setPixel(connectors[i], connectorColour.withBrightness(starBrightness));
             }
 
             // Pulse rings
@@ -158,7 +152,7 @@ public class Starlight extends Scenario {
                     }
                 }
                 pulsingRings.forEach((star)->{
-                    neoPixel.setPixelColourRGB(rings[star], ringColour.withBrightness(ringBrightness));
+                    neoPixel.setPixel(rings[star], ringColour.withBrightness(ringBrightness));
                 });
             });
             neoPixel.render();
@@ -168,13 +162,14 @@ public class Starlight extends Scenario {
 
     private void fill(int[] points, RGB colour) {
         for ( int i=0; i<points.length; i++ ) {
-            neoPixel.setPixelColourRGB(points[i], colour);
+            neoPixel.setPixel(points[i], colour);
         }
     }
 
     @Override
     public void shutdown() {
         super.shutdown();
+        neoPixel.allOff();
     }
 
     private static class Pixel {

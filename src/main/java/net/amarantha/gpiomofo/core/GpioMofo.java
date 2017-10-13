@@ -1,18 +1,11 @@
 package net.amarantha.gpiomofo.core;
 
-import com.amazonaws.services.iot.client.AWSIotException;
-import com.amazonaws.services.iot.client.AWSIotMqttClient;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import gnu.io.*;
-import net.amarantha.gpiomofo.Dmx;
 import net.amarantha.gpiomofo.factory.ScenarioBuilder;
 import net.amarantha.gpiomofo.scenario.Scenario;
 
-import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Scanner;
-import java.util.TooManyListenersException;
 
 import static net.amarantha.utils.shell.Utility.log;
 
