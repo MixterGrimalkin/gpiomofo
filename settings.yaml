@@ -24,7 +24,7 @@ AudioPlayer:
    - rise0,1
 NeoPixelGUI: 
    Spacer: 30
-   CustomLayout: scenarios/TestCustomLayout.layout
+   CustomLayout: scenarios/Starlight.layout
    LedSize: 10
 NeoPixelBoard: 
    RowsFirst: true
@@ -51,6 +51,8 @@ Services:
    MidiDevice: USB Uno MIDI Interface
 PixelTape: 
    TapeRefresh: 10
+SerialDmx: 
+   Port: /dev/ttyUSB0
 General: 
    ScenariosDirectory: scenarios
    Refresh: 50
@@ -89,5 +91,5 @@ Gui:
    Window-LightBoard: 1792.0,327.0
    Window-NeoPixel: 1525.0,243.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
-   Window-Input-GPIO: 2297.0,216.0
+   Window-Input-GPIO: 2350.0,86.0
    Window-GpioMofo: 789.0,542.0

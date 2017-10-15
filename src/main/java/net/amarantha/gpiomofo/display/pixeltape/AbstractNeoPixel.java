@@ -18,6 +18,25 @@ public abstract class AbstractNeoPixel implements NeoPixel {
         fireInteceptors();
     }
 
+    public int getPixelCount() {
+        return pixels.length - interceptors.size();
+    }
+
+    protected Integer getAdjustedPixel(int pixel) {
+        if ( interceptors.isEmpty() ) {
+            return pixel;
+        } else if ( interceptors.get(pixel)==null ) {
+            int regress = 0;
+            for (Map.Entry<Integer, Consumer<RGB>> entry : interceptors.entrySet() ) {
+                if ( entry.getKey() < pixel ) {
+                    regress++;
+                }
+            }
+            return pixel - regress;
+        }
+        return null;
+    }
+
     @Override
     public void close() {
 
@@ -35,9 +54,7 @@ public abstract class AbstractNeoPixel implements NeoPixel {
 
     private void fireInteceptors() {
         if ( !interceptors.isEmpty() ) {
-            interceptors.forEach((pixel, interceptor)->{
-                interceptor.accept(pixels[pixel]);
-            });
+            interceptors.forEach((pixel, interceptor)-> interceptor.accept(pixels[pixel]));
         }
     }
 

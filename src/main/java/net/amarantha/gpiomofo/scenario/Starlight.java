@@ -7,6 +7,7 @@ import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.dmx.DmxService;
 import net.amarantha.gpiomofo.trigger.Trigger.TriggerCallback;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.service.Service;
 import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.time.TimeGuard;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
+import static net.amarantha.utils.math.MathUtils.arrayContains;
 
 public class Starlight extends Scenario {
 
@@ -34,9 +36,9 @@ public class Starlight extends Scenario {
     @Parameter("PinResistance") private String resistanceStr;
     @Parameter("TriggerState") private boolean triggerState;
 
-    private int[] stars;
-    private int[] rings;
-    private int[] connectors;
+    private Integer[] stars;
+    private Integer[] rings;
+    private Integer[] connectors;
 
     private List<Integer> pulsingRings = new ArrayList<>();
 
@@ -60,20 +62,21 @@ public class Starlight extends Scenario {
             System.exit(1);
         }
 
-        stars = new int[pinsStrs.length];
-        rings = new int[pinsStrs.length];
-        connectors = new int[pixelCount-(stars.length+rings.length)];
+        stars = new Integer[pinsStrs.length];
+        rings = new Integer[pinsStrs.length];
+        connectors = new Integer[pixelCount-(stars.length*2)];
 
         for ( int i=0; i<pinsStrs.length; i++ ) {
             stars[i] = parseInt(starStrs[i].trim());
             rings[i] = parseInt(ringStrs[i].trim());
             triggers.gpio(
+                    "Star"+i,
                     parseInt(pinsStrs[i].trim()),
                     resistance,
                     triggerState
             ).onFire(starCallback(i));
-            neoPixel.intercept(rings[i], dmx.rgbDevice(i*6).getInterceptor());
-            neoPixel.intercept(stars[i], dmx.rgbDevice((i*6)+3).getInterceptor());
+            neoPixel.intercept(rings[i], dmx.rgbDevice(i*4).getInterceptor());
+            neoPixel.intercept(stars[i], dmx.device((i*4)+3).getInterceptor());
         }
 
         int j = 0;
@@ -83,18 +86,8 @@ public class Starlight extends Scenario {
             }
         }
 
-
         neoPixel.init(pixelCount);
 
-    }
-
-    private boolean arrayContains(int[] array, int value) {
-        for ( int i=0; i<array.length; i++ ) {
-            if ( array[i]==value ) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private TriggerCallback starCallback(int number) {

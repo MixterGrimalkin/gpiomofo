@@ -21,8 +21,6 @@ public class NeoPixelWS281X extends AbstractNeoPixel {
 
     private WS281x ws281x;
 
-    private int pixelCount;
-
     @Override
     public void init(int pixelCount) {
         log("Starting Native WS281x NeoPixel...");
@@ -34,20 +32,20 @@ public class NeoPixelWS281X extends AbstractNeoPixel {
                 return null;
             }
         });
-        this.pixelCount = pixelCount;
-        ws281x = new WS281x(frequency, dma, pin, 255, pixelCount);
+        ws281x = new WS281x(frequency, dma, pin, 255, getPixelCount());
     }
 
     @Override
     public void setPixel(int pixel, RGB colour) {
         super.setPixel(pixel, colour);
-        if ( pixel < pixelCount && !colour.equals(getPixel(pixel))) {
+        Integer adjustedPixel = getAdjustedPixel(pixel);
+        if ( adjustedPixel!=null && adjustedPixel < getPixelCount() ) { //&& !colour.equals(super.getPixel(pixel))) {
             dirty = true;
             RGB rgb = colour.withBrightness(getMasterBrightness());
             if (colourMode==ColourMode.RGB) {
-                ws281x.setPixelColourRGB(pixel, rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+                ws281x.setPixelColourRGB(adjustedPixel, rgb.getRed(), rgb.getGreen(), rgb.getBlue());
             } else {
-                ws281x.setPixelColourRGB(pixel, rgb.getGreen(), rgb.getRed(), rgb.getBlue());
+                ws281x.setPixelColourRGB(adjustedPixel, rgb.getGreen(), rgb.getRed(), rgb.getBlue());
             }
         }
     }

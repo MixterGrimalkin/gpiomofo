@@ -35,6 +35,10 @@ public class DmxService extends AbstractService {
         }
     }
 
+    public DmxDevice device(int channel) {
+        return new DmxDevice(this, channel);
+    }
+
     public DmxRgbDevice rgbDevice(int startChannel) {
         return new DmxRgbDevice(this, startChannel);
     }

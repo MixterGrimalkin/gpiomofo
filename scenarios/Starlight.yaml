@@ -1,13 +1,13 @@
 Parameters:
-  PixelCount: 26
-  StarTriggers: 1,2,3,4,5
   PinResistance: PULL_DOWN
   TriggerState: true
   RingColour: 255,255,100
-  RingPixels: 0,6,12,18,24
   StarColour: 255,255,255
-  StarPixels: 1,7,13,19,25
   ConnectorColour: 200,200,255
+  PixelCount: 26
+  RingPixels: 0,6,12,18,24
+  StarPixels: 1,7,13,19,25
+  StarTriggers: 1,2,3,4,5
 
 
 Triggers:
