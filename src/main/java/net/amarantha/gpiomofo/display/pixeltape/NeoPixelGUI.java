@@ -117,7 +117,7 @@ public class NeoPixelGUI extends AbstractNeoPixel {
 
         // Build UI components
         final Pane pane = new Pane();
-        pane.setStyle("-fx-background-color: rgb(30,30,30);");
+        pane.setStyle("-fx-background-color: rgb(10,10,10);");
         tape = new Group();
         pane.getChildren().add(tape);
 
