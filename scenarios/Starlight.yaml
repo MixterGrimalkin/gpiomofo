@@ -11,6 +11,9 @@ Parameters:
   RingColour: 100,80,255
   StarColour: 250,255,230
   ConnectorColour: 230,230,255
+  # DMX
+  DmxStars: true
+  DmxRings: true
   # Fade times (ms)
   StarFadeUp: 1700
   StarFadeDown: 500

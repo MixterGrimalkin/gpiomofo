@@ -18,15 +18,11 @@ import static net.amarantha.utils.math.MathUtils.*;
 
 public class Starlight extends Scenario {
 
-    @Service
-    private TaskService tasks;
-    @Service
-    private DmxService dmx;
+    @Service private TaskService tasks;
+    @Service private DmxService dmx;
 
-    @Inject
-    private NeoPixel neoPixel;
-    @Inject
-    private TimeGuard guard;
+    @Inject private NeoPixel neoPixel;
+    @Inject private TimeGuard guard;
 
     @Parameter("PixelCount")        private int pixelCount;
     @Parameter("StarTriggers")      private String starTriggerStr;
@@ -37,6 +33,9 @@ public class Starlight extends Scenario {
     @Parameter("ConnectorColour")   private RGB connectorColour;
     @Parameter("PinResistance")     private String resistanceStr;
     @Parameter("TriggerState")      private boolean triggerState;
+
+    @Parameter("DmxStars")          private boolean dmxStars;
+    @Parameter("DmxRings")          private boolean dmxRings;
 
     @Parameter("StarFadeUp")        private int starFadeUp;
     @Parameter("StarFadeDown")      private int starFadeDown;
@@ -82,8 +81,8 @@ public class Starlight extends Scenario {
                     resistance,
                     triggerState
             ).onFire(starCallback(i));
-            neoPixel.intercept(rings[i], dmx.rgbDevice(i * 4).getInterceptor());
-            neoPixel.intercept(stars[i], dmx.device((i * 4) + 3).getInterceptor());
+            if (dmxRings) neoPixel.intercept(rings[i], dmx.rgbDevice(i * 4).getInterceptor());
+            if (dmxStars) neoPixel.intercept(stars[i], dmx.device((i * 4) + 3).getInterceptor());
         }
 
         int j = 0;
@@ -157,14 +156,16 @@ public class Starlight extends Scenario {
                 pulseTime = round(maxPulseTime - (maxPulseTime - minPulseTime) * (((double) pulsingRings.size()) / ((double) rings.length - 1)));
             }
             Double jump = null;
+            boolean up = false;
             for (int i : pulsingRings) {
                 Pixel p = pixels.get(rings[i]);
                 if (jump == null) {
                     jump = p.current();
+                    up = p.goingUp();
                 } else {
                     p.jump(jump);
                 }
-                p.bounce(true).fadeUp(pulseTime);
+                p.bounce(true).fade(pulseTime, up);
             }
         }
     }
@@ -252,6 +253,10 @@ public class Starlight extends Scenario {
             this.min = min;
             this.max = max;
             return this;
+        }
+
+        boolean goingUp() {
+            return delta > 0;
         }
 
         void fadeUp(int duration) {
