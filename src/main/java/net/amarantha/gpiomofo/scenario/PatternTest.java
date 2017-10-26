@@ -1,12 +1,10 @@
 package net.amarantha.gpiomofo.scenario;
 
-import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.annotation.Named;
 import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.display.font.Font;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.service.Service;
 
 public class PatternTest extends Scenario {

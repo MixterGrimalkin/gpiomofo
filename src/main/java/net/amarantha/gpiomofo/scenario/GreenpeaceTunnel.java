@@ -7,11 +7,8 @@ import net.amarantha.gpiomofo.display.animation.AnimationService;
 import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
-import net.amarantha.gpiomofo.service.pixeltape.matrix.ButterPong;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.CrashingBlocks;
-import net.amarantha.gpiomofo.trigger.ContinuousTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.webservice.SystemResource;
 import net.amarantha.gpiomofo.webservice.WebService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.service.Service;
@@ -19,8 +16,6 @@ import net.amarantha.utils.service.Service;
 import java.util.HashMap;
 import java.util.Map;
 
-import static net.amarantha.gpiomofo.core.Constants.X;
-import static net.amarantha.gpiomofo.core.Constants.Y;
 import static net.amarantha.utils.colour.RGB.BLACK;
 
 public class GreenpeaceTunnel extends Scenario {

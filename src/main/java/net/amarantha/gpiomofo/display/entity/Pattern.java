@@ -1,8 +1,6 @@
 package net.amarantha.gpiomofo.display.entity;
 
-import net.amarantha.gpiomofo.core.Constants;
 import net.amarantha.utils.colour.RGB;
-import net.amarantha.utils.math.MathUtils;
 import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
@@ -17,7 +15,6 @@ import static net.amarantha.gpiomofo.core.Constants.Y;
 import static net.amarantha.utils.colour.RGB.BLACK;
 import static net.amarantha.utils.colour.RGB.WHITE;
 import static net.amarantha.utils.math.MathUtils.min;
-import static net.amarantha.utils.math.MathUtils.round;
 import static net.amarantha.utils.shell.Utility.log;
 
 /**

@@ -9,7 +9,8 @@ import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.SpriteField;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.service.Service;
 
-import static net.amarantha.utils.colour.RGB.*;
+import static net.amarantha.utils.colour.RGB.RED;
+import static net.amarantha.utils.colour.RGB.YELLOW;
 
 public class TransitionTest extends Scenario {
 

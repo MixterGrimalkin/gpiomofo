@@ -5,10 +5,8 @@ import net.amarantha.gpiomofo.factory.LinkFactory;
 import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.TriggerFactory;
 import net.amarantha.gpiomofo.webservice.WebService;
-import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.service.ServiceFactory;
 import net.amarantha.utils.time.Now;
-import org.codehaus.jettison.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.LinkedList;

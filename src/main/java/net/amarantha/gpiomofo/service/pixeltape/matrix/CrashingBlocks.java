@@ -1,12 +1,10 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.service.audio.AudioFile;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.Ball;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.Explosion;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.Sprite;
 import net.amarantha.utils.colour.RGB;
-import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.osc.OscService;
 import net.amarantha.utils.osc.entity.OscCommand;
 import net.amarantha.utils.properties.PropertiesService;
@@ -14,13 +12,15 @@ import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.properties.entity.PropertyNotFoundException;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static java.lang.Math.PI;
 import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
 import static net.amarantha.utils.math.MathUtils.randomBetween;
-import static net.amarantha.utils.math.MathUtils.randomFrom;
 
 @PropertyGroup("CrashingBlocks")
 public class CrashingBlocks extends Animation {

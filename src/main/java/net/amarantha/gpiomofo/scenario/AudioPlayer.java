@@ -4,15 +4,12 @@ import com.google.inject.Inject;
 import net.amarantha.gpiomofo.service.audio.AudioFile;
 import net.amarantha.gpiomofo.webservice.WebService;
 import net.amarantha.utils.osc.OscService;
-import net.amarantha.utils.osc.entity.OscListener;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.properties.entity.PropertyNotFoundException;
 import net.amarantha.utils.service.Service;
-import net.amarantha.utils.shell.Utility;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

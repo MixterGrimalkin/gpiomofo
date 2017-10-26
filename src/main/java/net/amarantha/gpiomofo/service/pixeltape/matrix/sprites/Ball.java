@@ -1,7 +1,5 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix.sprites;
 
-import net.amarantha.gpiomofo.core.Constants;
-
 import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
 

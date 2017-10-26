@@ -9,15 +9,12 @@ import net.amarantha.gpiomofo.factory.TriggerFactory;
 import net.amarantha.gpiomofo.trigger.GpioTrigger;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.utils.service.ServiceFactory;
-import net.amarantha.utils.string.StringUtils;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
 import static net.amarantha.utils.reflection.ReflectionUtils.reflectiveGet;
 import static net.amarantha.utils.string.StringUtils.asMap;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 @RunWith(StoryRunner.class) @Modules(TestModule.class)
 public class ServiceInjectionTest {

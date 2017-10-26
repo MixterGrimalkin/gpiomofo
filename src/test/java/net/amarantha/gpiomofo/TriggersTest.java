@@ -5,7 +5,6 @@ import com.googlecode.guicebehave.Story;
 import com.googlecode.guicebehave.StoryRunner;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeSensor;
 import org.junit.runner.RunWith;
 
 @RunWith(StoryRunner.class) @Modules(TestModule.class)

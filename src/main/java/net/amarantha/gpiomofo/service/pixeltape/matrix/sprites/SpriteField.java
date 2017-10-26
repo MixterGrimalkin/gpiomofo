@@ -2,12 +2,8 @@ package net.amarantha.gpiomofo.service.pixeltape.matrix.sprites;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import net.amarantha.gpiomofo.core.Constants;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
-import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
-import net.amarantha.utils.service.AbstractService;
-import net.amarantha.utils.task.Task;
 import net.amarantha.utils.task.TaskService;
 
 import java.util.*;

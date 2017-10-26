@@ -5,10 +5,9 @@ package net.amarantha.gpiomofo;
  * released into the public domain by
  * David K Eggen
  */
-import java.awt.GridLayout;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.*;
+import java.awt.*;
 
 public class Monitor extends JFrame {
 	

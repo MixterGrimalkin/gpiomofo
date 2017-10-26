@@ -3,22 +3,20 @@ package net.amarantha.gpiomofo.display.lightboard;
 import com.google.inject.Injector;
 import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.display.entity.Region;
-import net.amarantha.utils.service.AbstractService;
-import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;
+import net.amarantha.utils.service.AbstractService;
+import net.amarantha.utils.task.TaskService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import static net.amarantha.utils.colour.RGB.BLACK;
-import static net.amarantha.utils.shell.Utility.log;
 
 @Singleton
 @PropertyGroup("LightSurface")

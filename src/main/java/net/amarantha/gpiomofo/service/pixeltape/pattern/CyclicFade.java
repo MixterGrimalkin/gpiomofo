@@ -3,7 +3,6 @@ package net.amarantha.gpiomofo.service.pixeltape.pattern;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.target.PixelTapeTarget;
-import net.amarantha.utils.service.Service;
 import net.amarantha.utils.time.TimeGuard;
 
 public class CyclicFade extends PixelTapeTarget {

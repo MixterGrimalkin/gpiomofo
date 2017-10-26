@@ -4,7 +4,6 @@ package net.amarantha.gpiomofo.display.zone.transition;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
-import net.amarantha.gpiomofo.display.zone.AbstractZone;
 import net.amarantha.gpiomofo.display.zone.AbstractZone.ZoneCallback;
 import net.amarantha.utils.colour.RGB;
 

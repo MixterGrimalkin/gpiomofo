@@ -5,21 +5,16 @@ package net.amarantha.gpiomofo.display.dmx;
  * released into the public domain by David K Eggen 2011
  * Enjoy
  */
+
+import gnu.io.*;
+import net.amarantha.gpiomofo.Monitor;
+
+import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.Vector;
-
-import javax.swing.JFrame;
-
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
-
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
-import net.amarantha.gpiomofo.Monitor;
 
 public class Dmx
         implements SerialPortEventListener{

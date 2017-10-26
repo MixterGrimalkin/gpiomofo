@@ -2,7 +2,6 @@ package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
 import com.google.inject.Inject;
 import net.amarantha.utils.colour.RGB;
-import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;

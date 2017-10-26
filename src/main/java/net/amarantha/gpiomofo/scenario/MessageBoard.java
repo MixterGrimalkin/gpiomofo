@@ -1,26 +1,18 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
-import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.display.animation.AnimationService;
 import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.display.font.Font;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
-import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.webservice.WebService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.service.Service;
-import net.amarantha.utils.string.StringMap;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 import java.util.*;
 
-import static net.amarantha.utils.colour.RGB.BLACK;
-import static net.amarantha.utils.colour.RGB.GREEN;
-import static net.amarantha.utils.colour.RGB.YELLOW;
+import static net.amarantha.utils.colour.RGB.*;
 
 public class MessageBoard extends Scenario {
 

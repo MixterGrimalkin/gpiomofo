@@ -1,7 +1,6 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix.sprites;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.core.Constants;
 import net.amarantha.utils.colour.RGB;
 
 import java.util.*;
