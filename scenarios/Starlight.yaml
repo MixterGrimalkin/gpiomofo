@@ -23,6 +23,9 @@ Parameters:
   TwinklePulseMin: 200
   TwinklePulseMax: 1000
   TwinkleRange: 0.4
+  # Pulse brightness
+  MaxRingBrightness: 1.0
+  MinRingBrightness: 0.5
 
 Triggers:
   Dummy:

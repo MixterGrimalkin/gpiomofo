@@ -9,7 +9,6 @@ import net.amarantha.gpiomofo.trigger.Trigger.TriggerCallback;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.service.Service;
 import net.amarantha.utils.task.TaskService;
-import net.amarantha.utils.time.TimeGuard;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +24,6 @@ public class Starlight extends Scenario {
     @Service private DmxService dmx;
 
     @Inject private NeoPixel neoPixel;
-    @Inject private TimeGuard guard;
 
     @Parameter("PixelCount")        private int pixelCount;
     @Parameter("StarTriggers")      private String starTriggerStr;
@@ -49,6 +47,9 @@ public class Starlight extends Scenario {
     @Parameter("TwinklePulseMax")   private int maxTwinkleTime;
     @Parameter("TwinkleRange")      private double twinkleRange;
 
+    @Parameter("MaxRingBrightness") private double maxRingBrightness;
+    @Parameter("MinRingBrightness") private double minRingBrightness;
+
     private Map<Integer, Pixel> pixels = new HashMap<>();
     private Integer[] stars;
     private Integer[] rings;
@@ -60,8 +61,6 @@ public class Starlight extends Scenario {
 
     @Override
     public void setup() {
-
-        PinPullResistance resistance = PinPullResistance.valueOf(resistanceStr);
 
         String[] pinsStrs = starTriggerStr.split(",");
         String[] starStrs = starPixelStr.split(",");
@@ -81,7 +80,7 @@ public class Starlight extends Scenario {
             triggers.gpio(
                     "Star" + i,
                     parseInt(pinsStrs[i].trim()),
-                    resistance,
+                    PinPullResistance.valueOf(resistanceStr),
                     triggerState
             ).onFire(starCallback(i));
             if (dmxRings) neoPixel.intercept(rings[i], dmx.rgbDevice(i * 4).getInterceptor());
@@ -126,7 +125,7 @@ public class Starlight extends Scenario {
         if (pulsingRings.size() == rings.length) {
             // Payoff
             for ( int i=0; i<rings.length; i++ ) {
-                pixels.get(rings[i]).bounce(false).fadeUp(maxPulseTime);
+                pixels.get(rings[i]).bounce(false).max(maxRingBrightness).fadeUp(maxPulseTime);
                 pixels.get(stars[i]).bounce(false).fadeUp(starFadeUp);
             }
             for ( int i=0; i<connectors.length; i++ ) {
@@ -143,12 +142,15 @@ public class Starlight extends Scenario {
             }
         } else {
             int pulseTime = 0;
+            double ringBrightness = 0.0;
             if (pulsingRings.size() == 1) {
                 // First star
                 pulseTime = maxPulseTime;
+                ringBrightness = minRingBrightness;
             } else if (pulsingRings.size() == rings.length - 1) {
                 // Penultimate state
                 pulseTime = minPulseTime;
+                ringBrightness = maxRingBrightness;
                 for ( int i=0; i<stars.length; i++ ) {
                     pixels.get(stars[i]).bounce(false).fadeDown(starFadeDown);
                 }
@@ -156,7 +158,9 @@ public class Starlight extends Scenario {
                     pixels.get(connectors[i]).bounce(false).range(0,1).fadeDown(maxTwinkleTime);
                 }
             } else {
+                // Intermediate state
                 pulseTime = round(maxPulseTime - (maxPulseTime - minPulseTime) * (((double) pulsingRings.size()) / ((double) rings.length - 1)));
+                ringBrightness = minRingBrightness + (maxRingBrightness - minRingBrightness) * (((double) pulsingRings.size()) / ((double) rings.length - 1));
             }
             Double jump = null;
             boolean up = false;
@@ -168,13 +172,14 @@ public class Starlight extends Scenario {
                 } else {
                     p.jump(jump);
                 }
-                p.bounce(true).fade(pulseTime, up);
+                p.bounce(true).max(ringBrightness).fade(pulseTime, up);
             }
         }
     }
 
     @Override
     public void startup() {
+        neoPixel.allOff();
         tasks.addRepeatingTask("Update", updateInterval, () -> {
             pixels.forEach((i, pixel) -> pixel.update());
             neoPixel.render();
@@ -255,6 +260,16 @@ public class Starlight extends Scenario {
         Pixel range(double min, double max) {
             this.min = min;
             this.max = max;
+            return this;
+        }
+
+        Pixel max(double max) {
+            this.max = max;
+            return this;
+        }
+
+        Pixel min(double min) {
+            this.min = min;
             return this;
         }
 
