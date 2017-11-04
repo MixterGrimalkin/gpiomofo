@@ -1,32 +1,43 @@
-import time
-import random
+import time, random
 
 from pixeltape import *
-
 pixel_tape = PixelTape()
 
 # import opc
 # client = opc.client('localhost:7890')
 
-LED_COUNT = 25
+LED_COUNT = 64
 
+# Random factor to start lightening (in range 0-10 where 10 means always)
+CHANCE_OF_LIGHTENING = 1
+
+# Number of colour bands
+# Randomly chosen from this range
 MIN_BANDS = 2
-MAX_BANDS = 4
+MAX_BANDS = 8
 
+# Milliseconds to sleep between renders
+# Randomly chosen from this range
 MIN_SLEEP = 0.05
 MAX_SLEEP = 0.2
 
-DELTA = 1
+# Seconds before changing palette/mode
+SKY_TIME = 30
+STORM_TIME = 10
 
+# Colour palettes
+# One is chosen at random on each change
+# If there are more colours than bands, the first few colours are used
+# If there are more bands than colours, the colour cycle is repeated
 palettes = [
-    [(200, 20, 0), (250, 90, 10), (50, 146, 179), (255, 84, 21),  (255, 184, 21)],   # Sunset 1
-    [(255,45,10), (255,30,20), (200,10,0)], # Sunset 2
-    [(255, 161, 100), (48, 44, 93), (252, 144, 50), (252, 90, 27)],  # Lilac Sunset
-    [(30, 41, 56), (119, 145, 179), (10, 10, 10), (33, 40, 54)],  # Steel
-    [(126,217,52),(15,15,15),(203,6,35),(15,15,15)], # Aurora
-    # [(146,217,72)],
+    [(255, 45, 10), (255, 30, 20), (200, 10, 0)],  # Sunset Only
+    [(200, 20, 0), (250, 90, 10), (50, 146, 179), (255, 84, 21), (255, 184, 21)],  # Sunset w. Blue Sky
+    [(255, 161, 100), (48, 44, 93), (252, 144, 50), (252, 90, 27)],  # Sunset w. Lilac Sky
+    [(30, 41, 56), (119, 145, 179), (10, 10, 10), (33, 40, 54)],  # Overcast Sky
+    [(126, 217, 52), (15, 15, 15), (203, 6, 35), (15, 15, 15)],  # Aurora
 ]
 
+DELTA = 1
 bands = 2
 sleep_time = 0.2
 pixels = []
@@ -35,7 +46,6 @@ deltas = []
 palette = []
 brightness = 0.0
 delta_brightness = 0.1
-
 
 def reset():
     global sleep_time, bands, centres, deltas, palette
@@ -53,11 +63,6 @@ def reset():
             new_centre = random.randint(0, LED_COUNT - 1)
         centres[c] = new_centre
         c += 1
-
-
-# centres = [1, 10, 15, 19] #, 31, 45, 60]
-# palette = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]*10
-
 
 def clear():
     global pixels
@@ -121,7 +126,6 @@ def centres_around(pixel):
     return result
 
 
-
 def update_brightness():
     global brightness, delta_brightness
     brightness += delta_brightness
@@ -133,10 +137,6 @@ def update_brightness():
         delta_brightness = 0.0
 
 
-SKY_TIME = 10
-
-
-
 def main():
     global delta_brightness
     storm_mode = False
@@ -146,7 +146,8 @@ def main():
 
     while True:
         update_brightness()
-        if delta_brightness == 0.0 and time.time() - start_time > SKY_TIME:
+        t = time.time() - start_time
+        if delta_brightness == 0.0 and ((not storm_mode and t > SKY_TIME) or (storm_mode and t > STORM_TIME)):
             start_time = time.time()
             if brightness >= 1.0:
                 delta_brightness = -0.1
@@ -157,15 +158,17 @@ def main():
             start_time = time.time()
             reset()
             delta_brightness = 0.1
-            storm_mode = random.randint(0, 10) > 7
+            storm_mode = (not storm_mode) and random.randint(0, 10) > (10 - CHANCE_OF_LIGHTENING)
+            if storm_mode:
+                print "STORM!"
 
         if storm_mode:
             clear()
             render()
             time.sleep(random.uniform(0.2, 1.5))
-            flash = (random.randint(0,LED_COUNT), random.randint(2,10))
+            flash = (random.randint(0, LED_COUNT), random.randint(2, 10))
             for i in range(flash[1]):
-                draw((flash[0]+i)%LED_COUNT, (255,255,255))
+                draw((flash[0] + i) % LED_COUNT, (255, 255, 255))
             render()
             time.sleep(random.uniform(0.01, 0.2))
 
@@ -175,8 +178,6 @@ def main():
             for i in range(len(centres)):
                 if pixels[(int(centres[i] + deltas[i]) % LED_COUNT)] == (0, 0, 0):
                     centres[i] = (centres[i] + deltas[i]) % LED_COUNT
-                    # if centres[i] >= numLEDs:
-                    #     centres[i] = 0.0
                     draw(int(centres[i]), palette[i])
                     int_centres[i] = int(centres[i])
                 else:
