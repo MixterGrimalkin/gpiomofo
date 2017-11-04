@@ -10,8 +10,7 @@ import time
 from neopixel import *
 
 # LED strip configuration:
-TWINKLE_LED_COUNT = 29  # Number of LED pixels.
-AMBIENT_LED_COUNT = 57  # Number of LED pixels.
+LED_COUNT = 25  # Number of LED pixels.
 LED_PIN = 18  # GPIO pin connected to the pixels (must support PWM!).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 5  # DMA channel to use for generating signal (try 5)
@@ -22,8 +21,7 @@ LED_INVERT = False  # True to invert the signal (when using NPN transistor level
 # COMM_PIN = 18
 
 class PixelTape:
-    strip = Adafruit_NeoPixel(TWINKLE_LED_COUNT + AMBIENT_LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT,
-                              LED_BRIGHTNESS)
+    strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
 
     cancelPattern = False
 
@@ -54,9 +52,18 @@ class PixelTape:
 
         time.sleep(1)
 
+    def clear(self):
+        for i in range(LED_COUNT):
+            self.strip.setPixelColor(i, Color(0,0,0))
+
+    def draw(self, pixel, colour):
+        self.strip.setPixelColor(pixel, Color(int(colour[1]), int(colour[0]), int(colour[2])))
+
+    def render(self):
+        self.strip.show()
+
     def all_on(self, colour):
-        # print TWINKLE_LED_COUNT+AMBIENT_LED_COUNT
-        for i in range(TWINKLE_LED_COUNT + AMBIENT_LED_COUNT):
+        for i in range(LED_COUNT):
             self.strip.setPixelColor(i, colour)
 
         self.strip.show()
