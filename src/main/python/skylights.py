@@ -1,8 +1,7 @@
-import time, random
+import time, random, sys
 
 from pixeltape import *
 pixel_tape = PixelTape()
-
 # import opc
 # client = opc.client('localhost:7890')
 
@@ -16,10 +15,10 @@ CHANCE_OF_LIGHTENING = 1
 MIN_BANDS = 2
 MAX_BANDS = 8
 
-# Milliseconds to sleep between renders
+# Milliseconds to sleep between renders (smaller number = faster)
 # Randomly chosen from this range
 MIN_SLEEP = 0.05
-MAX_SLEEP = 0.2
+MAX_SLEEP = 0.12
 
 # Seconds before changing palette/mode
 SKY_TIME = 30
@@ -30,15 +29,13 @@ STORM_TIME = 10
 # If there are more colours than bands, the first few colours are used
 # If there are more bands than colours, the colour cycle is repeated
 palettes = [
-    [(255, 45, 10), (255, 30, 20), (200, 10, 0)],  # Sunset Only
+    [(255, 45, 10), (255, 30, 20), (200, 10, 0), (210, 26, 0)],  # Sunset Only
     [(200, 20, 0), (250, 90, 10), (50, 146, 179), (255, 84, 21), (255, 184, 21)],  # Sunset w. Blue Sky
     [(255, 161, 100), (48, 44, 93), (252, 144, 50), (252, 90, 27)],  # Sunset w. Lilac Sky
     [(30, 41, 56), (119, 145, 179), (10, 10, 10), (33, 40, 54)],  # Overcast Sky
     [(126, 217, 52), (15, 15, 15), (203, 6, 35), (15, 15, 15)],  # Aurora
 ]
 
-DELTA = 1
-bands = 2
 sleep_time = 0.2
 pixels = []
 centres = []
@@ -47,22 +44,32 @@ palette = []
 brightness = 0.0
 delta_brightness = 0.1
 
+
+def render():
+    client_pixels = list(pixels)
+    for i in range(len(pixels)):
+        # client_pixels[i] = dim(pixels[i])
+        pixel_tape.draw(i, dim(pixels[i]))
+    # client.put_pixels(client_pixels)
+    pixel_tape.render()
+
 def reset():
-    global sleep_time, bands, centres, deltas, palette
-    c = 0
+    global sleep_time, centres, deltas, palette
     bands = random.randint(MIN_BANDS, MAX_BANDS)
     sleep_time = random.uniform(MIN_SLEEP, MAX_SLEEP)
     p = random.randint(0, len(palettes) - 1)
     palette = palettes[p] * bands
-    deltas = [DELTA] * bands
     centres = [0] * bands
+    deltas = [1] * bands
     print "Palette:", p, "Bands:", bands
+    c = 0
     for i in range(bands):
         new_centre = random.randint(0, LED_COUNT - 1)
         while new_centre in centres:
             new_centre = random.randint(0, LED_COUNT - 1)
         centres[c] = new_centre
         c += 1
+
 
 def clear():
     global pixels
@@ -75,15 +82,6 @@ def draw(pixel, rgb):
 
 def dim(rgb):
     return rgb[0] * brightness, rgb[1] * brightness, rgb[2] * brightness
-
-
-def render():
-    client_pixels = list(pixels)
-    for i in range(len(pixels)):
-        client_pixels[i] = dim(pixels[i])
-        pixel_tape.draw(i, dim(pixels[i]))
-    # client.put_pixels(pixels)
-    pixel_tape.render()
 
 
 def interpolate(rgb1, rgb2, amount):
@@ -192,4 +190,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and int(sys.argv[1]) < len(palettes):
+        clear()
+        brightness = 1.0
+        for i in range(len(palettes[int(sys.argv[1])])):
+            print i, palettes[int(sys.argv[1])][i]
+            draw(i, palettes[int(sys.argv[1])][i])
+        render()
+    else:
+        main()
