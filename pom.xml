@@ -28,7 +28,11 @@
             <artifactId>aws-iot-device-sdk-java</artifactId>
             <version>1.1.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-iot-device-sdk-java-samples</artifactId>
+            <version>1.1.1</version>
+        </dependency>
         <!-- JPG Manipulation -->
         <dependency>
             <groupId>org.imgscalr</groupId>

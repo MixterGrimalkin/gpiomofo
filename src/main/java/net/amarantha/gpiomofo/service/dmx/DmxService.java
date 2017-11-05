@@ -1,10 +1,17 @@
 package net.amarantha.gpiomofo.service.dmx;
 
 import com.google.inject.Singleton;
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.UnsupportedCommOperationException;
+import net.amarantha.gpiomofo.core.Constants;
 import net.amarantha.gpiomofo.display.dmx.Dmx;
 import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.service.AbstractService;
+import net.amarantha.utils.shell.Utility;
+
+import java.util.TooManyListenersException;
 
 @Singleton
 @PropertyGroup("SerialDmx")
@@ -15,13 +22,17 @@ public class DmxService extends AbstractService {
     private Dmx dmx;
 
     public DmxService() {
-        super("Dmx");
+        super("Dmx Service");
         dmx = new Dmx();
     }
 
     @Override
     protected void onStart() {
-        dmx.open(port);
+        try {
+            dmx.open(port);
+        } catch (UnsupportedCommOperationException | TooManyListenersException | PortInUseException | NoSuchPortException e) {
+            Utility.log("Error opening '"+port+"': "+e.getClass().getSimpleName());
+        }
     }
 
     @Override

@@ -14,69 +14,56 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
+import java.util.TooManyListenersException;
 import java.util.Vector;
 
 public class Dmx
-        implements SerialPortEventListener{
+        implements SerialPortEventListener {
     static byte DMX_PRO_MESSAGE_START = (byte) 0x7E; // 128
-    static byte DMX_PRO_MESSAGE_END   = (byte) 0xE7; // 213
+    static byte DMX_PRO_MESSAGE_END = (byte) 0xE7; // 213
 
 
-    static final byte WIDGET_GET_PARAMETERS   = (byte)  3;
-    static final byte WIDGET_SET_PARAMETERS   = (byte)  4;
-    static final byte WIDGET_SEND_PACKET      = (byte) 0x06;
+    static final byte WIDGET_GET_PARAMETERS = (byte) 3;
+    static final byte WIDGET_SET_PARAMETERS = (byte) 4;
+    static final byte WIDGET_SEND_PACKET = (byte) 0x06;
     static final byte WIDGET_GET_SERIALNUMBER = (byte) 10;
 
 
     SerialPort port;
-    int     universeSize    = 128;    // this could be up to 512
-    boolean isOpen          = false;  // have we connected to the serial port?
-    static  boolean debug   = false;  // show debug info
-    public  boolean monitor = false;  // show internal information
-    byte[]  channelValues;            // the array of dmx values
-    JFrame  frame;                    // holds the dmx monitor frame
+    int universeSize = 128;    // this could be up to 512
+    boolean isOpen = false;  // have we connected to the serial port?
+    static boolean debug = false;  // show debug info
+    public boolean monitor = false;  // show internal information
+    byte[] channelValues;            // the array of dmx values
+    JFrame frame;                    // holds the dmx monitor frame
     Monitor Mon;
-
-
-    // standalone test
-    public static void main(String[] argx){
-        Dmx D = new Dmx();
-        if(D.open("COM3")){
-            D.getSerialNumber();
-            D.getParameters();
-            D.setDMXChannel(1, 10, false);
-            D.setDMXChannel(2, 20, false);
-            D.setDMXChannel(3, 30, true);
-        }
-        else{
-            System.out.println("Failure in opening com3");
-        }
-    }
-
 
     /**
      * initialixe object and set all channels to 0
      */
-    public Dmx(){
+    public Dmx() {
         channelValues = new byte[universeSize];
-        for(int i = 0; i < universeSize; i++){ channelValues[i] = 0; }
+        for (int i = 0; i < universeSize; i++) {
+            channelValues[i] = 0;
+        }
     }
 
 
     /**
      * helper method, get alist of the ports
+     *
      * @return
      */
-    public static String[] getPorts(){
+    public static String[] getPorts() {
         Vector<String> V = new Vector();
 
         Enumeration<CommPortIdentifier> E;
-        for(E = CommPortIdentifier.getPortIdentifiers(); E.hasMoreElements();){
+        for (E = CommPortIdentifier.getPortIdentifiers(); E.hasMoreElements(); ) {
             V.add(E.nextElement().getName());
         }
         String[] r = new String[V.size()];
         int i;
-        for(i=0;i<V.size();i++){
+        for (i = 0; i < V.size(); i++) {
             r[i] = V.elementAt(i);
         }
         return r;
@@ -85,7 +72,7 @@ public class Dmx
     /**
      * helper method, get the serial number of the box and show it
      */
-    public void getSerialNumber(){
+    public void getSerialNumber() {
         byte[] data = new byte[0];
         dmxMessage(WIDGET_GET_SERIALNUMBER, data);
         return;
@@ -94,49 +81,48 @@ public class Dmx
     /**
      * get the settings of the DMX pro and print them
      */
-    public void getParameters(){
+    public void getParameters() {
         byte[] data = new byte[0];
         dmxMessage(WIDGET_GET_PARAMETERS, data);
     }
 
     /**
      * open the serial port
+     *
      * @param name of the serial port
      * @return
      */
-    public boolean open(String name){
-        try{
-            CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(name);
-            if(portIdentifier.isCurrentlyOwned()){
-                System.out.println("Error: Port is currently in use");
-                return false;
-            }
-            CommPort comPort = portIdentifier.open(this.getClass().getName(),2000);
-            if(comPort instanceof SerialPort ){
-                port = (SerialPort) comPort;
-                port.setSerialPortParams(57600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
-                port.addEventListener(this);
-                // This causes seg fault in native code ffs
+    public boolean open(String name) throws UnsupportedCommOperationException, TooManyListenersException, PortInUseException, NoSuchPortException {
+        CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(name);
+        if (portIdentifier.isCurrentlyOwned()) {
+            System.out.println("Error: Port is currently in use");
+            return false;
+        }
+        CommPort comPort = portIdentifier.open(this.getClass().getName(), 2000);
+        if (comPort instanceof SerialPort) {
+            port = (SerialPort) comPort;
+            port.setSerialPortParams(57600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            port.addEventListener(this);
+            // This causes seg fault in native code ffs
 //                (new Thread(new SerialReader(port.getInputStream()))).start();
-                if(monitor){  System.out.println("port is:"+port); }
-                isOpen= true;
-                return true;
+            if (monitor) {
+                System.out.println("port is:" + port);
             }
-            System.out.println("was not a serial port");
+            isOpen = true;
+            return true;
         }
-        catch(Exception Ex){
-            Ex.printStackTrace();
-        }
+        System.out.println("was not a serial port");
         isOpen = false;
         return false;
     }
 
     /**
      * get a channel value from the internal buffer
+     *
      * @param channel
      * @return
      */
-    int getDMXChannel(int channel){
+    int getDMXChannel(int channel) {
         return channelValues[channel];
     }
 
@@ -150,41 +136,47 @@ public class Dmx
      * @param value
      * @param flush
      */
-    public void setDMXChannel(int channel,  int  value, boolean flush){
-        if(channelValues[channel] == (byte) value){ return; }
-        channelValues[channel] =   (byte) value;
-        if(monitor){
-            if(Mon == null){
+    public void setDMXChannel(int channel, int value, boolean flush) {
+        if (channelValues[channel] == (byte) value) {
+            return;
+        }
+        channelValues[channel] = (byte) value;
+        if (monitor) {
+            if (Mon == null) {
                 Mon = new Monitor();
                 Mon.setVisible(true);
             }
             Mon.setChan(channel, value);
         }
-        byte[] data = new byte[universeSize+1];
+        byte[] data = new byte[universeSize + 1];
 
         data[0] = 0; // DMX command byte..
 
-        for(int i = 0; i < universeSize; i++){
-            data[i+1] = channelValues[i];
+        for (int i = 0; i < universeSize; i++) {
+            data[i + 1] = channelValues[i];
         }
-        if(flush){
-            dmxMessage( WIDGET_SEND_PACKET, data );
+        if (flush) {
+            dmxMessage(WIDGET_SEND_PACKET, data);
         }
     }
 
     /**
      * is the serial port open?
+     *
      * @return
      */
-    public boolean isOpen(){ return isOpen; }
+    public boolean isOpen() {
+        return isOpen;
+    }
 
 
     /**
      * send a dmx message to the widget
+     *
      * @param messageType
      * @param data
      */
-    void dmxMessage( byte messageType, byte[] data ){
+    void dmxMessage(byte messageType, byte[] data) {
         byte[] message;
         int dataSize = data.length;
         message = new byte[5 + dataSize];
@@ -195,47 +187,48 @@ public class Dmx
         message[3] = (byte) ((dataSize >> 8) & 255);
 
         // there's probably a faster way to do this...
-        if(dataSize >0){
-            for(int i = 0; i < dataSize; i++){
-                message[i+4] = data[i];
+        if (dataSize > 0) {
+            for (int i = 0; i < dataSize; i++) {
+                message[i + 4] = data[i];
             }
         }
 
         message[4 + dataSize] = DMX_PRO_MESSAGE_END;
 //System.out.print("msg:");
 //  dump(message,5+dataSize);
-        try{
+        try {
             OutputStream out = port.getOutputStream();
             out.write(message);
-        }
-        catch(Exception E){
+        } catch (Exception E) {
             E.printStackTrace();
         }
     }
 
 
     public void serialEvent(SerialPortEvent e) {
-        System.out.println("Event:"+e.toString());
+        System.out.println("Event:" + e.toString());
     }
 
-    static void dump(byte[] buffer,int l){
+    static void dump(byte[] buffer, int l) {
         int i;
-        System.out.print(l+" bytes:");
-        for(i=0;i< l; i++){
-            System.out.print(toHex(buffer[i])+" ");
+        System.out.print(l + " bytes:");
+        for (i = 0; i < l; i++) {
+            System.out.print(toHex(buffer[i]) + " ");
         }
         System.out.println("");
     }
 
 
-    static  String toHex(byte b){
+    static String toHex(byte b) {
 
-        char[] X ={ '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
+        char[] X = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
         StringBuffer Sb = new StringBuffer();
         int lsb = b & 0x0F;
         int msb = b & 0x70;
         msb >>>= 4;
-        if(b<0){ msb +=8; }
+        if (b < 0) {
+            msb += 8;
+        }
         Sb.append(X[msb]);
         Sb.append(X[lsb]);
         return Sb.toString();
@@ -245,103 +238,107 @@ public class Dmx
 //----------------------------------
 
 
-    public static class SerialReader implements Runnable{
+    public static class SerialReader implements Runnable {
         InputStream in;
-        int     state = 0;
-        byte[]  temp  = new byte[600];
-        int     here;
-        int     ptype;  // packet type
-        int     dlen;
+        int state = 0;
+        byte[] temp = new byte[600];
+        int here;
+        int ptype;  // packet type
+        int dlen;
 
-        public SerialReader ( InputStream in ){
+        public SerialReader(InputStream in) {
             this.in = in;
         }
 
-        public void run (){
+        public void run() {
 
             byte[] buffer = new byte[1024];
             int len = -1;
 
-            try{
-                while((len = this.in.available()) > -1 ){
+            try {
+                while ((len = this.in.available()) > -1) {
                     int i = in.read();
 //      System.out.println("Read:"+toHex((byte)i));
 
-                    if(state ==0 ){ // look for start byte\
+                    if (state == 0) { // look for start byte\
 //        System.out.println("in state 0");
-                        if(i== DMX_PRO_MESSAGE_START){
+                        if (i == DMX_PRO_MESSAGE_START) {
                             state = 1;
                             ptype = -1;
                         }
                         continue;
                     }
-                    if(state == 1){ //get the message type
+                    if (state == 1) { //get the message type
 //        System.out.println("in state 1");
-                        if( i < 0){ state = 0; continue; } // bad type
-                        if( i > 11){ state = 0; continue; } // bad type
+                        if (i < 0) {
+                            state = 0;
+                            continue;
+                        } // bad type
+                        if (i > 11) {
+                            state = 0;
+                            continue;
+                        } // bad type
                         ptype = i;
                         dlen = 0;
                         state = 2;
                         //      System.out.println("ptype:"+ptype);
                         continue;
                     }
-                    if(state == 2){ // get lsb
+                    if (state == 2) { // get lsb
 //        System.out.println("in state 2");
                         dlen += i;
                         state = 3;
                         continue;
                     }
-                    if(state == 3){ // get msb - cant be > 1, then read the thing
+                    if (state == 3) { // get msb - cant be > 1, then read the thing
 //        System.out.println("in state 3");
-                        if(i >1){
+                        if (i > 1) {
                             state = 0;
                             continue;
                         }
-                        i= i *255;
-                        dlen= dlen +i;
+                        i = i * 255;
+                        dlen = dlen + i;
 //        System.out.println("dlen"+dlen);
                         // clear out buffer
-                        for(i=0;i<temp.length;i++){
+                        for (i = 0; i < temp.length; i++) {
                             temp[i] = 0;
                         }
                         int r = in.read(temp, 0, dlen);  // heres where we read te response
 //        System.out.println("tried to read "+dlen+" bytes, got "+r);
-                        if(r != dlen){
+                        if (r != dlen) {
                             state = 0;
                             continue;
                         }
                         state = 4;
                         continue;
                     }
-                    if(state==4){ // read the end packet
+                    if (state == 4) { // read the end packet
 //        System.out.println("in state 4");
-                        if(i == DMX_PRO_MESSAGE_END){ // its all good
-                            crackMsg(ptype,dlen,temp);
-                        }
-                        else{ // not so good
+                        if (i == DMX_PRO_MESSAGE_END) { // its all good
+                            crackMsg(ptype, dlen, temp);
+                        } else { // not so good
                             System.out.println("state 4: bad message end packet");
-                            System.out.println("was "+i+" expecting 231");
+                            System.out.println("was " + i + " expecting 231");
                         }
                         state = 0;
                         continue;
                     }
                 }
-            }
-            catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        void crackMsg(int typ,int len, byte[] buff){
-            System.out.println("***msg Type:"+typ);
+        void crackMsg(int typ, int len, byte[] buff) {
+            System.out.println("***msg Type:" + typ);
             dump(buff, len);
-            switch(typ){
+            switch (typ) {
                 case 03:
-                    System.out.println("fw rev:"+toHex(buff[1]));
-                    System.out.println("fw rev:"+toHex(buff[0]));
-                    System.out.println("Breaktime:"+toHex(buff[2]));
-                    System.out.println("Mark time:"+toHex(buff[3]));
-                    System.out.println("Update:"+toHex(buff[4]));
+                    System.out.println("fw rev:" + toHex(buff[1]));
+                    System.out.println("fw rev:" + toHex(buff[0]));
+                    System.out.println("Breaktime:" + toHex(buff[2]));
+                    System.out.println("Mark time:" + toHex(buff[3]));
+                    System.out.println("Update:" + toHex(buff[4]));
                     break;
 
                 case 10:
@@ -350,7 +347,7 @@ public class Dmx
                     Sb.append(toHex(buff[2]));
                     Sb.append(toHex(buff[1]));
                     Sb.append(toHex(buff[0]));
-                    System.out.println("Ser:"+Sb.toString());
+                    System.out.println("Ser:" + Sb.toString());
                     break;
             }
         }
