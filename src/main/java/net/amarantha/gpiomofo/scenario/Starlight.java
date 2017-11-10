@@ -4,12 +4,15 @@ import com.google.inject.Inject;
 import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
+import net.amarantha.gpiomofo.display.pixeltape.NeoPixelFactory;
+import net.amarantha.gpiomofo.display.pixeltape.Pixel;
 import net.amarantha.gpiomofo.service.AwsService;
 import net.amarantha.gpiomofo.service.dmx.DmxService;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.trigger.Trigger.TriggerCallback;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.service.Service;
+import net.amarantha.utils.string.StringMap;
 import net.amarantha.utils.task.TaskService;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -22,70 +25,43 @@ import static net.amarantha.utils.shell.Utility.log;
 
 public class Starlight extends Scenario {
 
-    @Service
-    private TaskService tasks;
-    @Service
-    private DmxService dmx;
-    @Service
-    private AwsService aws;
+    @Service private TaskService tasks;
+    @Service private DmxService dmx;
+    @Service private AwsService aws;
 
-    @Inject
-    private NeoPixel neoPixel;
+    @Inject private NeoPixelFactory pixels;
+    @Inject private NeoPixel neoPixel;
 
-    @Parameter("PixelCount")
-    private int pixelCount;
-    @Parameter("StarTriggers")
-    private String starTriggerStr;
-    @Parameter("StarPixels")
-    private String starPixelStr;
-    @Parameter("RingPixels")
-    private String ringPixelStr;
-    @Parameter("RingColour")
-    private RGB ringColour;
-    @Parameter("StarColour")
-    private RGB starColour;
-    @Parameter("ConnectorColour")
-    private RGB connectorColour;
-    @Parameter("PinResistance")
-    private String resistanceStr;
-    @Parameter("TriggerState")
-    private boolean triggerState;
+    @Parameter("PixelCount")        private int pixelCount;
+    @Parameter("StarTriggers")      private String starTriggerStr;
+    @Parameter("StarPixels")        private String starPixelStr;
+    @Parameter("RingPixels")        private String ringPixelStr;
+    @Parameter("RingColour")        private RGB ringColour;
+    @Parameter("StarColour")        private RGB starColour;
+    @Parameter("ConnectorColour")   private RGB connectorColour;
+    @Parameter("PinResistance")     private String resistanceStr;
+    @Parameter("TriggerState")      private boolean triggerState;
 
-    @Parameter("DmxStars")
-    private boolean dmxStars;
-    @Parameter("DmxRings")
-    private boolean dmxRings;
+    @Parameter("DmxStars")          private boolean dmxStars;
+    @Parameter("DmxRings")          private boolean dmxRings;
 
-    @Parameter("StarFadeUp")
-    private int starFadeUp;
-    @Parameter("StarFadeDown")
-    private int starFadeDown;
-    @Parameter("RingFadeDown")
-    private int ringFadeDown;
-    @Parameter("RingPulseMin")
-    private int minPulseTime;
-    @Parameter("RingPulseMax")
-    private int maxPulseTime;
-    @Parameter("TwinklePulseMin")
-    private int minTwinkleTime;
-    @Parameter("TwinklePulseMax")
-    private int maxTwinkleTime;
-    @Parameter("TwinkleRange")
-    private double twinkleRange;
+    @Parameter("StarFadeUp")        private int starFadeUp;
+    @Parameter("StarFadeDown")      private int starFadeDown;
+    @Parameter("RingFadeDown")      private int ringFadeDown;
+    @Parameter("RingPulseMin")      private int minPulseTime;
+    @Parameter("RingPulseMax")      private int maxPulseTime;
+    @Parameter("TwinklePulseMin")   private int minTwinkleTime;
+    @Parameter("TwinklePulseMax")   private int maxTwinkleTime;
+    @Parameter("TwinkleRange")      private double twinkleRange;
 
-    @Parameter("MaxRingBrightness")
-    private double maxRingBrightness;
-    @Parameter("MinRingBrightness")
-    private double minRingBrightness;
+    @Parameter("MaxRingBrightness") private double maxRingBrightness;
+    @Parameter("MinRingBrightness") private double minRingBrightness;
 
-    private Map<Integer, Pixel> pixels = new HashMap<>();
     private Integer[] stars;
     private Integer[] rings;
     private Integer[] connectors;
 
     private List<Integer> pulsingRings = new ArrayList<>();
-
-    private int updateInterval = 10;
 
     @Override
     public void setup() {
@@ -119,7 +95,7 @@ public class Starlight extends Scenario {
         for (int i = 0; i < pixelCount; i++) {
             boolean isStar = arrayContains(stars, i);
             boolean isRing = arrayContains(rings, i);
-            Pixel p = new Pixel(i);
+            Pixel p = pixels.create(i);
             if (isStar) {
                 p.rgb(starColour);
             }
@@ -130,7 +106,6 @@ public class Starlight extends Scenario {
                 p.rgb(connectorColour);
                 connectors[j++] = i;
             }
-            pixels.put(i, p);
         }
 
         neoPixel.init(pixelCount);
@@ -140,14 +115,16 @@ public class Starlight extends Scenario {
     private String constellationName = "cassiopeia";
 
     private TriggerCallback starCallback(int number) {
+        Map<String, String> onMessage = buildMessage(number, true);
+        Map<String, String> offMessage = buildMessage(number, false);
         return (state) -> {
             if (state) {
                 pulsingRings.add(number);
-                aws.publish("starlight/" + constellationName, "Star " + number + " Activated");
+                aws.publish("Starlight", onMessage);
             } else {
                 pulsingRings.remove((Object) number);
                 pixels.get(rings[number]).bounce(false).fadeDown(ringFadeDown);
-                aws.publish("starlight/" + constellationName, "Star " + number + " Deactivated");
+                aws.publish("Starlight", offMessage);
             }
             modifyEffect();
         };
@@ -172,6 +149,7 @@ public class Starlight extends Scenario {
                             .fadeUp(randomBetween(minTwinkleTime, maxTwinkleTime));
                 }
             }
+            aws.publish("Starlight", activateConstellationMessage);
         } else {
             int pulseTime = 0;
             double ringBrightness = 0.0;
@@ -209,21 +187,6 @@ public class Starlight extends Scenario {
         }
     }
 
-    private Map<String, String> jsonToStringMap(String json) {
-        Map<String, String> result = new HashMap<>();
-        try {
-            JSONObject obj = new JSONObject(json);
-            Iterator it = obj.keys();
-            while (it.hasNext()) {
-                String key = it.next().toString();
-                result.put(key, obj.get(key).toString());
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
     @Override
     public void startup() {
 
@@ -248,133 +211,44 @@ public class Starlight extends Scenario {
             }
         });
 
-        neoPixel.allOff();
-        tasks.addRepeatingTask("Update", updateInterval, () -> {
-            pixels.forEach((i, pixel) -> pixel.update());
-            neoPixel.render();
-        });
+        pixels.start();
     }
 
     @Override
     public void shutdown() {
         super.shutdown();
-        neoPixel.allOff();
+        pixels.stop();
     }
 
-    private class Pixel {
-        int number;
-        double current;
-        double min;
-        double max;
-        double delta;
-        boolean bounce;
-        RGB rgb = RGB.WHITE;
-
-        Pixel(int number) {
-            this(number, 0.0, 0.0, 1.0, 0.0, false);
-        }
-
-        Pixel(int number, double current, double min, double max, double delta, boolean bounce) {
-            this.number = number;
-            this.current = current;
-            this.min = min;
-            this.max = max;
-            this.delta = delta;
-            this.bounce = bounce;
-        }
-
-        Pixel update() {
-            return applyDelta().draw();
-        }
-
-        Pixel applyDelta() {
-            current += delta;
-            if (current >= max) {
-                if (delta > 0) {
-                    current = max;
-                    if (bounce) {
-                        delta *= -1;
-                    } else {
-                        delta = 0;
-                    }
-                }
-            } else if (current <= min) {
-                if (delta < 0) {
-                    current = min;
-                    if (bounce) {
-                        delta *= -1;
-                    } else {
-                        delta = 0;
-                    }
-                }
-            }
-            return this;
-        }
-
-        Pixel rgb(RGB rgb) {
-            this.rgb = rgb;
-            return this;
-        }
-
-        Pixel delta(double delta) {
-            this.delta = delta;
-            return this;
-        }
-
-        Pixel bounce(boolean bounce) {
-            this.bounce = bounce;
-            return this;
-        }
-
-        Pixel range(double min, double max) {
-            this.min = min;
-            this.max = max;
-            return this;
-        }
-
-        Pixel max(double max) {
-            this.max = max;
-            return this;
-        }
-
-        Pixel min(double min) {
-            this.min = min;
-            return this;
-        }
-
-        boolean goingUp() {
-            return delta > 0;
-        }
-
-        void fadeUp(int duration) {
-            fade(duration, true);
-        }
-
-        void fadeDown(int duration) {
-            fade(duration, false);
-        }
-
-        void fade(int duration, boolean up) {
-            if ((up && current <= max) || (!up && current >= min)) {
-                double distance = up ? (max - min) : -(max - min);
-                delta = distance / (duration / updateInterval);
-            }
-        }
-
-        Pixel draw() {
-            neoPixel.setPixel(number, rgb.withBrightness(current));
-            return this;
-        }
-
-        Pixel jump(double jump) {
-            current = jump;
-            return this;
-        }
-
-        double current() {
-            return current;
-        }
+    private Map<String, String> buildMessage(int number, boolean activate) {
+        return
+                new StringMap()
+                        .add("constellation", constellationName)
+                        .add("star", number + "")
+                        .add("state", activate ? "ON" : "OFF")
+                        .get();
     }
 
+    private Map<String, String> activateConstellationMessage =
+            new StringMap()
+                    .add("constellation", constellationName)
+                    .add("activated", "true")
+                    .get();
+
+
+    private Map<String, String> jsonToStringMap(String json) {
+        Map<String, String> result = new HashMap<>();
+        try {
+            JSONObject obj = new JSONObject(json);
+            Iterator it = obj.keys();
+            while (it.hasNext()) {
+                String key = it.next().toString();
+                result.put(key, obj.get(key).toString());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 }

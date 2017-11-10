@@ -33,6 +33,7 @@
             <artifactId>aws-iot-device-sdk-java-samples</artifactId>
             <version>1.1.1</version>
         </dependency>
+
         <!-- JPG Manipulation -->
         <dependency>
             <groupId>org.imgscalr</groupId>
@@ -42,6 +43,7 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- GUI -->
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>javaFX</artifactId>
@@ -79,7 +81,7 @@
             </exclusions>
         </dependency>
 
-        <!-- Guice Behave -->
+        <!-- Serial RX/TX -->
         <dependency>
             <groupId>com.googlecode.guicebehave</groupId>
             <artifactId>rxtx</artifactId>

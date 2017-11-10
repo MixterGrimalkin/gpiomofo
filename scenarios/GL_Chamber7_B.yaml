@@ -1,0 +1,97 @@
+# IP 192.168.42.101
+Parameters:
+  PixelCount: 150
+  Refresh: 20
+  MaxC: 20
+  CDelta: 0
+  HeadDelta: 4
+  TailDelta: 2
+
+
+Triggers:
+  Red7Hold:
+    type: Gpio
+    pin: 2
+    resistance: PULL_UP
+    triggerState: false
+    holdTime: 1000
+  Red7:
+    type: Gpio
+    pin: 2
+    resistance: PULL_UP
+    triggerState: false
+  Green7:
+    type: Gpio
+    pin: 3
+    resistance: PULL_UP
+    triggerState: false
+  Blue7:
+    type: Gpio
+    pin: 4
+    resistance: PULL_UP
+    triggerState: false
+  RedBHold:
+    type: Gpio
+    pin: 5
+    resistance: PULL_UP
+    triggerState: false
+    holdTime: 1000
+  RedB:
+    type: Gpio
+    pin: 5
+    resistance: PULL_UP
+    triggerState: false
+  GreenB:
+    type: Gpio
+    pin: 6
+    resistance: PULL_UP
+    triggerState: false
+  BlueB:
+    type: Gpio
+    pin: 7
+    resistance: PULL_UP
+    triggerState: false
+
+Targets:
+  Panic7:
+    type: Http
+    onCommand: POST|192.168.42.105:8001/gpiomofo/trigger/panic-toybox/fire
+  Red7Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber7-red|255
+  Green7Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber7-green|255
+  Blue7Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber7-blue|255
+  PanicB:
+    type: Http
+    onCommand: POST|192.168.42.105:8001/gpiomofo/trigger/panic-toybox/fire
+  RedBOsc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/briefing-red|255
+  GreenBOsc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/briefing-green|255
+  BlueBOsc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/briefing-blue|255
+
+Links:
+  Red7Hold:
+    - Panic7
+  Red7:
+    - Red7Osc
+  Green7:
+    - Green7Osc
+  Blue7:
+    - Blue7Osc
+  RedBHold:
+    - PanicB
+  RedB:
+    - RedBOsc
+  GreenB:
+    - GreenBOsc
+  BlueB:
+    - BlueBOsc
