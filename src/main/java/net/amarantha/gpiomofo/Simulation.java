@@ -1,6 +1,5 @@
 package net.amarantha.gpiomofo;
 
-import com.google.inject.Guice;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import net.amarantha.gpiomofo.core.GpioMofo;
@@ -21,8 +20,7 @@ public class Simulation extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Guice.createInjector(new SimulationModule(primaryStage))
-            .getInstance(GpioMofo.class).startSimulation();
+        GpioMofo.build(new SimulationModule(primaryStage)).start();
     }
 
 }

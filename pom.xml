@@ -274,7 +274,7 @@
                             </resources>
                         </configuration>
                     </execution>
-                    <!-- Include default.properties -->
+                    <!-- Include default-settings -->
                     <execution>
                         <id>copy-props</id>
                         <phase>validate</phase>
@@ -282,12 +282,12 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/gpiomofo/config</outputDirectory>
+                            <outputDirectory>${basedir}/target/gpiomofo</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/config</directory>
+                                    <directory>${basedir}</directory>
                                     <includes>
-                                        <include>default.properties</include>
+                                        <include>default-settings.yaml</include>
                                     </includes>
                                     <filtering>true</filtering>
                                 </resource>

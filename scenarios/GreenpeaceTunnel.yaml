@@ -1,5 +1,5 @@
 Parameters:
-  SpriteCount: 30
+  SpriteCount: 130
   Colour1: 192,65,0
   Colour2: 65,20,200
   Colour3: 205,62,0
@@ -10,6 +10,7 @@ Parameters:
   PaddleColour: 255,0,0
   LingerTime: 50
   PayoffTime: 10
+  OffsetMask: false
 
 Triggers:
   PIR1:
@@ -50,24 +51,24 @@ CompositeTriggers:
 Targets:
   H1:
     type: Http
-    onCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR1/fire
-    offCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR1/cancel
+    onCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR1/fire
+    offCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR1/cancel
   H2:
     type: Http
-    onCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR2/fire
-    offCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR2/cancel
+    onCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR2/fire
+    offCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR2/cancel
   H3:
     type: Http
-    onCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR3/fire
-    offCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR3/cancel
+    onCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR3/fire
+    offCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR3/cancel
   H4:
     type: Http
-    onCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR4/fire
-    offCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR4/cancel
+    onCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR4/fire
+    offCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR4/cancel
   H5:
     type: Http
-    onCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR5/fire
-    offCommand: post|192.168.1.100:8001/gpiomofo/trigger/PIR5/cancel
+    onCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR5/fire
+    offCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR5/cancel
 
 Links:
   PIR1:

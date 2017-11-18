@@ -67,7 +67,18 @@ public class Trigger implements HasName, HasEnable {
     private List<TriggerCallback> triggerCallbacks = new LinkedList<>();
     private List<TriggerCallback> compositeCallbacks = new LinkedList<>();
 
+    private int customHandlerCount = 0;
+
+    public int getCustomHandlerCount() {
+        return customHandlerCount;
+    }
+
+    public void onFireLink(TriggerCallback triggerCallback) {
+        triggerCallbacks.add(triggerCallback);
+    }
+
     public void onFire(TriggerCallback triggerCallback) {
+        customHandlerCount++;
         triggerCallbacks.add(triggerCallback);
     }
 

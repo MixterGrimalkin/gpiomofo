@@ -1,5 +1,36 @@
-import time, random, sys
+import datetime, time, random, sys
 
+HOUR_SCATTER = 0
+MINUTE_SCATTER = 29
+
+TIMES = [
+    [(0,0),(1,30)],
+    [(7,0),(9,30)],
+    [(12,0),(13,0)],
+    [(17,00),(20,00)],
+    [(22,0),(23,30)]
+]
+
+times = []
+
+def scatter(value, range, modulus):
+    return abs((value+random.randint(-range, range)) % modulus)
+
+def scatter_times():
+    global times
+    times = [0]*len(TIMES)
+    for i in range(len(TIMES)):
+        on, off = TIMES[i]
+        on_hrs = scatter(on[0], HOUR_SCATTER, 24)
+        on_mins = scatter(on[1], MINUTE_SCATTER, 60)
+        off_hrs = scatter(off[0], HOUR_SCATTER, 24)
+        off_mins = scatter(off[1], MINUTE_SCATTER, 60)
+        times[i] = [(min(on_hrs,off_hrs), min(on_mins,off_mins)), (max(off_hrs,on_hrs), max(off_mins,on_mins))]
+
+    print times
+
+# from audioplayer import AudioPlayer
+# audio = AudioPlayer()
 from pixeltape import *
 pixel_tape = PixelTape()
 # import opc
@@ -8,7 +39,7 @@ pixel_tape = PixelTape()
 LED_COUNT = 64
 
 # Random factor to start lightening (in range 0-10 where 10 means always)
-CHANCE_OF_LIGHTENING = 1
+CHANCE_OF_LIGHTENING = 0
 
 # Number of colour bands
 # Randomly chosen from this range
@@ -36,6 +67,9 @@ palettes = [
     [(126, 217, 52), (15, 15, 15), (203, 6, 35), (15, 15, 15)],  # Aurora
 ]
 
+# Audio files will be played at random during storm
+audio_files = ["thunder1.mp3", "thunder2.mp3", "thunder3.mp3"]
+
 sleep_time = 0.2
 pixels = []
 centres = []
@@ -48,6 +82,7 @@ delta_brightness = 0.1
 def render():
     client_pixels = list(pixels)
     for i in range(len(pixels)):
+        # print pixels[i]
         # client_pixels[i] = dim(pixels[i])
         pixel_tape.draw(i, dim(pixels[i]))
     # client.put_pixels(client_pixels)
@@ -134,59 +169,89 @@ def update_brightness():
         brightness = 0.0
         delta_brightness = 0.0
 
+def is_active():
+    for i in range(len(times)):
+        on = datetime.time(times[i][0][0], times[i][0][1])
+        off = datetime.time(times[i][1][0], times[i][1][1])
+        if on <= datetime.datetime.now().time() < off:
+            return True
+    return False
 
 def main():
     global delta_brightness
+    has_cleared = False
     storm_mode = False
     reset()
     clear()
+    render()
+    scatter_times()
     start_time = time.time()
 
     while True:
-        update_brightness()
-        t = time.time() - start_time
-        if delta_brightness == 0.0 and ((not storm_mode and t > SKY_TIME) or (storm_mode and t > STORM_TIME)):
-            start_time = time.time()
-            if brightness >= 1.0:
-                delta_brightness = -0.1
-            else:
+
+        if is_active():
+
+            if has_cleared:
+                start_time = time.time()
+                has_cleared = False
+
+            update_brightness()
+            t = time.time() - start_time
+            if delta_brightness == 0.0 and ((not storm_mode and t > SKY_TIME) or (storm_mode and t > STORM_TIME)):
+                start_time = time.time()
+                if brightness >= 1.0:
+                    delta_brightness = -0.1
+                else:
+                    delta_brightness = 0.1
+
+            if brightness <= 0.0:
+                start_time = time.time()
+                reset()
                 delta_brightness = 0.1
+                storm_mode = (not storm_mode) and random.randint(0, 10) > (10 - CHANCE_OF_LIGHTENING)
+                if storm_mode:
+                    print "STORM!"
+                # else:
+                #     audio.stop()
 
-        if brightness <= 0.0:
-            start_time = time.time()
-            reset()
-            delta_brightness = 0.1
-            storm_mode = (not storm_mode) and random.randint(0, 10) > (10 - CHANCE_OF_LIGHTENING)
             if storm_mode:
-                print "STORM!"
+                clear()
+                render()
+                time.sleep(random.uniform(0.2, 1.5))
+                flash = (random.randint(0, LED_COUNT), random.randint(2, 10))
+                for i in range(flash[1]):
+                    draw((flash[0] + i) % LED_COUNT, (255, 255, 255))
+                render()
+                # if not audio.is_playing():
+                #     file = audio_files[random.randint(0,len(audio_files)-1)]
+                #     print "Thunder: ", file
+                #     audio.play(file)
+                time.sleep(random.uniform(0.01, 0.2))
 
-        if storm_mode:
-            clear()
-            render()
-            time.sleep(random.uniform(0.2, 1.5))
-            flash = (random.randint(0, LED_COUNT), random.randint(2, 10))
-            for i in range(flash[1]):
-                draw((flash[0] + i) % LED_COUNT, (255, 255, 255))
-            render()
-            time.sleep(random.uniform(0.01, 0.2))
+            else:
+                clear()
+                int_centres = list(centres)
+                for i in range(len(centres)):
+                    if pixels[(int(centres[i] + deltas[i]) % LED_COUNT)] == (0, 0, 0):
+                        centres[i] = (centres[i] + deltas[i]) % LED_COUNT
+                        draw(int(centres[i]), palette[i])
+                        int_centres[i] = int(centres[i])
+                    else:
+                        deltas[i] *= -1
+                for i in range(LED_COUNT):
+                    if i not in int_centres:
+                        ca = centres_around(i)
+                        # draw(i, (0,0,0))
+                        draw(i, interpolate(pixels[int(ca[0])], pixels[int(ca[1])], ca[2]))
+                render()
+                time.sleep(sleep_time)
 
         else:
-            clear()
-            int_centres = list(centres)
-            for i in range(len(centres)):
-                if pixels[(int(centres[i] + deltas[i]) % LED_COUNT)] == (0, 0, 0):
-                    centres[i] = (centres[i] + deltas[i]) % LED_COUNT
-                    draw(int(centres[i]), palette[i])
-                    int_centres[i] = int(centres[i])
-                else:
-                    deltas[i] *= -1
-            for i in range(LED_COUNT):
-                if i not in int_centres:
-                    ca = centres_around(i)
-                    # draw(i, (0,0,0))
-                    draw(i, interpolate(pixels[int(ca[0])], pixels[int(ca[1])], ca[2]))
-            render()
-            time.sleep(sleep_time)
+            if not has_cleared:
+                clear()
+                render()
+                scatter_times()
+                has_cleared = True
 
 
 if __name__ == "__main__":

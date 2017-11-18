@@ -43,6 +43,7 @@ public class GreenpeaceTunnel extends Scenario {
     @Parameter("Colour3") private RGB colour3;
     @Parameter("Colour4") private RGB colour4;
     @Parameter("Colour5") private RGB colour5;
+    @Parameter("OffsetMask") private boolean offsetMask;
 
     private Map<Integer, RGB> colours = new HashMap<>();
 
@@ -125,9 +126,12 @@ public class GreenpeaceTunnel extends Scenario {
         animationService.start();
         animationService.play("Butterflies");
 
-        offsetMask(BLACK);
+        if ( offsetMask ) {
+            offsetMask(BLACK);
+        }
 
     }
+
 
     private int maskLayer = 8;
 

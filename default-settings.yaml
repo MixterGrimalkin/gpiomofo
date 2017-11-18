@@ -1,0 +1,23 @@
+General:
+   ScenariosDirectory: scenarios
+   Refresh: 50
+   TriggerPackage: net.amarantha.gpiomofo.trigger
+   PinScanInterval: 10
+   TargetPackage: net.amarantha.gpiomofo.target
+   HttpAsyncTargets: true
+   ScenarioPackage: net.amarantha.gpiomofo.scenario
+   Scenario: GreenpeaceTunnel
+Services:
+   MidiDevice: USB Uno MIDI Interface
+PixelTape:
+   TapeRefresh: 1
+SerialDmx:
+   Port: /dev/ttyUSB0
+NeoPixelBoard:
+   RowsFirst: true
+   LoopBack: false
+LightSurface:
+   LayerCount: 10
+   BoardClass: net.amarantha.gpiomofo.display.lightboard.LightBoardGUI
+   Height: 64
+   Width: 256
