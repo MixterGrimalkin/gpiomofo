@@ -33,6 +33,8 @@ public class AwsService extends AbstractService {
     protected void onStart() {
         KeyStorePasswordPair pair = getKeyStorePasswordPair(certificateFile, privateKeyFile);
         client = new AWSIotMqttClient(clientEndpoint, clientId, pair.keyStore, pair.keyPassword);
+        System.out.println(clientId + "   " + pair.keyStore + "   " + pair.keyPassword);
+
         try {
             client.connect();
         } catch (AWSIotException e) {

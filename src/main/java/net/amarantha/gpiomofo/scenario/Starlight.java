@@ -11,12 +11,17 @@ import net.amarantha.gpiomofo.service.dmx.DmxService;
 import net.amarantha.gpiomofo.trigger.Trigger;
 import net.amarantha.gpiomofo.trigger.Trigger.TriggerCallback;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.http.HttpService;
+import net.amarantha.utils.http.entity.HttpCallback;
+import net.amarantha.utils.http.entity.Param;
+import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.service.Service;
 import net.amarantha.utils.string.StringMap;
 import net.amarantha.utils.task.TaskService;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import javax.ws.rs.core.Response;
 import java.util.*;
 
 import static java.lang.Integer.parseInt;
@@ -28,9 +33,13 @@ public class Starlight extends Scenario {
     @Service private TaskService tasks;
     @Service private DmxService dmx;
     @Service private AwsService aws;
+    @Service private HttpService http;
+
 
     @Inject private NeoPixelFactory pixels;
     @Inject private NeoPixel neoPixel;
+
+    @Parameter("FullWinThreshold")  private int fullWinThreshold;
 
     @Parameter("PixelCount")        private int pixelCount;
     @Parameter("StarTriggers")      private String starTriggerStr;
@@ -112,7 +121,7 @@ public class Starlight extends Scenario {
 
     }
 
-    private String constellationName = "cassiopeia";
+    private String constellationName = "Cassiopeia";
 
     private TriggerCallback starCallback(int number) {
         Map<String, String> onMessage = buildMessage(number, true);
@@ -131,7 +140,7 @@ public class Starlight extends Scenario {
     }
 
     private void modifyEffect() {
-        if (pulsingRings.size() == rings.length) {
+        if (pulsingRings.size() >= min(rings.length, fullWinThreshold) ) {
             // Payoff
             for (int i = 0; i < rings.length; i++) {
                 pixels.get(rings[i]).bounce(false).max(maxRingBrightness).fadeUp(maxPulseTime);
@@ -157,7 +166,7 @@ public class Starlight extends Scenario {
                 // First star
                 pulseTime = maxPulseTime;
                 ringBrightness = minRingBrightness;
-            } else if (pulsingRings.size() == rings.length - 1) {
+            } else if (pulsingRings.size() == min(rings.length, fullWinThreshold) - 1) {
                 // Penultimate state
                 pulseTime = minPulseTime;
                 ringBrightness = maxRingBrightness;
@@ -212,6 +221,12 @@ public class Starlight extends Scenario {
         });
 
         pixels.start();
+
+        String payload = "{\"message\": \"Hello!\"}"; //new StringMap().add("message", "Please just fucking work!").toString();
+
+
+        String resp = http.post("localhost", 3000, "register-event", payload);
+        System.out.println(resp);
     }
 
     @Override

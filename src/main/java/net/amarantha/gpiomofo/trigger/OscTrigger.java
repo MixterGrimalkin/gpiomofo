@@ -16,7 +16,7 @@ public class OscTrigger extends Trigger {
     public void enable() {
         osc.onReceive(port, address, ((time, args) -> {
             if ( args!=null && !args.isEmpty() ) {
-                fire(args.get(0).equals(data));
+                fire("any".equals(data) || args.get(0).equals(data));
             }
         }));
     }

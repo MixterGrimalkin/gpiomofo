@@ -1,0 +1,14 @@
+Triggers:
+  Test1:
+    type: Gpio
+    pin: 0
+    triggerState: true
+
+Targets:
+  Test1:
+    type: Osc
+    onCommand: 192.168.42.101:53000/pixels-slide|0
+
+Links:
+  Test1:
+  - Test1
