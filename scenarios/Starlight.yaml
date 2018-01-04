@@ -5,26 +5,29 @@ Parameters:
 #  MonitorPort: 3000
   MonitorHost: starlight-monitor.herokuapp.com
   MonitorPort: 80
+  # Win States
+  FullWinStarCount: 4
+  LeapFrogStarCount: 2
+  LeapFrogTime: 500
   # Sensors
   PinResistance: PULL_DOWN
   TriggerState: true
-  StarTriggers: 1,2,3,4,5,6,7
+  StarTriggers: 1,2,3,4
   # Layout
-  FullWinThreshold: 7
-  PixelCount: 40
-  RingPixels: 0,5,9,15,21,27,33
-  StarPixels: 1,6,10,16,22,28,34
+  PixelCount: 20
+  RingPixels: 0,5,10,15
+  StarPixels: 1,6,11,16
   # Clustering
-  Clusters: 3,6
+  Clusters:
   # Colours
-  RingColour: 100,80,255
-  StarColour: 250,255,230
-  ConnectorColour: 230,230,255
+  RingColour: 255,0,255
+  StarColour: 255,255,200
+  ConnectorColour: 150,150,255
   # DMX
   DmxStars: true
   DmxRings: true
   # Fade times (ms)
-  StarFadeUp: 1700
+  StarFadeUp: 500
   StarFadeDown: 500
   RingFadeDown: 1000
   RingPulseMin: 250

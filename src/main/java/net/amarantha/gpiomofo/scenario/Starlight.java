@@ -6,22 +6,15 @@ import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixelFactory;
 import net.amarantha.gpiomofo.display.pixeltape.Pixel;
-import net.amarantha.gpiomofo.service.AwsService;
 import net.amarantha.gpiomofo.service.dmx.DmxService;
-import net.amarantha.gpiomofo.trigger.Trigger;
+import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.gpiomofo.trigger.Trigger.TriggerCallback;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.http.HttpService;
-import net.amarantha.utils.http.entity.HttpCallback;
-import net.amarantha.utils.http.entity.Param;
 import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.service.Service;
-import net.amarantha.utils.string.StringMap;
 import net.amarantha.utils.task.TaskService;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
-import javax.ws.rs.core.Response;
 import java.util.*;
 
 import static java.lang.Integer.parseInt;
@@ -33,9 +26,8 @@ public class Starlight extends Scenario {
     @Service private TaskService tasks;
     @Service private DmxService dmx;
     @Service private HttpService http;
+    @Service private GpioService gpio;
 //    @Service private AwsService aws;
-
-
     @Inject private NeoPixelFactory pixels;
     @Inject private NeoPixel neoPixel;
 
@@ -43,7 +35,9 @@ public class Starlight extends Scenario {
     @Parameter("MonitorHost")       private String monitorHost;
     @Parameter("MonitorPort")       private int monitorPort;
 
-    @Parameter("FullWinThreshold")  private int fullWinThreshold;
+    @Parameter("FullWinStarCount")  private int fullWinStarCount;
+    @Parameter("LeapFrogStarCount") private int leapFrogStarCount;
+    @Parameter("LeapFrogTime")      private int leapFrogTime;
 
     @Parameter("PixelCount")        private int pixelCount;
     @Parameter("StarTriggers")      private String starTriggerStr;
@@ -55,7 +49,7 @@ public class Starlight extends Scenario {
     @Parameter("PinResistance")     private String resistanceStr;
     @Parameter("TriggerState")      private boolean triggerState;
 
-    @Parameter("Clusters")          private String clusters;
+    @Parameter("Clusters")          private String clusterString;
 
     @Parameter("DmxStars")          private boolean dmxStars;
     @Parameter("DmxRings")          private boolean dmxRings;
@@ -72,15 +66,23 @@ public class Starlight extends Scenario {
     @Parameter("MaxRingBrightness") private double maxRingBrightness;
     @Parameter("MinRingBrightness") private double minRingBrightness;
 
+    private Integer[] pins;
     private Integer[] stars;
     private Integer[] rings;
     private Integer[] connectors;
 
-    private List<Integer> pulsingRings = new ArrayList<>();
+    private Long[] lastStarEvents;
+
+    private Map<Integer, Boolean> currentStates = new HashMap<>();
+    private Map<Integer, List<Integer>> clusters = new HashMap<>();
+
+    private boolean leapFrogActive = false;
+    private boolean completeActive = false;
 
     @Override
     public void setup() {
 
+        // Parse config strings
         String[] pinsStrs = starTriggerStr.split(",");
         String[] starStrs = starPixelStr.split(",");
         String[] ringStrs = ringPixelStr.split(",");
@@ -88,24 +90,29 @@ public class Starlight extends Scenario {
             System.out.println("StarTriggers, StarPixels and RingPixels must all be the same length!");
             System.exit(1);
         }
-
+        pins = new Integer[pinsStrs.length];
         stars = new Integer[pinsStrs.length];
         rings = new Integer[pinsStrs.length];
         connectors = new Integer[pixelCount - (stars.length * 2)];
+        lastStarEvents = new Long[leapFrogStarCount];
 
+        // Create stars and rings
         for (int i = 0; i < pinsStrs.length; i++) {
+            pins[i] = parseInt(pinsStrs[i].trim());
             stars[i] = parseInt(starStrs[i].trim());
             rings[i] = parseInt(ringStrs[i].trim());
             triggers.gpio(
                     "Star" + i,
-                    parseInt(pinsStrs[i].trim()),
+                    pins[i],
                     PinPullResistance.valueOf(resistanceStr),
                     triggerState
-            ).onFire(starCallback(i));
+            ).onFire(this::updateState);
             if (dmxRings) neoPixel.intercept(rings[i], dmx.rgbDevice(i * 4).getInterceptor());
             if (dmxStars) neoPixel.intercept(stars[i], dmx.device((i * 4) + 3).getInterceptor());
+            currentStates.put(i, false);
         }
 
+        // Create connectors and apply colours
         int j = 0;
         for (int i = 0; i < pixelCount; i++) {
             boolean isStar = arrayContains(stars, i);
@@ -123,34 +130,184 @@ public class Starlight extends Scenario {
             }
         }
 
+        // Create star clusters
+        if ( !clusterString.isEmpty() ) {
+            for (String clusterSet : clusterString.split(":")) {
+                List<Integer> clusterList = new ArrayList<>();
+                for (String star : clusterSet.split(",")) {
+                    clusterList.add(parseInt(star.trim()));
+                }
+                for (Integer star : clusterList) {
+                    clusters.put(star, clusterList);
+                }
+            }
+        }
+
         neoPixel.init(pixelCount);
 
     }
 
-    private TriggerCallback starCallback(int number) {
-        return (state) -> {
-            if (state) {
-                pulsingRings.add(number);
-                http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/star"+number+"/on", "");
-            } else {
-                pulsingRings.remove((Object) number);
-                pixels.get(rings[number]).bounce(false).fadeDown(ringFadeDown);
-                http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/star"+number+"/off", "");
-            }
-            modifyEffect();
-        };
+    private Map<Integer, Boolean> getPinStates() {
+        Map<Integer, Boolean> result = new HashMap<>();
+        for ( int i=0; i<pins.length; i++ ) {
+            result.put(i, gpio.read(pins[i]));
+        }
+        return result;
     }
 
-    private List<Integer> ringsToAdd = new LinkedList<>();
-    private List<Integer> ringsToRemove = new LinkedList<>();
+    private void updateState(boolean state) {
 
-    private void modifyEffect() {
-        if (pulsingRings.size() >= min(rings.length, fullWinThreshold) ) {
-            // Payoff
-            for (int i = 0; i < rings.length; i++) {
-                pixels.get(rings[i]).bounce(false).max(maxRingBrightness).fadeUp(maxPulseTime);
-                pixels.get(stars[i]).bounce(false).fadeUp(starFadeUp);
+        // Update base state
+        Map<Integer, Boolean> pinStates = getPinStates();
+        Map<Integer, Boolean> newStates = new HashMap<>();
+        for ( int i=0; i<pins.length; i++ ) {
+            newStates.put(i, pinStates.get(i));
+        }
+
+        // Apply clustering
+        for ( int i=0; i<pins.length; i++ ) {
+            if ( newStates.get(i) ) {
+                List<Integer> cluster = clusters.get(i);
+                if ( cluster!=null ) {
+                    for ( Integer j : cluster ) {
+                        newStates.put(j, true);
+                    }
+                }
             }
+        }
+
+        // Count active stars
+        int activeStarCount = 0;
+        for ( int i=0; i<pins.length; i++ ) {
+            activeStarCount += newStates.get(i) ? 1 : 0;
+        }
+
+        // Detect Complete event
+        if ( activeStarCount >= fullWinStarCount ) {
+            activateComplete();
+        } else {
+            cancelComplete();
+        }
+
+        // Detect First Star event
+        if ( state && activeStarCount==1 ) {
+            for ( int i=0; i<pins.length; i++ ) {
+                pixels.get(rings[i]).jump(1.0).bounce(false).fadeDown(500);
+            }
+        }
+
+        // Detect Leap Frog event
+        if ( state ) {
+            // Store event time
+            for (int i = 1; i < lastStarEvents.length; i++) {
+                lastStarEvents[i - 1] = lastStarEvents[i];
+            }
+            lastStarEvents[lastStarEvents.length - 1] = System.currentTimeMillis();
+            if (    lastStarEvents[lastStarEvents.length - 1] != null &&
+                    lastStarEvents[0] != null &&
+                    lastStarEvents[lastStarEvents.length - 1] - lastStarEvents[0] <= leapFrogTime   )
+            {
+                activateLeapFrog();
+            } else {
+                cancelLeapFrog();
+            }
+        } else {
+            cancelLeapFrog();
+        }
+
+        // Update display
+        for ( int i=0; i<pins.length; i++ ) {
+            if ( newStates.get(i)!=currentStates.get(i) ) {
+                currentStates.put(i, newStates.get(i));
+                if (newStates.get(i)) {
+                    activateStar(i);
+                } else {
+                    cancelStar(i);
+                }
+            }
+        }
+    }
+
+    private void activateStar(int number) {
+        pixels.get(rings[number]).jump(1.0).bounce(true).fadeUp(ringFadeDown);
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/on", "");
+    }
+
+    private void cancelStar(int number) {
+        pixels.get(rings[number]).bounce(false).fadeDown(ringFadeDown);
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/off", "");
+    }
+
+    private void activateLeapFrog() {
+        if (!leapFrogActive && !completeActive) {
+            leapFrogActive = true;
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    for ( int i=stars.length-1; i>=0; i-- ) {
+                        pixels.get(stars[i]).jump(0.0).bounce(true).range(0.0, 0.4).fadeUp(800);
+                        sleep(400);
+                    }
+                }
+            }, 0);
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    int limit = 10;
+                    for ( int i=0; i<connectors.length; i+=limit ) {
+                        for ( int j=0; j<(limit-1); j++) {
+                            if ( i+j < connectors.length ) {
+                                pixels.get(connectors[i + j]).bounce(true).range(0.0, 0.5).fadeUp(200);
+                                sleep(100);
+                            }
+                        }
+                    }
+                }
+            }, 0);
+            http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/on", "");
+        }
+    }
+
+    private void cancelLeapFrog() {
+        if (leapFrogActive) {
+            leapFrogActive = false;
+            for ( int i=0; i<pins.length; i++ ) {
+                pixels.get(stars[i]).bounce(false).min(0.0).fadeDown(starFadeDown);
+            }
+            twinkle(false);
+            http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/off", "");
+        }
+    }
+
+    private void activateComplete() {
+        if (!completeActive) {
+            completeActive = true;
+            cancelLeapFrog();
+            for ( int i=0; i<pins.length; i++ ) {
+                pixels.get(rings[i]).jump(1.0).bounce(true).fadeDown(ringFadeDown);
+                pixels.get(stars[i]).bounce(true).range(0.8, 1.0).fadeUp(starFadeUp);
+            }
+            twinkle(true);
+            http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/on", "");
+        }
+    }
+
+    private void cancelComplete() {
+        if (completeActive) {
+            completeActive = false;
+            for ( int i=0; i<pins.length; i++ ) {
+                pixels.get(stars[i]).bounce(false).min(0.0).fadeDown(starFadeDown);
+                if ( !currentStates.get(i) ) {
+                    pixels.get(rings[i]).bounce(false).min(0.0).fadeDown(ringFadeDown);
+                }
+            }
+            twinkle(false);
+            http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/off", "");
+        }
+    }
+
+    private void twinkle(boolean on) {
+        if ( on ) {
             for (int i = 0; i < connectors.length; i++) {
                 Pixel p = pixels.get(connectors[i]);
                 if (twinkleRange > 0) {
@@ -163,41 +320,9 @@ public class Starlight extends Scenario {
                             .fadeUp(randomBetween(minTwinkleTime, maxTwinkleTime));
                 }
             }
-            http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/complete/on", "");
         } else {
-            http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/complete/off", "");
-            int pulseTime = 0;
-            double ringBrightness = 0.0;
-            if (pulsingRings.size() == 1) {
-                // First star
-                pulseTime = maxPulseTime;
-                ringBrightness = minRingBrightness;
-            } else if (pulsingRings.size() == min(rings.length, fullWinThreshold) - 1) {
-                // Penultimate state
-                pulseTime = minPulseTime;
-                ringBrightness = maxRingBrightness;
-                for (int i = 0; i < stars.length; i++) {
-                    pixels.get(stars[i]).bounce(false).fadeDown(starFadeDown);
-                }
-                for (int i = 0; i < connectors.length; i++) {
-                    pixels.get(connectors[i]).bounce(false).range(0, 1).fadeDown(maxTwinkleTime);
-                }
-            } else {
-                // Intermediate state
-                pulseTime = round(maxPulseTime - (maxPulseTime - minPulseTime) * (((double) pulsingRings.size()) / ((double) rings.length - 1)));
-                ringBrightness = minRingBrightness + (maxRingBrightness - minRingBrightness) * (((double) pulsingRings.size()) / ((double) rings.length - 1));
-            }
-            Double jump = null;
-            boolean up = false;
-            for (int i : pulsingRings) {
-                Pixel p = pixels.get(rings[i]);
-                if (jump == null) {
-                    jump = p.current();
-                    up = p.goingUp();
-                } else {
-                    p.jump(jump);
-                }
-                p.bounce(true).max(ringBrightness).fade(pulseTime, up);
+            for (int i = 0; i < connectors.length; i++) {
+                pixels.get(connectors[i]).bounce(false).range(0, 1).fadeDown(maxTwinkleTime);
             }
         }
     }
@@ -228,58 +353,12 @@ public class Starlight extends Scenario {
         pixels.stop();
     }
 
-//    private void subscribeToAws() {
-//        aws.subscribe("starlight/" + constellationName, (message) -> {
-//            Map<String, String> data = jsonToStringMap(message.getStringPayload());
-//            if ("Activate".equals(data.get("message"))) {
-//                pulsingRings.clear();
-//                for ( int i=0; i<rings.length; i++ ) {
-//                    pulsingRings.add(i);
-//                }
-//                modifyEffect();
-//            } else if ("Deactivate".equals(data.get("message"))) {
-//                pulsingRings.clear();
-//                for ( int i=0; i<rings.length; i++ ) {
-//                    pixels.get(stars[i]).bounce(false).fadeDown(starFadeDown);
-//                    pixels.get(rings[i]).bounce(false).fadeDown(ringFadeDown);
-//                }
-//                for (int i = 0; i < connectors.length; i++) {
-//                    pixels.get(connectors[i]).bounce(false).range(0, 1).fadeDown(maxTwinkleTime);
-//                }
-//                modifyEffect();
-//            }
-//        });
-//    }
-
-//    private Map<String, String> buildMessage(int number, boolean activate) {
-//        return
-//                new StringMap()
-//                        .add("constellation", constellationName)
-//                        .add("star", number + "")
-//                        .add("state", activate ? "ON" : "OFF")
-//                        .get();
-//    }
-
-//    private Map<String, String> activateConstellationMessage =
-//            new StringMap()
-//                    .add("constellation", constellationName)
-//                    .add("activated", "true")
-//                    .get();
-//
-//
-//    private Map<String, String> jsonToStringMap(String json) {
-//        Map<String, String> result = new HashMap<>();
-//        try {
-//            JSONObject obj = new JSONObject(json);
-//            Iterator it = obj.keys();
-//            while (it.hasNext()) {
-//                String key = it.next().toString();
-//                result.put(key, obj.get(key).toString());
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return result;
-//    }
+    private void sleep(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
