@@ -10,4 +10,8 @@ then
     java -cp gpiomofo.jar net.amarantha.gpiomofo.Simulation $*
 else
     sudo nice -n -20 java -Djava.library.path=/home/pi/gpiomofo/c -jar gpiomofo.jar $*
+    if [ $? -eq 7 ]
+    then
+        sudo reboot
+    fi
 fi

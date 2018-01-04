@@ -32,12 +32,16 @@ public class Starlight extends Scenario {
 
     @Service private TaskService tasks;
     @Service private DmxService dmx;
-    @Service private AwsService aws;
     @Service private HttpService http;
+//    @Service private AwsService aws;
 
 
     @Inject private NeoPixelFactory pixels;
     @Inject private NeoPixel neoPixel;
+
+    @Parameter("ConstellationId")   private String constellationId;
+    @Parameter("MonitorHost")       private String monitorHost;
+    @Parameter("MonitorPort")       private int monitorPort;
 
     @Parameter("FullWinThreshold")  private int fullWinThreshold;
 
@@ -50,6 +54,8 @@ public class Starlight extends Scenario {
     @Parameter("ConnectorColour")   private RGB connectorColour;
     @Parameter("PinResistance")     private String resistanceStr;
     @Parameter("TriggerState")      private boolean triggerState;
+
+    @Parameter("Clusters")          private String clusters;
 
     @Parameter("DmxStars")          private boolean dmxStars;
     @Parameter("DmxRings")          private boolean dmxRings;
@@ -121,23 +127,22 @@ public class Starlight extends Scenario {
 
     }
 
-    private String constellationName = "Cassiopeia";
-
     private TriggerCallback starCallback(int number) {
-        Map<String, String> onMessage = buildMessage(number, true);
-        Map<String, String> offMessage = buildMessage(number, false);
         return (state) -> {
             if (state) {
                 pulsingRings.add(number);
-                aws.publish("Starlight", onMessage);
+                http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/star"+number+"/on", "");
             } else {
                 pulsingRings.remove((Object) number);
                 pixels.get(rings[number]).bounce(false).fadeDown(ringFadeDown);
-                aws.publish("Starlight", offMessage);
+                http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/star"+number+"/off", "");
             }
             modifyEffect();
         };
     }
+
+    private List<Integer> ringsToAdd = new LinkedList<>();
+    private List<Integer> ringsToRemove = new LinkedList<>();
 
     private void modifyEffect() {
         if (pulsingRings.size() >= min(rings.length, fullWinThreshold) ) {
@@ -158,8 +163,9 @@ public class Starlight extends Scenario {
                             .fadeUp(randomBetween(minTwinkleTime, maxTwinkleTime));
                 }
             }
-            aws.publish("Starlight", activateConstellationMessage);
+            http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/complete/on", "");
         } else {
+            http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/complete/off", "");
             int pulseTime = 0;
             double ringBrightness = 0.0;
             if (pulsingRings.size() == 1) {
@@ -198,72 +204,82 @@ public class Starlight extends Scenario {
 
     @Override
     public void startup() {
-
-        aws.subscribe("starlight/" + constellationName, (message) -> {
-            Map<String, String> data = jsonToStringMap(message.getStringPayload());
-            if ("Activate".equals(data.get("message"))) {
-                pulsingRings.clear();
-                for ( int i=0; i<rings.length; i++ ) {
-                    pulsingRings.add(i);
-                }
-                modifyEffect();
-            } else if ("Deactivate".equals(data.get("message"))) {
-                pulsingRings.clear();
-                for ( int i=0; i<rings.length; i++ ) {
-                    pixels.get(stars[i]).bounce(false).fadeDown(starFadeDown);
-                    pixels.get(rings[i]).bounce(false).fadeDown(ringFadeDown);
-                }
-                for (int i = 0; i < connectors.length; i++) {
-                    pixels.get(connectors[i]).bounce(false).range(0, 1).fadeDown(maxTwinkleTime);
-                }
-                modifyEffect();
-            }
-        });
-
         pixels.start();
+        tasks.addRepeatingTask("UpdateMonitor", 50000, this::pingMonitor);
+        clearMonitor();
+    }
 
-        String payload = "{\"message\": \"Hello!\"}"; //new StringMap().add("message", "Please just fucking work!").toString();
+    private void pingMonitor() {
+        http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/ping", "");
+    }
 
-
-        String resp = http.post("localhost", 3000, "register-event", payload);
-        System.out.println(resp);
+    private void clearMonitor() {
+        for ( int i=0; i<stars.length; i++ ) {
+            http.post(monitorHost, monitorPort, "events/"+constellationId+"/star"+i+"/off", "");
+        }
+        http.post(monitorHost, monitorPort, "events/"+constellationId+"/leapfrog/off", "");
+        http.post(monitorHost, monitorPort, "events/"+constellationId+"/complete/off", "");
     }
 
     @Override
     public void shutdown() {
         super.shutdown();
+        clearMonitor();
         pixels.stop();
     }
 
-    private Map<String, String> buildMessage(int number, boolean activate) {
-        return
-                new StringMap()
-                        .add("constellation", constellationName)
-                        .add("star", number + "")
-                        .add("state", activate ? "ON" : "OFF")
-                        .get();
-    }
+//    private void subscribeToAws() {
+//        aws.subscribe("starlight/" + constellationName, (message) -> {
+//            Map<String, String> data = jsonToStringMap(message.getStringPayload());
+//            if ("Activate".equals(data.get("message"))) {
+//                pulsingRings.clear();
+//                for ( int i=0; i<rings.length; i++ ) {
+//                    pulsingRings.add(i);
+//                }
+//                modifyEffect();
+//            } else if ("Deactivate".equals(data.get("message"))) {
+//                pulsingRings.clear();
+//                for ( int i=0; i<rings.length; i++ ) {
+//                    pixels.get(stars[i]).bounce(false).fadeDown(starFadeDown);
+//                    pixels.get(rings[i]).bounce(false).fadeDown(ringFadeDown);
+//                }
+//                for (int i = 0; i < connectors.length; i++) {
+//                    pixels.get(connectors[i]).bounce(false).range(0, 1).fadeDown(maxTwinkleTime);
+//                }
+//                modifyEffect();
+//            }
+//        });
+//    }
 
-    private Map<String, String> activateConstellationMessage =
-            new StringMap()
-                    .add("constellation", constellationName)
-                    .add("activated", "true")
-                    .get();
+//    private Map<String, String> buildMessage(int number, boolean activate) {
+//        return
+//                new StringMap()
+//                        .add("constellation", constellationName)
+//                        .add("star", number + "")
+//                        .add("state", activate ? "ON" : "OFF")
+//                        .get();
+//    }
 
-
-    private Map<String, String> jsonToStringMap(String json) {
-        Map<String, String> result = new HashMap<>();
-        try {
-            JSONObject obj = new JSONObject(json);
-            Iterator it = obj.keys();
-            while (it.hasNext()) {
-                String key = it.next().toString();
-                result.put(key, obj.get(key).toString());
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
+//    private Map<String, String> activateConstellationMessage =
+//            new StringMap()
+//                    .add("constellation", constellationName)
+//                    .add("activated", "true")
+//                    .get();
+//
+//
+//    private Map<String, String> jsonToStringMap(String json) {
+//        Map<String, String> result = new HashMap<>();
+//        try {
+//            JSONObject obj = new JSONObject(json);
+//            Iterator it = obj.keys();
+//            while (it.hasNext()) {
+//                String key = it.next().toString();
+//                result.put(key, obj.get(key).toString());
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        return result;
+//    }
 
 }

@@ -1,13 +1,21 @@
 Parameters:
+  # Observatory
+  ConstellationId: orion
+#  MonitorHost: localhost
+#  MonitorPort: 3000
+  MonitorHost: starlight-monitor.herokuapp.com
+  MonitorPort: 80
   # Sensors
   PinResistance: PULL_DOWN
   TriggerState: true
-  StarTriggers: 1,2,3,4,5
+  StarTriggers: 1,2,3,4,5,6,7
   # Layout
-  FullWinThreshold: 3
-  PixelCount: 26
-  RingPixels: 0,6,12,18,24
-  StarPixels: 1,7,13,19,25
+  FullWinThreshold: 7
+  PixelCount: 40
+  RingPixels: 0,5,9,15,21,27,33
+  StarPixels: 1,6,10,16,22,28,34
+  # Clustering
+  Clusters: 3,6
   # Colours
   RingColour: 100,80,255
   StarColour: 250,255,230
@@ -31,6 +39,6 @@ Parameters:
 Triggers:
   Dummy:
     type: Gpio
-    pin: 1
+    pin: 9
     resistance: PULL_DOWN
     triggerState: true

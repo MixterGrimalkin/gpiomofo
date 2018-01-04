@@ -10,10 +10,7 @@ import org.codehaus.jettison.json.JSONObject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Path("system")
 public class SystemResource extends Resource {
@@ -80,6 +77,19 @@ public class SystemResource extends Resource {
         } catch (JSONException e) {
             return error("Bad JSON: " + e.getMessage());
         }
+    }
+
+    @POST
+    @Path("shutthefuckdown")
+    public Response shutdown() {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                application.stop();
+                System.exit(7);
+            }
+        }, 0);
+        return ok("Shutting down shortly....");
     }
 
 
