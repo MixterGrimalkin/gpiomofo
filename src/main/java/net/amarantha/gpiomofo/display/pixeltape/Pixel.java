@@ -12,6 +12,8 @@ public class Pixel {
     private double min = 0.0;
     private double max = 1.0;
     private double delta = 0.0;
+    private double posDelta = 0.0;
+    private double negDelta = 0.0;
     private boolean bounce = false;
     private RGB rgb = RGB.WHITE;
 
@@ -31,7 +33,7 @@ public class Pixel {
             if (delta > 0) {
                 current = max;
                 if (bounce) {
-                    delta *= -1;
+                    delta = negDelta;
                 } else {
                     delta = 0;
                 }
@@ -40,7 +42,7 @@ public class Pixel {
             if (delta < 0) {
                 current = min;
                 if (bounce) {
-                    delta *= -1;
+                    delta = posDelta;
                 } else {
                     delta = 0;
                 }
@@ -55,7 +57,17 @@ public class Pixel {
     }
 
     public Pixel delta(double delta) {
-        this.delta = delta;
+//        if ( delta >= 0 ) {
+            return delta(delta, -delta);
+//        } else {
+//            return delta(-delta, delta);
+//        }
+    }
+
+    public Pixel delta(double up, double down) {
+        delta = up;
+        posDelta = up >= 0 ? up : down;
+        negDelta = down <= 0 ? down : up;
         return this;
     }
 
@@ -84,19 +96,45 @@ public class Pixel {
         return delta > 0;
     }
 
-    public void fadeUp(int duration) {
-        fade(duration, true);
-    }
-
-    public void fadeDown(int duration) {
-        fade(duration, false);
-    }
-
-    public void fade(int duration, boolean up) {
-        if ((up && current <= max) || (!up && current >= min)) {
-            double distance = up ? (max - min) : -(max - min);
-            delta = distance / (duration / updateInterval);
+    public Pixel fadeUp(int duration) {
+        if ( current < max ) {
+            delta = posDelta = (max - min) / (duration / updateInterval);
+            bounce = false;
         }
+        return this;
+    }
+
+    public Pixel fadeDown(int duration) {
+        if ( current > min ) {
+            delta = posDelta = -(max - min) / (duration / updateInterval);
+            bounce = false;
+        }
+        return this;
+    }
+
+    public Pixel bounceFadeUp(int duration) {
+        return bounceFade(duration, duration, true);
+    }
+    public Pixel bounceFadeUp(int upDuration, int downDuration) {
+        return bounceFade(upDuration, downDuration, true);
+    }
+    public Pixel bounceFadeDown(int upDuration, int downDuration) {
+        return bounceFade(upDuration, downDuration, false);
+    }
+    public Pixel bounceFadeDown(int duration) {
+        return bounceFade(duration, duration, false);
+    }
+    public Pixel bounceFade(int upDuration, int downDuration, boolean goUp) {
+        posDelta = (max - min) / (upDuration / updateInterval);
+        negDelta = -(max - min) / (downDuration / updateInterval);
+        bounce = true;
+        delta = goUp ? posDelta : negDelta;
+        return this;
+    }
+
+    public Pixel pause() {
+        delta = 0;
+        return this;
     }
 
     public Pixel draw() {

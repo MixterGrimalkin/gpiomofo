@@ -1,14 +1,12 @@
 Parameters:
   # Observatory
   ConstellationId: orion
-#  MonitorHost: localhost
-#  MonitorPort: 3000
   MonitorHost: starlight-monitor.herokuapp.com
   MonitorPort: 80
-  # Win States
-  FullWinStarCount: 4
-  LeapFrogStarCount: 2
-  LeapFrogTime: 500
+  PingInterval: 30000
+  # DMX
+  DmxStars: true
+  DmxRings: true
   # Sensors
   PinResistance: PULL_DOWN
   TriggerState: true
@@ -19,25 +17,28 @@ Parameters:
   StarPixels: 1,6,11,16
   # Clustering
   Clusters:
-  # Colours
-  RingColour: 255,0,255
-  StarColour: 255,255,200
-  ConnectorColour: 150,150,255
-  # DMX
-  DmxStars: true
-  DmxRings: true
-  # Fade times (ms)
-  StarFadeUp: 500
-  StarFadeDown: 500
-  RingFadeDown: 1000
-  RingPulseMin: 250
-  RingPulseMax: 900
+  # Single star activation
+  RingFlashColour: 255,200,200
+  RingPulseColour: 255,0,130
+  RingOnFadeUp: 100
+  RingOnFadeDown: 1000
+  RingOffFadeDown: 2000
+  # Leapfrog
+  LeapFrogStarCount: 2
+  LeapFrogTime: 500
+  StarChaseDelay: 400
+  StarChaseColour: 255,255,180
+  ConnectorChaseDelay: 200
+  ConnectorChaseColour: 90,180,255
+  # Complete Win
+  FullWinStarCount: 4
+  RingWinColour: 100,100,255
+  StarWinColour: 255,255,200
+  TwinkleColour: 150,150,255
   TwinklePulseMin: 200
   TwinklePulseMax: 1000
   TwinkleRange: 0.4
-  # Pulse brightness
-  MaxRingBrightness: 1.0
-  MinRingBrightness: 0.5
+  StarFadeDown: 2000
 
 Triggers:
   Dummy:

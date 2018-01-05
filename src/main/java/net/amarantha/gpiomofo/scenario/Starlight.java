@@ -8,18 +8,17 @@ import net.amarantha.gpiomofo.display.pixeltape.NeoPixelFactory;
 import net.amarantha.gpiomofo.display.pixeltape.Pixel;
 import net.amarantha.gpiomofo.service.dmx.DmxService;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
-import net.amarantha.gpiomofo.trigger.Trigger.TriggerCallback;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.http.HttpService;
-import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.service.Service;
 import net.amarantha.utils.task.TaskService;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import static java.lang.Integer.parseInt;
-import static net.amarantha.utils.math.MathUtils.*;
-import static net.amarantha.utils.shell.Utility.log;
+import static net.amarantha.utils.math.MathUtils.arrayContains;
+import static net.amarantha.utils.math.MathUtils.randomBetween;
 
 public class Starlight extends Scenario {
 
@@ -34,37 +33,42 @@ public class Starlight extends Scenario {
     @Parameter("ConstellationId")   private String constellationId;
     @Parameter("MonitorHost")       private String monitorHost;
     @Parameter("MonitorPort")       private int monitorPort;
-
-    @Parameter("FullWinStarCount")  private int fullWinStarCount;
-    @Parameter("LeapFrogStarCount") private int leapFrogStarCount;
-    @Parameter("LeapFrogTime")      private int leapFrogTime;
-
-    @Parameter("PixelCount")        private int pixelCount;
-    @Parameter("StarTriggers")      private String starTriggerStr;
-    @Parameter("StarPixels")        private String starPixelStr;
-    @Parameter("RingPixels")        private String ringPixelStr;
-    @Parameter("RingColour")        private RGB ringColour;
-    @Parameter("StarColour")        private RGB starColour;
-    @Parameter("ConnectorColour")   private RGB connectorColour;
-    @Parameter("PinResistance")     private String resistanceStr;
-    @Parameter("TriggerState")      private boolean triggerState;
-
-    @Parameter("Clusters")          private String clusterString;
+    @Parameter("PingInterval")      private int pingInterval;
 
     @Parameter("DmxStars")          private boolean dmxStars;
     @Parameter("DmxRings")          private boolean dmxRings;
 
-    @Parameter("StarFadeUp")        private int starFadeUp;
-    @Parameter("StarFadeDown")      private int starFadeDown;
-    @Parameter("RingFadeDown")      private int ringFadeDown;
-    @Parameter("RingPulseMin")      private int minPulseTime;
-    @Parameter("RingPulseMax")      private int maxPulseTime;
+    @Parameter("PinResistance")     private String resistanceStr;
+    @Parameter("TriggerState")      private boolean triggerState;
+    @Parameter("StarTriggers")      private String starTriggerStr;
+
+    @Parameter("PixelCount")        private int pixelCount;
+    @Parameter("RingPixels")        private String ringPixelStr;
+    @Parameter("StarPixels")        private String starPixelStr;
+
+    @Parameter("Clusters")          private String clusterString;
+
+    @Parameter("RingFlashColour")   private RGB ringFlashColour;
+    @Parameter("RingPulseColour")   private RGB ringPulseColour;
+    @Parameter("RingOnFadeUp")      private int ringOnFadeUp;
+    @Parameter("RingOnFadeDown")    private int ringOnFadeDown;
+    @Parameter("RingOffFadeDown")   private int ringOffFadeDown;
+
+    @Parameter("LeapFrogStarCount") private int leapFrogStarCount;
+    @Parameter("LeapFrogTime")      private int leapFrogTime;
+    @Parameter("StarChaseDelay")    private int starChaseDelay;
+    @Parameter("StarChaseColour")   private RGB starChaseColour;
+    @Parameter("ConnectorChaseDelay")  private int connectorChaseDelay;
+    @Parameter("ConnectorChaseColour") private RGB connectorChaseColour;
+
+    @Parameter("FullWinStarCount")  private int fullWinStarCount;
+    @Parameter("RingWinColour")     private RGB ringWinColour;
+    @Parameter("StarWinColour")     private RGB starWinColour;
+    @Parameter("TwinkleColour")     private RGB twinkleColour;
     @Parameter("TwinklePulseMin")   private int minTwinkleTime;
     @Parameter("TwinklePulseMax")   private int maxTwinkleTime;
     @Parameter("TwinkleRange")      private double twinkleRange;
-
-    @Parameter("MaxRingBrightness") private double maxRingBrightness;
-    @Parameter("MinRingBrightness") private double minRingBrightness;
+    @Parameter("StarFadeDown")      private int starFadeDown;
 
     private Integer[] pins;
     private Integer[] stars;
@@ -72,6 +76,7 @@ public class Starlight extends Scenario {
     private Integer[] connectors;
 
     private Long[] lastStarEvents;
+    private Integer[] lastStarNumbers;
 
     private Map<Integer, Boolean> currentStates = new HashMap<>();
     private Map<Integer, List<Integer>> clusters = new HashMap<>();
@@ -95,6 +100,7 @@ public class Starlight extends Scenario {
         rings = new Integer[pinsStrs.length];
         connectors = new Integer[pixelCount - (stars.length * 2)];
         lastStarEvents = new Long[leapFrogStarCount];
+        lastStarNumbers = new Integer[leapFrogStarCount];
 
         // Create stars and rings
         for (int i = 0; i < pinsStrs.length; i++) {
@@ -112,20 +118,11 @@ public class Starlight extends Scenario {
             currentStates.put(i, false);
         }
 
-        // Create connectors and apply colours
+        // Create pixels
         int j = 0;
         for (int i = 0; i < pixelCount; i++) {
-            boolean isStar = arrayContains(stars, i);
-            boolean isRing = arrayContains(rings, i);
-            Pixel p = pixels.create(i);
-            if (isStar) {
-                p.rgb(starColour);
-            }
-            if (isRing) {
-                p.rgb(ringColour);
-            }
-            if (!isStar && !isRing) {
-                p.rgb(connectorColour);
+            pixels.create(i);
+            if (!arrayContains(stars, i) && !arrayContains(rings, i)) {
                 connectors[j++] = i;
             }
         }
@@ -182,40 +179,44 @@ public class Starlight extends Scenario {
             activeStarCount += newStates.get(i) ? 1 : 0;
         }
 
-        // Detect Complete event
-        if ( activeStarCount >= fullWinStarCount ) {
-            activateComplete();
-        } else {
-            cancelComplete();
+        if ( activeStarCount == 0 ) {
+            resetAll();
         }
 
         // Detect First Star event
         if ( state && activeStarCount==1 ) {
-            for ( int i=0; i<pins.length; i++ ) {
-                pixels.get(rings[i]).jump(1.0).bounce(false).fadeDown(500);
-            }
+            flashRings();
         }
 
-        // Detect Leap Frog event
+        // Store event time for activations only
         if ( state ) {
-            // Store event time
             for (int i = 1; i < lastStarEvents.length; i++) {
                 lastStarEvents[i - 1] = lastStarEvents[i];
-            }
-            lastStarEvents[lastStarEvents.length - 1] = System.currentTimeMillis();
-            if (    lastStarEvents[lastStarEvents.length - 1] != null &&
-                    lastStarEvents[0] != null &&
-                    lastStarEvents[lastStarEvents.length - 1] - lastStarEvents[0] <= leapFrogTime   )
-            {
-                activateLeapFrog();
-            } else {
-                cancelLeapFrog();
             }
         } else {
             cancelLeapFrog();
         }
 
-        // Update display
+        // Detect Leap Frog event
+        lastStarEvents[lastStarEvents.length - 1] = System.currentTimeMillis();
+        if (    lastStarEvents[lastStarEvents.length - 1] != null &&
+                lastStarEvents[0] != null &&
+                lastStarEvents[lastStarEvents.length - 1] - lastStarEvents[0] <= leapFrogTime   )
+        {
+//            boolean validLeapFrog = false;
+//            for (int i = 1; i < lastStarNumbers.length; i++) {
+//                if (lastStarNumbers[i-1]!=null && lastStarNumbers[i]!=null && !lastStarNumbers[i-1].equals(lastStarNumbers[i])) {
+//                    validLeapFrog = true;
+//                }
+//            }
+//            if (validLeapFrog) {
+                activateLeapFrog();
+//            }
+        } else {
+            cancelLeapFrog();
+        }
+
+        // Update Star Activations
         for ( int i=0; i<pins.length; i++ ) {
             if ( newStates.get(i)!=currentStates.get(i) ) {
                 currentStates.put(i, newStates.get(i));
@@ -226,15 +227,37 @@ public class Starlight extends Scenario {
                 }
             }
         }
+
+        // Detect Complete event
+        if ( activeStarCount >= fullWinStarCount ) {
+            activateComplete();
+        } else {
+            cancelComplete();
+        }
+
+    }
+
+    private void resetAll() {
+        twinkle(false);
+        for ( int i=0; i<pins.length; i++ ) {
+            pixels.get(stars[i]).min(0.0).fadeDown(ringOnFadeDown);
+            pixels.get(rings[i]).min(0.0).fadeDown(ringOnFadeDown);
+        }
+    }
+
+    private void flashRings() {
+        for ( int i=0; i<pins.length; i++ ) {
+            pixels.get(rings[i]).rgb(ringFlashColour).jump(1.0).fadeDown(500);
+        }
     }
 
     private void activateStar(int number) {
-        pixels.get(rings[number]).jump(1.0).bounce(true).fadeUp(ringFadeDown);
+        pixels.get(rings[number]).rgb(ringPulseColour).jump(1.0).bounceFadeDown(ringOnFadeUp, ringOnFadeDown);
         http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/on", "");
     }
 
     private void cancelStar(int number) {
-        pixels.get(rings[number]).bounce(false).fadeDown(ringFadeDown);
+        pixels.get(rings[number]).fadeDown(ringOffFadeDown);
         http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/off", "");
     }
 
@@ -245,8 +268,12 @@ public class Starlight extends Scenario {
                 @Override
                 public void run() {
                     for ( int i=stars.length-1; i>=0; i-- ) {
-                        pixels.get(stars[i]).jump(0.0).bounce(true).range(0.0, 0.4).fadeUp(800);
-                        sleep(400);
+                        pixels.get(stars[i])
+                                .rgb(starChaseColour)
+                                .jump(0.0)
+                                .range(0.0, 0.4)
+                                .bounceFadeUp(starChaseDelay);
+                        sleep(starChaseDelay /2);
                     }
                 }
             }, 0);
@@ -257,8 +284,11 @@ public class Starlight extends Scenario {
                     for ( int i=0; i<connectors.length; i+=limit ) {
                         for ( int j=0; j<(limit-1); j++) {
                             if ( i+j < connectors.length ) {
-                                pixels.get(connectors[i + j]).bounce(true).range(0.0, 0.5).fadeUp(200);
-                                sleep(100);
+                                pixels.get(connectors[i + j])
+                                        .rgb(connectorChaseColour)
+                                        .range(0.0, 0.7)
+                                        .bounceFadeUp(connectorChaseDelay);
+                                sleep(connectorChaseDelay /2);
                             }
                         }
                     }
@@ -272,11 +302,11 @@ public class Starlight extends Scenario {
         if (leapFrogActive) {
             leapFrogActive = false;
             for ( int i=0; i<pins.length; i++ ) {
-                pixels.get(stars[i]).bounce(false).min(0.0).fadeDown(starFadeDown);
+                pixels.get(stars[i]).min(0.0).fadeDown(starFadeDown);
             }
             twinkle(false);
-            http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/off", "");
         }
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/off", "");
     }
 
     private void activateComplete() {
@@ -284,8 +314,15 @@ public class Starlight extends Scenario {
             completeActive = true;
             cancelLeapFrog();
             for ( int i=0; i<pins.length; i++ ) {
-                pixels.get(rings[i]).jump(1.0).bounce(true).fadeDown(ringFadeDown);
-                pixels.get(stars[i]).bounce(true).range(0.8, 1.0).fadeUp(starFadeUp);
+                pixels.get(stars[i])
+                        .rgb(starWinColour)
+                        .jump(0.0)
+                        .range(0.8, 1.0)
+                        .bounceFadeUp(ringOnFadeDown, ringOnFadeUp);
+                pixels.get(rings[i])
+                        .rgb(ringWinColour)
+                        .jump(1.0)
+                        .bounceFadeDown(ringOnFadeUp, ringOnFadeDown);
             }
             twinkle(true);
             http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/on", "");
@@ -296,14 +333,15 @@ public class Starlight extends Scenario {
         if (completeActive) {
             completeActive = false;
             for ( int i=0; i<pins.length; i++ ) {
-                pixels.get(stars[i]).bounce(false).min(0.0).fadeDown(starFadeDown);
+                pixels.get(stars[i]).min(0.0).fadeDown(starFadeDown);
+                pixels.get(rings[i]).rgb(ringPulseColour);
                 if ( !currentStates.get(i) ) {
-                    pixels.get(rings[i]).bounce(false).min(0.0).fadeDown(ringFadeDown);
+                    pixels.get(rings[i]).min(0.0).fadeDown(ringOffFadeDown);
                 }
             }
             twinkle(false);
-            http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/off", "");
         }
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/off", "");
     }
 
     private void twinkle(boolean on) {
@@ -312,17 +350,20 @@ public class Starlight extends Scenario {
                 Pixel p = pixels.get(connectors[i]);
                 if (twinkleRange > 0) {
                     p.range(randomBetween(1 - twinkleRange, 0.9), 1)
-                            .bounce(true)
-                            .fadeUp(randomBetween(minTwinkleTime, maxTwinkleTime));
+                            .rgb(twinkleColour)
+                            .bounceFadeUp(randomBetween(minTwinkleTime, maxTwinkleTime));
                 } else {
                     p.range(0, 1)
-                            .bounce(false)
-                            .fadeUp(randomBetween(minTwinkleTime, maxTwinkleTime));
+                            .rgb(twinkleColour)
+                            .bounceFadeUp(randomBetween(minTwinkleTime, maxTwinkleTime));
                 }
             }
         } else {
             for (int i = 0; i < connectors.length; i++) {
-                pixels.get(connectors[i]).bounce(false).range(0, 1).fadeDown(maxTwinkleTime);
+                pixels.get(connectors[i])
+                        .rgb(twinkleColour)
+                        .range(0, 1)
+                        .fadeDown(maxTwinkleTime);
             }
         }
     }
@@ -330,11 +371,22 @@ public class Starlight extends Scenario {
     @Override
     public void startup() {
         pixels.start();
-        tasks.addRepeatingTask("UpdateMonitor", 50000, this::pingMonitor);
+        tasks.addRepeatingTask("UpdateMonitor", pingInterval, this::pingMonitor);
         clearMonitor();
+        updateState(false);
     }
 
     private void pingMonitor() {
+        boolean allOff = true;
+        for ( Entry<Integer, Boolean> state : getPinStates().entrySet() ) {
+            if ( state.getValue() ) {
+                allOff = false;
+                break;
+            }
+        }
+        if ( allOff ) {
+            updateState(false);
+        }
         http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/ping", "");
     }
 
