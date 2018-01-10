@@ -155,7 +155,7 @@ public class Starlight extends Scenario {
     private Map<Integer, Boolean> getPinStates() {
         Map<Integer, Boolean> result = new HashMap<>();
         for ( int i=0; i<pins.length; i++ ) {
-            result.put(i, gpio.read(pins[i]));
+            result.put(i, gpio.read(pins[i])==triggerState);
         }
         return result;
     }
