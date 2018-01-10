@@ -89,10 +89,10 @@ Gui:
    Window-Output-GPIO: 191.0,139.0
    Window-Range-Sensor: 139.0,289.0
    Window-LightBoard: 314.0,189.0
-   Window-NeoPixel: 960.0,736.0
+   Window-NeoPixel: 749.0,395.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
-   Window-Input-GPIO: 2367.0,592.0
-   Window-GpioMofo: 1787.0,377.0
+   Window-Input-GPIO: 765.0,199.0
+   Window-GpioMofo: 1147.0,140.0
 Aws: 
    ClientId: sdk-java
    CertificateFile: /home/grimalkin/Downloads/aws/SnootBox.cert.pem

@@ -12,21 +12,25 @@ import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.http.HttpService;
 import net.amarantha.utils.service.Service;
 import net.amarantha.utils.task.TaskService;
+import net.amarantha.utils.time.Now;
 
 import java.util.*;
 import java.util.Map.Entry;
 
 import static java.lang.Integer.parseInt;
+import static java.lang.System.currentTimeMillis;
 import static net.amarantha.utils.math.MathUtils.arrayContains;
 import static net.amarantha.utils.math.MathUtils.randomBetween;
+import static net.amarantha.utils.shell.Utility.log;
 
 public class Starlight extends Scenario {
+
+    @Inject private Now now;
 
     @Service private TaskService tasks;
     @Service private DmxService dmx;
     @Service private HttpService http;
     @Service private GpioService gpio;
-//    @Service private AwsService aws;
     @Inject private NeoPixelFactory pixels;
     @Inject private NeoPixel neoPixel;
 
@@ -75,14 +79,13 @@ public class Starlight extends Scenario {
     private Integer[] rings;
     private Integer[] connectors;
 
-    private Long[] lastStarEvents;
-    private Integer[] lastStarNumbers;
+    private long[] lastStarTimes;
+    private int[] lastStarNumbs;
 
     private Map<Integer, Boolean> currentStates = new HashMap<>();
     private Map<Integer, List<Integer>> clusters = new HashMap<>();
 
     private boolean leapFrogActive = false;
-    private boolean completeActive = false;
 
     @Override
     public void setup() {
@@ -99,20 +102,25 @@ public class Starlight extends Scenario {
         stars = new Integer[pinsStrs.length];
         rings = new Integer[pinsStrs.length];
         connectors = new Integer[pixelCount - (stars.length * 2)];
-        lastStarEvents = new Long[leapFrogStarCount];
-        lastStarNumbers = new Integer[leapFrogStarCount];
+
+        lastStarTimes = new long[leapFrogStarCount];
+        lastStarNumbs = new int[leapFrogStarCount];
+        for ( int i=0; i<leapFrogStarCount; i++ ) {
+            lastStarNumbs[i] = -1;
+        }
 
         // Create stars and rings
         for (int i = 0; i < pinsStrs.length; i++) {
             pins[i] = parseInt(pinsStrs[i].trim());
             stars[i] = parseInt(starStrs[i].trim());
             rings[i] = parseInt(ringStrs[i].trim());
+            final int starNo = i;
             triggers.gpio(
                     "Star" + i,
                     pins[i],
                     PinPullResistance.valueOf(resistanceStr),
                     triggerState
-            ).onFire(this::updateState);
+            ).onFire((state) -> updateState(state, starNo));
             if (dmxRings) neoPixel.intercept(rings[i], dmx.rgbDevice(i * 4).getInterceptor());
             if (dmxStars) neoPixel.intercept(stars[i], dmx.device((i * 4) + 3).getInterceptor());
             currentStates.put(i, false);
@@ -153,8 +161,12 @@ public class Starlight extends Scenario {
     }
 
     private void updateState(boolean state) {
+        updateState(state, null);
+    }
 
-        // Update base state
+    private void updateState(boolean state, Integer latestStar) {
+
+        // Read base state
         Map<Integer, Boolean> pinStates = getPinStates();
         Map<Integer, Boolean> newStates = new HashMap<>();
         for ( int i=0; i<pins.length; i++ ) {
@@ -179,169 +191,182 @@ public class Starlight extends Scenario {
             activeStarCount += newStates.get(i) ? 1 : 0;
         }
 
-        if ( activeStarCount == 0 ) {
-            resetAll();
-        }
-
-        // Detect First Star event
-        if ( state && activeStarCount==1 ) {
-            flashRings();
-        }
-
-        // Store event time for activations only
+        // Store event time
         if ( state ) {
-            for (int i = 1; i < lastStarEvents.length; i++) {
-                lastStarEvents[i - 1] = lastStarEvents[i];
+            if ( latestStar!=null ) {
+                boolean alreadyTracked = false;
+                for (int i = 1; i < leapFrogStarCount; i++) {
+                    if ( lastStarNumbs[i]==latestStar ) {
+                        alreadyTracked = true;
+                    }
+                }
+                if ( !alreadyTracked ) {
+                    for ( int i=1; i<leapFrogStarCount; i++ ) {
+                        lastStarNumbs[i-1] = lastStarNumbs[i];
+                        lastStarTimes[i-1] = lastStarTimes[i];
+                    }
+                    lastStarNumbs[leapFrogStarCount-1] = latestStar;
+                    lastStarTimes[leapFrogStarCount-1] = currentTimeMillis();
+                }
             }
         } else {
-            cancelLeapFrog();
+            for ( int i=0; i<leapFrogStarCount; i++ ) {
+                lastStarNumbs[i] = -1;
+                lastStarTimes[i] = -1;
+            }
         }
 
-        // Detect Leap Frog event
-        lastStarEvents[lastStarEvents.length - 1] = System.currentTimeMillis();
-        if (    lastStarEvents[lastStarEvents.length - 1] != null &&
-                lastStarEvents[0] != null &&
-                lastStarEvents[lastStarEvents.length - 1] - lastStarEvents[0] <= leapFrogTime   )
-        {
-//            boolean validLeapFrog = false;
-//            for (int i = 1; i < lastStarNumbers.length; i++) {
-//                if (lastStarNumbers[i-1]!=null && lastStarNumbers[i]!=null && !lastStarNumbers[i-1].equals(lastStarNumbers[i])) {
-//                    validLeapFrog = true;
-//                }
-//            }
-//            if (validLeapFrog) {
-                activateLeapFrog();
-//            }
+        // Check states
+        boolean noStars = false;
+        boolean firstStar = false;
+        boolean leapFrog = false;
+        boolean complete = false;
+
+        if ( activeStarCount == 0 ) {
+            noStars = true;
+        }
+
+        if ( state && activeStarCount==1 ) {
+            firstStar = true;
+        }
+
+        if ( activeStarCount >= fullWinStarCount ) {
+            complete = true;
+        }
+
+        if ( lastStarTimes[0]!=-1 && lastStarTimes[leapFrogStarCount-1] - lastStarTimes[0] <= leapFrogTime ) {
+            leapFrog = true;
+        }
+
+        // Update
+        applyStarStates(newStates);
+        if ( noStars ) {
+            resetAll();
         } else {
-            cancelLeapFrog();
-        }
-
-        // Update Star Activations
-        for ( int i=0; i<pins.length; i++ ) {
-            if ( newStates.get(i)!=currentStates.get(i) ) {
-                currentStates.put(i, newStates.get(i));
-                if (newStates.get(i)) {
-                    activateStar(i);
+            if ( firstStar ) {
+                flashRings(latestStar==null ? -1 : latestStar);
+            } else if (complete) {
+                cancelLeapFrog();
+                activateComplete();
+            } else {
+                cancelComplete();
+                if (leapFrog) {
+                    activateLeapFrog();
                 } else {
-                    cancelStar(i);
+                    cancelLeapFrog();
                 }
             }
         }
 
-        // Detect Complete event
-        if ( activeStarCount >= fullWinStarCount ) {
-            activateComplete();
-        } else {
-            cancelComplete();
-        }
+    }
 
+    private void applyStarStates(Map<Integer, Boolean> newStates) {
+        for (int i = 0; i < pins.length; i++) {
+            if (newStates.get(i) != currentStates.get(i)) {
+                currentStates.put(i, newStates.get(i));
+                if (newStates.get(i)) {
+                    pixels.get(rings[i]).rgb(ringPulseColour).jump(1.0).bounceFadeDown(ringOnFadeUp, ringOnFadeDown);
+                    httpStarOn(i);
+                } else {
+                    pixels.get(rings[i]).fadeDown(ringOffFadeDown);
+                    httpStarOff(i);
+                }
+            }
+        }
     }
 
     private void resetAll() {
+        cancelComplete();
+        cancelLeapFrog();
         twinkle(false);
         for ( int i=0; i<pins.length; i++ ) {
             pixels.get(stars[i]).min(0.0).fadeDown(ringOnFadeDown);
             pixels.get(rings[i]).min(0.0).fadeDown(ringOnFadeDown);
+            httpStarOff(i);
         }
     }
 
-    private void flashRings() {
+    private void flashRings(int except) {
         for ( int i=0; i<pins.length; i++ ) {
-            pixels.get(rings[i]).rgb(ringFlashColour).jump(1.0).fadeDown(500);
+            if ( i!=except ) {
+                pixels.get(rings[i]).rgb(ringFlashColour).jump(1.0).fadeDown(500);
+            }
         }
-    }
-
-    private void activateStar(int number) {
-        pixels.get(rings[number]).rgb(ringPulseColour).jump(1.0).bounceFadeDown(ringOnFadeUp, ringOnFadeDown);
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/on", "");
-    }
-
-    private void cancelStar(int number) {
-        pixels.get(rings[number]).fadeDown(ringOffFadeDown);
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/off", "");
     }
 
     private void activateLeapFrog() {
-        if (!leapFrogActive && !completeActive) {
-            leapFrogActive = true;
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    for ( int i=stars.length-1; i>=0; i-- ) {
+        leapFrogActive = true;
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                for ( int i=stars.length-1; i>=0; i-- ) {
+                    if ( leapFrogActive ) {
                         pixels.get(stars[i])
                                 .rgb(starChaseColour)
                                 .jump(0.0)
                                 .range(0.0, 0.4)
                                 .bounceFadeUp(starChaseDelay);
-                        sleep(starChaseDelay /2);
+                        sleep(starChaseDelay / 2);
                     }
                 }
-            }, 0);
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    int limit = 10;
-                    for ( int i=0; i<connectors.length; i+=limit ) {
-                        for ( int j=0; j<(limit-1); j++) {
-                            if ( i+j < connectors.length ) {
-                                pixels.get(connectors[i + j])
-                                        .rgb(connectorChaseColour)
-                                        .range(0.0, 0.7)
-                                        .bounceFadeUp(connectorChaseDelay);
-                                sleep(connectorChaseDelay /2);
-                            }
+            }
+        }, 0);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                int limit = 10;
+                for ( int i=0; i<connectors.length; i+=limit ) {
+                    for ( int j=0; j<(limit-1); j++) {
+                        if ( leapFrogActive && i+j < connectors.length ) {
+                            pixels.get(connectors[i + j])
+                                    .rgb(connectorChaseColour)
+                                    .range(0.0, 0.7)
+                                    .bounceFadeUp(connectorChaseDelay);
+                            sleep(connectorChaseDelay /2);
                         }
                     }
                 }
-            }, 0);
-            http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/on", "");
-        }
+            }
+        }, 0);
+        httpLeapfrogOn();
     }
 
     private void cancelLeapFrog() {
-        if (leapFrogActive) {
-            leapFrogActive = false;
-            for ( int i=0; i<pins.length; i++ ) {
-                pixels.get(stars[i]).min(0.0).fadeDown(starFadeDown);
-            }
-            twinkle(false);
+        leapFrogActive = false;
+        for ( int i=0; i<pins.length; i++ ) {
+            pixels.get(stars[i]).min(0.0).fadeDown(starFadeDown);
         }
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/off", "");
+        twinkle(false);
+        httpLeapFrogOff();
     }
 
     private void activateComplete() {
-        if (!completeActive) {
-            completeActive = true;
-            cancelLeapFrog();
-            for ( int i=0; i<pins.length; i++ ) {
-                pixels.get(stars[i])
-                        .rgb(starWinColour)
-                        .jump(0.0)
-                        .range(0.8, 1.0)
-                        .bounceFadeUp(ringOnFadeDown, ringOnFadeUp);
-                pixels.get(rings[i])
-                        .rgb(ringWinColour)
-                        .jump(1.0)
-                        .bounceFadeDown(ringOnFadeUp, ringOnFadeDown);
-            }
-            twinkle(true);
-            http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/on", "");
+        cancelLeapFrog();
+        for ( int i=0; i<pins.length; i++ ) {
+            pixels.get(stars[i])
+                    .rgb(starWinColour)
+                    .jump(0.0)
+                    .range(0.8, 1.0)
+                    .bounceFadeUp(ringOnFadeDown, ringOnFadeUp);
+            pixels.get(rings[i])
+                    .rgb(ringWinColour)
+                    .jump(1.0)
+                    .bounceFadeDown(ringOnFadeUp, ringOnFadeDown);
         }
+        twinkle(true);
+        httpCompleteOn();
     }
 
     private void cancelComplete() {
-        if (completeActive) {
-            completeActive = false;
-            for ( int i=0; i<pins.length; i++ ) {
-                pixels.get(stars[i]).min(0.0).fadeDown(starFadeDown);
-                pixels.get(rings[i]).rgb(ringPulseColour);
-                if ( !currentStates.get(i) ) {
-                    pixels.get(rings[i]).min(0.0).fadeDown(ringOffFadeDown);
-                }
+        for ( int i=0; i<pins.length; i++ ) {
+            pixels.get(stars[i]).min(0.0).fadeDown(starFadeDown);
+            pixels.get(rings[i]).rgb(ringPulseColour);
+            if ( !currentStates.get(i) ) {
+                pixels.get(rings[i]).min(0.0).fadeDown(ringOffFadeDown);
             }
-            twinkle(false);
         }
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/off", "");
+        twinkle(false);
+        httpCompleteOff();
     }
 
     private void twinkle(boolean on) {
@@ -387,15 +412,15 @@ public class Starlight extends Scenario {
         if ( allOff ) {
             updateState(false);
         }
-        http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/ping", "");
+        httpPing();
     }
 
     private void clearMonitor() {
         for ( int i=0; i<stars.length; i++ ) {
-            http.post(monitorHost, monitorPort, "events/"+constellationId+"/star"+i+"/off", "");
+            httpStarOff(i);
         }
-        http.post(monitorHost, monitorPort, "events/"+constellationId+"/leapfrog/off", "");
-        http.post(monitorHost, monitorPort, "events/"+constellationId+"/complete/off", "");
+        httpLeapFrogOff();
+        httpCompleteOff();
     }
 
     @Override
@@ -403,6 +428,41 @@ public class Starlight extends Scenario {
         super.shutdown();
         clearMonitor();
         pixels.stop();
+    }
+
+    private void httpPing() {
+        log(now.time().toString()+": HTTP: !PING!");
+        http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/ping", "");
+    }
+
+    private void httpStarOn(int number) {
+        log(now.time().toString()+": HTTP: Star "+number+" ON");
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/on", "");
+    }
+
+    private void httpStarOff(int number) {
+        log(now.time().toString()+": HTTP: Star "+number+" OFF");
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/off", "");
+    }
+
+    private void httpLeapfrogOn() {
+        log(now.time().toString()+": HTTP: Leapfrog ON");
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/on", "");
+    }
+
+    private void httpLeapFrogOff() {
+        log(now.time().toString()+": HTTP: Leapfrog OFF");
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/off", "");
+    }
+
+    private void httpCompleteOn() {
+        log(now.time().toString()+": HTTP: Complete ON");
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/on", "");
+    }
+
+    private void httpCompleteOff() {
+        log(now.time().toString()+": HTTP: Complete OFF");
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/off", "");
     }
 
     private void sleep(int milliseconds) {
