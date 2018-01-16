@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 public interface NeoPixel {
 
     void init(int pixelCount);
+    int getPixelCount();
     void allOff();
     void close();
 

@@ -7,7 +7,6 @@ package net.amarantha.gpiomofo.display.dmx;
  */
 
 import gnu.io.*;
-import net.amarantha.gpiomofo.Monitor;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -36,7 +35,7 @@ public class Dmx
     public boolean monitor = false;  // show internal information
     byte[] channelValues;            // the array of dmx values
     JFrame frame;                    // holds the dmx monitor frame
-    Monitor Mon;
+//    Monitor Mon;
 
     /**
      * initialixe object and set all channels to 0
@@ -141,13 +140,13 @@ public class Dmx
             return;
         }
         channelValues[channel] = (byte) value;
-        if (monitor) {
-            if (Mon == null) {
-                Mon = new Monitor();
-                Mon.setVisible(true);
-            }
-            Mon.setChan(channel, value);
-        }
+//        if (monitor) {
+//            if (Mon == null) {
+//                Mon = new Monitor();
+//                Mon.setVisible(true);
+//            }
+//            Mon.setChan(channel, value);
+//        }
         byte[] data = new byte[universeSize + 1];
 
         data[0] = 0; // DMX command byte..

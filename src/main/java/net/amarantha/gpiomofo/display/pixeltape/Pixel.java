@@ -1,11 +1,32 @@
 package net.amarantha.gpiomofo.display.pixeltape;
 
+import com.google.inject.Inject;
 import net.amarantha.utils.colour.RGB;
 
 public class Pixel {
 
-    private final NeoPixel neoPixel;
-    private final int updateInterval;
+    private enum Mode { OFF, PATTERN, ANIMATION}
+
+    private Mode mode = Mode.PATTERN;
+
+    public Pixel off() {
+        mode = Mode.OFF;
+        return this;
+    }
+
+    public Pixel pattern() {
+        mode = Mode.PATTERN;
+        return this;
+    }
+
+    public Pixel animation() {
+        mode = Mode.ANIMATION;
+        return this;
+    }
+
+    @Inject private NeoPixel neoPixel;
+
+    private int updateInterval;
 
     private int number;
     private double current = 0.0;
@@ -17,14 +38,29 @@ public class Pixel {
     private boolean bounce = false;
     private RGB rgb = RGB.WHITE;
 
-    public Pixel(NeoPixel neoPixel, int updateInterval, int number) {
-        this.neoPixel = neoPixel;
+    public void setUpdateInterval(int updateInterval) {
         this.updateInterval = updateInterval;
+    }
+
+    public void setNumber(int number) {
         this.number = number;
     }
 
-    public Pixel update() {
-        return applyDelta().draw();
+    public Pixel update(RGB rgb) {
+        switch ( mode ) {
+            case OFF:
+                return this;
+            case PATTERN:
+                return applyDelta().draw();
+            case ANIMATION:
+                return set(rgb);
+        }
+        return null;
+    }
+
+    private Pixel set(RGB rgb) {
+        neoPixel.setPixel(number, rgb);
+        return this;
     }
 
     public Pixel applyDelta() {
@@ -97,18 +133,18 @@ public class Pixel {
     }
 
     public Pixel fadeUp(int duration) {
-        if ( current < max ) {
+        if ( current <= max ) {
             delta = posDelta = (max - min) / (duration / updateInterval);
-            bounce = false;
         }
+        bounce = false;
         return this;
     }
 
     public Pixel fadeDown(int duration) {
-        if ( current > min ) {
+        if ( current >= min ) {
             delta = posDelta = -(max - min) / (duration / updateInterval);
-            bounce = false;
         }
+        bounce = false;
         return this;
     }
 

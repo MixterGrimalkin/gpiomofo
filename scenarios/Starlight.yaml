@@ -10,11 +10,11 @@ Parameters:
   # Sensors
   PinResistance: PULL_DOWN
   TriggerState: true
-  StarTriggers: 1,2,3,4
+  StarTriggers: 1,2,3,4,5
   # Layout
-  PixelCount: 20
-  RingPixels: 0,5,10,15
-  StarPixels: 1,6,11,16
+  PixelCount: 26
+  RingPixels: 0,6,12,18,24
+  StarPixels: 1,7,13,19,25
   # Clustering
   Clusters:
   # Single star activation
@@ -39,6 +39,18 @@ Parameters:
   TwinklePulseMax: 1000
   TwinkleRange: 0.4
   StarFadeDown: 2000
+  # Final win
+  RingFinalColour: 200,180,200
+  StarFinalColour1: 255,0,0
+  StarFinalColour2: 0,255,0
+  StarFinalColour3: 0,0,255
+  StarFinalColour4: 255,255,0
+  FinalAllColour: 255,255,255
+  FinalMaxInterval: 2000
+  FinalMinInterval: 250
+  FinalIntervalDelta: 250
+  FinalAnimationDuration: 30000
+  FinalPulseDuration: 10000
 
 Triggers:
   Dummy:
