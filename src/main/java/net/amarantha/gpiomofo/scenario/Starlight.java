@@ -14,6 +14,7 @@ import net.amarantha.utils.http.HttpService;
 import net.amarantha.utils.service.Service;
 import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.time.Now;
+import net.amarantha.utils.time.TimeGuard;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -21,13 +22,13 @@ import java.util.function.Consumer;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.System.currentTimeMillis;
-import static net.amarantha.utils.math.MathUtils.arrayContains;
-import static net.amarantha.utils.math.MathUtils.randomBetween;
+import static net.amarantha.utils.math.MathUtils.*;
 import static net.amarantha.utils.shell.Utility.log;
 
 public class Starlight extends Scenario {
 
     @Inject private Now now;
+    @Inject private TimeGuard guard;
 
     @Service private TaskService tasks;
     @Service private DmxService dmx;
@@ -76,18 +77,36 @@ public class Starlight extends Scenario {
     @Parameter("TwinkleRange")      private double twinkleRange;
     @Parameter("StarFadeDown")      private int starFadeDown;
 
-    @Parameter("RingFinalColour")   private RGB ringFinalColour;
-    @Parameter("StarFinalColour1")   private RGB starFinalColour1;
-    @Parameter("StarFinalColour2")   private RGB starFinalColour2;
-    @Parameter("StarFinalColour3")   private RGB starFinalColour3;
-    @Parameter("StarFinalColour4")   private RGB starFinalColour4;
+    @Parameter("StarFinalColour")   private RGB ringFinalColour;
+    @Parameter("FinalColour1")   private RGB starFinalColour1;
+    @Parameter("FinalColour2")   private RGB starFinalColour2;
+    @Parameter("FinalColour3")   private RGB starFinalColour3;
+    @Parameter("FinalColour4")   private RGB starFinalColour4;
     @Parameter("FinalAllColour")   private RGB finalAllColour;
+    @Parameter("FinalRingFadeOut") private int wooshRingFadeOut;
 
     @Parameter("FinalMaxInterval") private long wooshMaxInterval;
     @Parameter("FinalMinInterval") private long wooshMinInterval;
     @Parameter("FinalIntervalDelta") private long wooshIntervalDelta;
     @Parameter("FinalAnimationDuration") private long finalWooshDuration;
     @Parameter("FinalPulseDuration") private long finalPulseDuration;
+    @Parameter("FinalPulseMaxDelay") private int finalPulseMaxDelay;
+    @Parameter("FinalPulseMinDelay") private int finalPulseMinDelay;
+    @Parameter("FinalPulseDeltaFactor") double finalPulseDeltaFactor;
+
+    @Parameter("LoneStarTime") private long loneStarTime;
+
+    private long finalStartedAt;
+    private boolean finalWinActive = false;
+
+    private long lastWoosh;
+    private long wooshInterval;
+
+    private boolean finalPulse = false;
+    private int finalPulseDelay;
+
+    private boolean loneStarActive = false;
+    private Long loneStarted;
 
     private Integer[] pins;
     private Integer[] stars;
@@ -101,6 +120,8 @@ public class Starlight extends Scenario {
     private Map<Integer, List<Integer>> clusters = new HashMap<>();
 
     private boolean leapFrogActive = false;
+
+    private Map<Integer, PixelAnimation> animations = new HashMap<>();
 
     private Map<Integer, RGB> finalColours = new HashMap<>();
 
@@ -181,8 +202,6 @@ public class Starlight extends Scenario {
 
     }
 
-    Map<Integer, PixelAnimation> animations = new HashMap<>();
-
     private class Woosh implements Consumer<PixelAnimation> {
         List<Ray> rays = new LinkedList<>();
         private RGB rgb;
@@ -198,7 +217,8 @@ public class Starlight extends Scenario {
             animation.clear();
             List<Ray> newRays = new LinkedList<>();
             rays.forEach((ray) -> {
-                animation.fill(ray.position, ray.position +raySize, rgb);
+                int p = ray.position - (raySize/2);
+                animation.fill(p, p+raySize, rgb);
                 ray.update();
                 if ( ray.wraps > 0 ) {
                     newRays.add(ray);
@@ -229,47 +249,6 @@ public class Starlight extends Scenario {
             if ( position >= pixelCount ) {
                 position = 0;
                 wraps--;
-            }
-        }
-    }
-
-    private long finalStartedAt;
-    private boolean finalWinActive = false;
-    private long lastWoosh;
-    private long wooshInterval = 3000;
-    private int wooshStarFadeOut = 400;
-
-
-
-    private boolean finalPulse = false;
-
-    private void finalWinLoop() {
-        if ( finalWinActive ) {
-            if ( currentTimeMillis() - finalStartedAt > finalWooshDuration) {
-                if ( finalPulse ) {
-                    if ( currentTimeMillis() - finalStartedAt > (finalWooshDuration+finalPulseDuration)) {
-                        for ( int i=0; i<pixelCount; i++ ) {
-                            pixels.get(i).pattern().rgb(finalAllColour).max(1.0).fadeUp(1000);
-                        }
-                    }
-                } else {
-                    finalPulse = true;
-                    for ( int i=0; i<pixelCount; i++ ) {
-                        pixels.get(i).pattern().rgb(finalAllColour).bounceFadeUp(500);
-                    }
-                }
-            } else if ( currentTimeMillis() - lastWoosh > wooshInterval ) {
-                finalPulse = false;
-                lastWoosh = currentTimeMillis();
-                if (wooshInterval-wooshIntervalDelta >= wooshMinInterval) {
-                    wooshInterval -= wooshIntervalDelta;
-                }
-                int star = randomBetween(0, pins.length-1);
-                int anim = randomBetween(0, 3);
-                RGB colour = finalColours.get(anim);
-                int factor = randomBetween(0,10) > 5 ? 1 : -1;
-                ((Woosh)animations.get(anim).getRenderer()).addRay(stars[star], factor*randomBetween(1,2));
-                pixels.get(stars[star]).rgb(colour).jump(1.0).fadeDown(wooshStarFadeOut);
             }
         }
     }
@@ -331,11 +310,6 @@ public class Starlight extends Scenario {
                     lastStarTimes[leapFrogStarCount-1] = currentTimeMillis();
                 }
             }
-        } else {
-            for ( int i=0; i<leapFrogStarCount; i++ ) {
-                lastStarNumbs[i] = -1;
-                lastStarTimes[i] = -1;
-            }
         }
 
         // Check states
@@ -350,23 +324,30 @@ public class Starlight extends Scenario {
 
         if ( state && activeStarCount==1 ) {
             firstStar = true;
+            loneStarted = currentTimeMillis();
+        } else {
+            loneStarted = null;
+            loneStarActive = false;
+            cancelLoneStar();
         }
 
         if ( activeStarCount >= fullWinStarCount ) {
             complete = true;
         }
 
-        if ( lastStarTimes[0]!=-1 && lastStarTimes[leapFrogStarCount-1] - lastStarTimes[0] <= leapFrogTime ) {
+        if ( currentTimeMillis()-lastStarTimes[leapFrogStarCount-1] <= leapFrogTime
+                && lastStarTimes[leapFrogStarCount-1] - lastStarTimes[0] <= leapFrogTime ) {
             leapFrog = true;
         }
 
         // Update
-//        System.out.println("Scanning...");
         applyStarStates(newStates);
-        if ( noStars ) {
+        if ( noStars && !leapFrog) {
             resetAll();
         } else {
-            if ( complete ) {
+            if (firstStar ) {
+
+            } else if ( complete ) {
                 cancelLeapFrog();
                 activateFinal();
             } else {
@@ -385,14 +366,12 @@ public class Starlight extends Scenario {
         for (int i = 0; i < pins.length; i++) {
             if (newStates.get(i) != currentStates.get(i)) {
                 currentStates.put(i, newStates.get(i));
-                if ( !finalWinActive ) {
-                    if (newStates.get(i)) {
-                        pixels.get(rings[i]).rgb(ringPulseColour).jump(1.0).bounceFadeDown(ringOnFadeUp, ringOnFadeDown);
-                        httpStarOn(i);
-                    } else {
-                        pixels.get(rings[i]).fadeDown(ringOffFadeDown);
-                        httpStarOff(i);
-                    }
+                if (newStates.get(i)) {
+                    if ( !finalWinActive ) pixels.get(rings[i]).rgb(ringPulseColour).jump(1.0).bounceFadeDown(ringOnFadeUp, ringOnFadeDown);
+                    httpStarOn(i);
+                } else {
+                    if ( !finalWinActive ) pixels.get(rings[i]).fadeDown(ringOffFadeDown);
+                    httpStarOff(i);
                 }
             }
         }
@@ -463,7 +442,7 @@ public class Starlight extends Scenario {
         httpLeapFrogOff();
     }
 
-    private void activateComplete() {
+    private void activateLoneStar() {
         cancelLeapFrog();
         for ( int i=0; i<pins.length; i++ ) {
             pixels.get(stars[i])
@@ -477,54 +456,99 @@ public class Starlight extends Scenario {
                     .bounceFadeDown(ringOnFadeUp, ringOnFadeDown);
         }
         twinkle(true);
-//        httpCompleteOn();
+        httpLoneStarOn();
     }
 
-    private void cancelComplete() {
-        for ( int i=0; i<pins.length; i++ ) {
-            pixels.get(stars[i]).min(0.0).fadeDown(starFadeDown);
-            pixels.get(rings[i]).rgb(ringPulseColour);
-            if ( !currentStates.get(i) ) {
-                pixels.get(rings[i]).min(0.0).fadeDown(ringOffFadeDown);
+    private void cancelLoneStar() {
+        if ( !finalWinActive ) {
+            for (int i = 0; i < pins.length; i++) {
+                if (!currentStates.get(i)) {
+                    pixels.get(rings[i]).fadeDown(ringOffFadeDown);
+                }
             }
         }
-        twinkle(false);
-//        httpCompleteOff();
+        httpLoneStarOff();
+    }
+
+    private void finalWinLoop() {
+        if ( finalWinActive ) {
+            if ( currentTimeMillis() - finalStartedAt > finalWooshDuration) {
+                if ( finalPulse ) {
+                    if ( currentTimeMillis() - finalStartedAt > (finalWooshDuration+finalPulseDuration)) {
+                        for ( int i=0; i<pixelCount; i++ ) {
+                            int delay = round(randomBetween(0.8,1.2)*finalPulseMaxDelay);
+                            pixels.get(i).pattern().rgb(finalAllColour).max(1.0).fadeUp(delay);
+                        }
+                    } else {
+                        guard.every(finalPulseMaxDelay, "FinalPulse", ()->{
+                            for ( int i=0; i<pixelCount; i++ ) {
+                                Pixel p = pixels.get(i);
+                                double factor = randomBetween(0.5,1.05);
+                                p.pattern().rgb(finalAllColour).bounceFade(round(factor*finalPulseDelay), finalPulseDelay, p.goingUp());
+                            }
+                            if ( finalPulseDelay*finalPulseDeltaFactor >= finalPulseMinDelay ) {
+                                finalPulseDelay *= finalPulseDeltaFactor;
+                            }
+                        });
+                    }
+                } else {
+                    finalPulse = true;
+                    for ( int i=0; i<pixelCount; i++ ) {
+                        pixels.get(i).pattern().rgb(finalAllColour).min(0.3).max(0.8).bounceFadeUp(finalPulseDelay=finalPulseMaxDelay);
+                    }
+                }
+            } else if ( currentTimeMillis() - lastWoosh > wooshInterval ) {
+                finalPulse = false;
+                lastWoosh = currentTimeMillis();
+                if (wooshInterval-wooshIntervalDelta >= wooshMinInterval) {
+                    wooshInterval -= wooshIntervalDelta;
+                }
+                int star = randomBetween(0, pins.length-1);
+                int anim = randomBetween(0, 3);
+                RGB colour = finalColours.get(anim);
+                int factor = randomBetween(0,10) > 5 ? 1 : -1;
+                ((Woosh)animations.get(anim).getRenderer()).addRay(stars[star], factor*randomBetween(1,2));
+                pixels.get(rings[star]).rgb(colour).jump(1.0).fadeDown(wooshRingFadeOut);
+            }
+        } else if ( !loneStarActive && loneStarted!=null && currentTimeMillis()-loneStarted >= loneStarTime ) {
+            loneStarActive = true;
+            activateLoneStar();
+        }
     }
 
     private void activateFinal() {
         if ( !finalWinActive ) {
             finalStartedAt = currentTimeMillis();
             wooshInterval = wooshMaxInterval;
-            lastWoosh = currentTimeMillis();
+            lastWoosh = currentTimeMillis()-wooshMaxInterval/3;
             finalWinActive = true;
             for (int i = 0; i < pins.length; i++) {
-                pixels.get(stars[i]).min(0.0).fadeDown(1);
-                pixels.get(rings[i]).rgb(ringFinalColour).bounce(false).delta(0).jump(1.0);
+                pixels.get(stars[i]).rgb(ringFinalColour).bounce(false).delta(0).fadeUp(finalPulseMaxDelay);
+                pixels.get(rings[i]).min(0.0).fadeDown(finalPulseMaxDelay);
             }
             for (int i = 0; i < connectors.length; i++) {
                 pixels.get(connectors[i]).animation();
             }
             animations.forEach((k,v)->v.start());
         }
-        httpCompleteOn();
+        httpFinalOn();
     }
 
     private void cancelFinal() {
         if ( finalWinActive ) {
             finalWinActive = false;
             for (int i = 0; i < pins.length; i++) {
-                pixels.get(stars[i]).min(0.0).fadeDown(1);
-                pixels.get(rings[i]).min(0.0).fadeDown(1);
+                pixels.get(stars[i]).min(0.0).fadeDown(round(starFadeDown*1.1));
+                pixels.get(rings[i]).min(0.0).fadeDown(round(ringOffFadeDown*0.9));
             }
             for (int i = 0; i < connectors.length; i++) {
-                pixels.get(connectors[i]).pattern().jump(0.0);
+                pixels.get(connectors[i]).pattern().min(0.0).fadeDown(starFadeDown);
             }
             animations.forEach((k,a)->{
                 ((Woosh)a.getRenderer()).clearRays();
                 a.stop();
             });
-            httpCompleteOff();
+            httpFinalOff();
         }
     }
 
@@ -582,7 +606,8 @@ public class Starlight extends Scenario {
             httpStarOff(i);
         }
         httpLeapFrogOff();
-        httpCompleteOff();
+        httpFinalOff();
+        httpLoneStarOff();
     }
 
     @Override
@@ -617,14 +642,24 @@ public class Starlight extends Scenario {
         http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/off", "");
     }
 
-    private void httpCompleteOn() {
+    private void httpFinalOn() {
         log(now.time().toString()+": HTTP: Complete ON");
         http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/on", "");
     }
 
-    private void httpCompleteOff() {
+    private void httpFinalOff() {
         log(now.time().toString()+": HTTP: Complete OFF");
         http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/off", "");
+    }
+
+    private void httpLoneStarOn() {
+        log(now.time().toString()+": HTTP: Lone Star ON");
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/lonestar/on", "");
+    }
+
+    private void httpLoneStarOff() {
+        log(now.time().toString()+": HTTP: Lone Star OFF");
+        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/lonestar/off", "");
     }
 
     private void sleep(int milliseconds) {

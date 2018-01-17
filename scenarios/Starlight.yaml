@@ -1,6 +1,6 @@
 Parameters:
   # Observatory
-  ConstellationId: orion
+  ConstellationId: cass
   MonitorHost: starlight-monitor.herokuapp.com
   MonitorPort: 80
   PingInterval: 30000
@@ -16,7 +16,7 @@ Parameters:
   RingPixels: 0,6,12,18,24
   StarPixels: 1,7,13,19,25
   # Clustering
-  Clusters:
+  Clusters: 0,1
   # Single star activation
   RingFlashColour: 255,200,200
   RingPulseColour: 255,0,130
@@ -25,7 +25,7 @@ Parameters:
   RingOffFadeDown: 2000
   # Leapfrog
   LeapFrogStarCount: 2
-  LeapFrogTime: 500
+  LeapFrogTime: 1000
   StarChaseDelay: 400
   StarChaseColour: 255,255,180
   ConnectorChaseDelay: 200
@@ -40,17 +40,23 @@ Parameters:
   TwinkleRange: 0.4
   StarFadeDown: 2000
   # Final win
-  RingFinalColour: 200,180,200
-  StarFinalColour1: 255,0,0
-  StarFinalColour2: 0,255,0
-  StarFinalColour3: 0,0,255
-  StarFinalColour4: 255,255,0
+  StarFinalColour: 230,230,230
+  FinalColour1: 255,86,0
+  FinalColour2: 78,24,255
+  FinalColour3: 255,74,0
+  FinalColour4: 111,0,255
   FinalAllColour: 255,255,255
-  FinalMaxInterval: 2000
+  FinalRingFadeOut: 400
+  FinalMaxInterval: 3000
   FinalMinInterval: 250
   FinalIntervalDelta: 250
   FinalAnimationDuration: 30000
-  FinalPulseDuration: 10000
+  FinalPulseDuration: 15000
+  FinalPulseMaxDelay: 1500
+  FinalPulseMinDelay: 300
+  FinalPulseDeltaFactor: 0.85
+  # Lone Star
+  LoneStarTime: 10000
 
 Triggers:
   Dummy:
