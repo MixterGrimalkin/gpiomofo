@@ -96,6 +96,8 @@ public class Starlight extends Scenario {
 
     @Parameter("LoneStarTime") private long loneStarTime;
 
+    @Parameter("TriggerHoldTime") private int triggerHoldTime;
+
     private long finalStartedAt;
     private boolean finalWinActive = false;
 
@@ -158,7 +160,7 @@ public class Starlight extends Scenario {
                     pins[i],
                     PinPullResistance.valueOf(resistanceStr),
                     triggerState
-            ).onFire((state) -> updateState(state, starNo));
+            ).setHoldTime(triggerHoldTime).onFire((state) -> updateState(state, starNo));
             if (dmxRings) neoPixel.intercept(rings[i], dmx.rgbDevice(i * 4).getInterceptor());
             if (dmxStars) neoPixel.intercept(stars[i], dmx.device((i * 4) + 3).getInterceptor());
             currentStates.put(i, false);

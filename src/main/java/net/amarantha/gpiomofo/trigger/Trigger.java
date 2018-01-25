@@ -32,9 +32,11 @@ public class Trigger implements HasName, HasEnable {
             doFire(active);
         } else {
             if ( active ) {
+                tasks.removeTask("hold-cancel-"+getName());
                 tasks.addTask("hold-"+getName(), holdTime, () -> doFire(true));
             } else {
                 tasks.removeTask("hold-"+getName());
+                tasks.addTask("hold-cancel-"+getName(), holdTime, () -> doFire(false));
             }
         }
     }
