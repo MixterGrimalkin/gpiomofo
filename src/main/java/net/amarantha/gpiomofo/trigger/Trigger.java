@@ -23,8 +23,7 @@ public class Trigger implements HasName, HasEnable {
     @Parameter("holdTime") private Integer holdTime;
 
     @Override
-    public void enable() {
-    }
+    public void enable() {    }
 
     public void fire(boolean active) {
         lastState = active;
