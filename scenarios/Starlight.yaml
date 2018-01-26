@@ -1,9 +1,9 @@
 Parameters:
   # Observatory
-  ConstellationId: taur
+  ConstellationId: cass
   MonitorHost: starlight-monitor.herokuapp.com
   MonitorPort: 80
-  PingInterval: 30000
+  PingInterval: 1000
   # DMX
   DmxStars: true
   DmxRings: true
@@ -11,7 +11,7 @@ Parameters:
   PinResistance: PULL_UP
   TriggerState: true
   StarTriggers: 2,3,4,5,6,7,8,9
-  TriggerHoldTime: 1000
+  TriggerHoldTime: 100
   # Layout
   PixelCount: 38
   RingPixels: 0,5,7,9,15,24,26,34
@@ -25,14 +25,14 @@ Parameters:
   RingOnFadeDown: 1000
   RingOffFadeDown: 2000
   # Leapfrog
-  LeapFrogStarCount: 6
+  LeapFrogStarCount: 2
   LeapFrogTime: 3000
   StarChaseDelay: 400
   StarChaseColour: 255,255,180
   ConnectorChaseDelay: 200
   ConnectorChaseColour: 100,100,255
   # Complete Win
-  FullWinStarCount: 3
+  FullWinStarCount: 5
   RingWinColour: 100,100,255
   StarWinColour: 255,255,200
   TwinkleColour: 150,150,255
@@ -58,7 +58,7 @@ Parameters:
   FinalPulseMinDelay: 300
   FinalPulseDeltaFactor: 0.85
   # Lone Star
-  LoneStarTime: 10000
+  LoneStarTime: 1000
 
 Triggers:
   Dummy:

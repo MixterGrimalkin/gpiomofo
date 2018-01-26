@@ -11,6 +11,7 @@ import net.amarantha.gpiomofo.service.dmx.DmxService;
 import net.amarantha.gpiomofo.service.gpio.GpioService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.http.HttpService;
+import net.amarantha.utils.http.entity.HttpCommand;
 import net.amarantha.utils.service.Service;
 import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.time.Now;
@@ -330,7 +331,7 @@ public class Starlight extends Scenario {
         } else {
             loneStarted = null;
             loneStarActive = false;
-            cancelLoneStar();
+            if ( loneStarTime>0 ) cancelLoneStar();
         }
 
         if ( activeStarCount >= fullWinStarCount ) {
@@ -514,7 +515,7 @@ public class Starlight extends Scenario {
             }
         } else if ( !loneStarActive && loneStarted!=null && currentTimeMillis()-loneStarted >= loneStarTime ) {
             loneStarActive = true;
-            activateLoneStar();
+            if (loneStarTime>0) activateLoneStar();
         }
     }
 
@@ -598,9 +599,21 @@ public class Starlight extends Scenario {
             }
         }
         if ( allOff ) {
-            updateState(false);
+            guard.every(50000, "Panic", ()->updateState(false));
         }
-        httpPing();
+        if ( monitorUpdates.isEmpty() ) {
+            httpPing();
+        } else {
+            List<HttpCommand> commands = new ArrayList<>();
+            monitorUpdates.forEach((name,command)-> commands.add(command));
+            monitorUpdates.clear();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    commands.forEach((command)-> http.fire(command));
+                }
+            }, 0);
+        }
     }
 
     private void clearMonitor() {
@@ -619,49 +632,42 @@ public class Starlight extends Scenario {
         pixels.stop();
     }
 
+    private Map<String, HttpCommand> monitorUpdates = new HashMap<>();
+
     private void httpPing() {
-        log(now.time().toString()+": HTTP: !PING!");
         http.postAsync(null, monitorHost, monitorPort, "events/"+constellationId+"/ping", "");
     }
 
     private void httpStarOn(int number) {
-        log(now.time().toString()+": HTTP: Star "+number+" ON");
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/on", "");
+        monitorUpdates.put("star"+number, new HttpCommand("POST", monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/on", "", null));
     }
 
     private void httpStarOff(int number) {
-        log(now.time().toString()+": HTTP: Star "+number+" OFF");
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/off", "");
+        monitorUpdates.put("star"+number, new HttpCommand("POST", monitorHost, monitorPort, "events/" + constellationId + "/star" + number + "/off", "", null));
     }
 
     private void httpLeapfrogOn() {
-        log(now.time().toString()+": HTTP: Leapfrog ON");
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/on", "");
+        monitorUpdates.put("leapfrog", new HttpCommand("POST", monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/on", "", null));
     }
 
     private void httpLeapFrogOff() {
-        log(now.time().toString()+": HTTP: Leapfrog OFF");
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/off", "");
+        monitorUpdates.put("leapfrog", new HttpCommand("POST", monitorHost, monitorPort, "events/" + constellationId + "/leapfrog/off", "", null));
     }
 
     private void httpFinalOn() {
-        log(now.time().toString()+": HTTP: Complete ON");
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/on", "");
+        monitorUpdates.put("complete", new HttpCommand("POST", monitorHost, monitorPort, "events/" + constellationId + "/complete/on", "", null));
     }
 
     private void httpFinalOff() {
-        log(now.time().toString()+": HTTP: Complete OFF");
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/complete/off", "");
+        monitorUpdates.put("complete", new HttpCommand("POST", monitorHost, monitorPort, "events/" + constellationId + "/complete/off", "", null));
     }
 
     private void httpLoneStarOn() {
-        log(now.time().toString()+": HTTP: Lone Star ON");
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/lonestar/on", "");
+        monitorUpdates.put("lonestar", new HttpCommand("POST", monitorHost, monitorPort, "events/" + constellationId + "/lonestar/on", "", null));
     }
 
     private void httpLoneStarOff() {
-        log(now.time().toString()+": HTTP: Lone Star OFF");
-        http.postAsync(null, monitorHost, monitorPort, "events/" + constellationId + "/lonestar/off", "");
+        monitorUpdates.put("lonestar", new HttpCommand("POST", monitorHost, monitorPort, "events/" + constellationId + "/lonestar/off", "", null));
     }
 
     private void sleep(int milliseconds) {
