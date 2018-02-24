@@ -1,4 +1,44 @@
+# from audioplayer import AudioPlayer
+# audio = AudioPlayer()
+# import opc
+# client = opc.client('localhost:7890')
 import datetime, time, random, sys
+from pixel_tape import *
+
+LED_COUNT = 84
+
+pixel_tape = PixelTape(LED_COUNT)
+
+# Random factor to start lightening (in range 0-10 where 10 means always)
+CHANCE_OF_LIGHTENING = 2
+
+# Number of colour bands
+# Randomly chosen from this range
+MIN_BANDS = 2
+MAX_BANDS = 8
+
+# Milliseconds to sleep between renders (smaller number = faster)
+# Randomly chosen from this range
+MIN_SLEEP = 0.05
+MAX_SLEEP = 0.12
+
+# Seconds before changing palette/mode
+SKY_TIME = 30
+STORM_TIME = 10
+
+# Colour palettes
+# One is chosen at random on each change
+# If there are more colours than bands, the first few colours are used
+# If there are more bands than colours, the colour cycle is repeated
+palettes = [
+    [(255, 45, 10), (255, 30, 20), (200, 10, 0), (210, 26, 0)],  # Sunset Only
+    [(200, 20, 0), (250, 90, 10), (50, 146, 179), (255, 84, 21), (255, 184, 21)],  # Sunset w. Blue Sky
+    [(255, 161, 100), (48, 44, 93), (252, 144, 50), (252, 90, 27)],  # Sunset w. Lilac Sky
+    [(30, 41, 56), (119, 145, 179), (10, 10, 10), (33, 40, 54)],  # Overcast Sky
+    [(126, 217, 52), (15, 15, 15), (203, 6, 35), (15, 15, 15)],  # Aurora
+]
+
+TIMER_MODE = False
 
 HOUR_SCATTER = 0
 MINUTE_SCATTER = 29
@@ -29,43 +69,6 @@ def scatter_times():
 
     print times
 
-# from audioplayer import AudioPlayer
-# audio = AudioPlayer()
-from pixeltape import *
-pixel_tape = PixelTape()
-# import opc
-# client = opc.client('localhost:7890')
-
-LED_COUNT = 64
-
-# Random factor to start lightening (in range 0-10 where 10 means always)
-CHANCE_OF_LIGHTENING = 0
-
-# Number of colour bands
-# Randomly chosen from this range
-MIN_BANDS = 2
-MAX_BANDS = 8
-
-# Milliseconds to sleep between renders (smaller number = faster)
-# Randomly chosen from this range
-MIN_SLEEP = 0.05
-MAX_SLEEP = 0.12
-
-# Seconds before changing palette/mode
-SKY_TIME = 30
-STORM_TIME = 10
-
-# Colour palettes
-# One is chosen at random on each change
-# If there are more colours than bands, the first few colours are used
-# If there are more bands than colours, the colour cycle is repeated
-palettes = [
-    [(255, 45, 10), (255, 30, 20), (200, 10, 0), (210, 26, 0)],  # Sunset Only
-    [(200, 20, 0), (250, 90, 10), (50, 146, 179), (255, 84, 21), (255, 184, 21)],  # Sunset w. Blue Sky
-    [(255, 161, 100), (48, 44, 93), (252, 144, 50), (252, 90, 27)],  # Sunset w. Lilac Sky
-    [(30, 41, 56), (119, 145, 179), (10, 10, 10), (33, 40, 54)],  # Overcast Sky
-    [(126, 217, 52), (15, 15, 15), (203, 6, 35), (15, 15, 15)],  # Aurora
-]
 
 # Audio files will be played at random during storm
 audio_files = ["thunder1.mp3", "thunder2.mp3", "thunder3.mp3"]
@@ -170,6 +173,9 @@ def update_brightness():
         delta_brightness = 0.0
 
 def is_active():
+    if not TIMER_MODE:
+        return True
+
     for i in range(len(times)):
         on = datetime.time(times[i][0][0], times[i][0][1])
         off = datetime.time(times[i][1][0], times[i][1][1])
