@@ -9,7 +9,8 @@ import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.SpriteField;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.service.Service;
 
-import static net.amarantha.utils.colour.RGB.*;
+import static net.amarantha.utils.colour.RGB.RED;
+import static net.amarantha.utils.colour.RGB.YELLOW;
 
 public class TransitionTest extends Scenario {
 
@@ -26,8 +27,8 @@ public class TransitionTest extends Scenario {
         Ball ball = sprites.make(Ball.class);
         ball.setSize(3).setColour(RGB.RED).setLinearDelta(3, 1).setLayer(7).show();
 
-//        Butterfly butterfly = sprites.make(Butterfly.class);
-//        butterfly.setColour(RGB.GREEN).show();
+        Butterfly butterfly = sprites.make(Butterfly.class);
+        butterfly.setColour(RGB.GREEN).show();
 
 
         sprites.setRefresh(50).start();
@@ -42,7 +43,7 @@ public class TransitionTest extends Scenario {
 
 
 
-        surface.layer(4).drawCircle(40, 16, 6, RED);
+        surface.layer(4).fillCircle(40, 16, 6, RED);
 
         surface.layer(4).drawRect(20, 32, 50, 25, YELLOW);
 

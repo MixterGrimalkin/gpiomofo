@@ -1,0 +1,124 @@
+# IP 192.168.42.104
+
+Parameters:
+  Colour: 0,255,0
+  Refresh: 100
+  Slow: 400
+  Medium: 150
+  Fast: 50
+  ScrambleRefresh: 50
+  ScrambleSize: 5
+
+Triggers:
+  ScramblePixels:
+    type: Osc
+    port: 5300
+    address: pixels-scramble
+    data: 255
+  StopPixels:
+    type: Osc
+    port: 5300
+    address: pixels-stop
+    data: 255
+  SlowPixels:
+    type: Osc
+    port: 5300
+    address: pixels-slow
+    data: 255
+  MediumPixels:
+    type: Osc
+    port: 5300
+    address: pixels-medium
+    data: 255
+  FastPixels:
+    type: Osc
+    port: 5300
+    address: pixels-fast
+    data: 255
+
+  Red2Hold:
+    type: Gpio
+    pin: 2
+    resistance: PULL_UP
+    triggerState: false
+    holdTime: 1000
+  Red2:
+    type: Gpio
+    pin: 2
+    resistance: PULL_UP
+    triggerState: false
+  Green2:
+    type: Gpio
+    pin: 3
+    resistance: PULL_UP
+    triggerState: false
+  Blue2:
+    type: Gpio
+    pin: 4
+    resistance: PULL_UP
+    triggerState: false
+  Red3Hold:
+    type: Gpio
+    pin: 5
+    resistance: PULL_UP
+    triggerState: false
+    holdTime: 1000
+  Red3:
+    type: Gpio
+    pin: 5
+    resistance: PULL_UP
+    triggerState: false
+  Green3:
+    type: Gpio
+    pin: 6
+    resistance: PULL_UP
+    triggerState: false
+  Blue3:
+    type: Gpio
+    pin: 7
+    resistance: PULL_UP
+    triggerState: false
+
+Targets:
+  Panic2:
+    type: Http
+    onCommand: POST|192.168.42.105:8001/gpiomofo/trigger/panic-gameshow/fire
+  Red2Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber2-red|255
+  Green2Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber2-green|255
+  Blue2Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber2-blue|255
+  Panic3:
+    type: Http
+    onCommand: POST|192.168.42.105:8001/gpiomofo/trigger/panic-underwater/fire
+  Red3Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber3-red|255
+  Green3Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber3-green|255
+  Blue3Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber3-blue|255
+
+Links:
+  Red2Hold:
+    - Panic2
+  Red2:
+    - Red2Osc
+  Green2:
+    - Green2Osc
+  Blue2:
+    - Blue2Osc
+  Red3Hold:
+    - Panic3
+  Red3:
+    - Red3Osc
+  Green3:
+    - Green3Osc
+  Blue3:
+    - Blue3Osc

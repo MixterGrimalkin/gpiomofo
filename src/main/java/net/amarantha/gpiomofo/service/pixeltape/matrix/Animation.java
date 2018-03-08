@@ -2,6 +2,7 @@ package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
+import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.SpriteField;
 
 import java.util.List;
 
@@ -9,6 +10,11 @@ public abstract class Animation {
 
     @Inject protected LightSurface surface;
     @Inject protected OldSpriteFactory sprites;
+    @Inject protected SpriteField field;
+
+    public void init(){
+
+    }
 
     public abstract void start();
 
@@ -29,5 +35,6 @@ public abstract class Animation {
     public long getRefreshInterval() {
         return refreshInterval;
     }
+
 
 }

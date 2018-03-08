@@ -15,7 +15,6 @@ import java.util.Map;
 
 import static net.amarantha.utils.reflection.ReflectionUtils.iterateAnnotatedFields;
 import static net.amarantha.utils.reflection.ReflectionUtils.reflectiveSet;
-import static net.amarantha.utils.shell.Utility.log;
 
 public class Factory<T extends HasName & HasEnable> {
 

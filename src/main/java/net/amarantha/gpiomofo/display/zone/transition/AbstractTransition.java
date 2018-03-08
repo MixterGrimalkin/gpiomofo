@@ -1,15 +1,19 @@
 package net.amarantha.gpiomofo.display.zone.transition;
 
 
+import com.google.inject.Inject;
 import net.amarantha.gpiomofo.display.entity.Pattern;
-import net.amarantha.gpiomofo.display.zone.AbstractZone;
+import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.display.zone.AbstractZone.ZoneCallback;
+import net.amarantha.utils.colour.RGB;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
 public abstract class AbstractTransition {
+
+    @Inject private LightSurface surface;
 
     private long delay;
     private long lastDrawn;
@@ -40,8 +44,9 @@ public abstract class AbstractTransition {
     public final void tick() {
         if ( System.currentTimeMillis() - lastDrawn >= delay ) {
             currentStep++;
-            if ( zone.getPattern()==null || isComplete() ) {
-                zone.clear();
+//            if ( zone.getPattern()==null || isComplete() ) {
+            if ( isComplete() ) {
+//                zone.clear();
                 complete();
             } else {
                 double progress = (double)currentStep / (double)getNumberOfSteps();
@@ -55,13 +60,54 @@ public abstract class AbstractTransition {
         }
     }
 
+    public Pattern getPattern() {
+        return pattern;
+    }
+
+    protected int getRestX() {
+        return 0;
+    }
+
+    protected int getRestY() {
+        return 0;
+    }
+
+    protected int getWidth() {
+        return surface.width();
+    }
+
+    protected int getHeight() {
+        return surface.height();
+    }
+
+    protected void draw(int x, int y, Pattern p) {
+        surface.layer(layer).draw(x, y, p);
+    }
+
+    protected void draw(int x, int y, RGB rgb) {
+        surface.layer(layer).draw(x, y, rgb);
+    }
+
+    protected void clear() {
+        surface.layer(layer).clear();
+    }
+
+    private int layer = 0;
+
+    public void setLayer(int layer) {
+        this.layer = layer;
+    }
+
+    public int getLayer() {
+        return layer;
+    }
+
     /**
      * Activate transition
-     * @param zone Zone
-     * @param onComplete To execute when transition is complete
      */
-    public final void transition(AbstractZone zone, ZoneCallback onComplete, ZoneCallback onAt, double onAtProgress) {
-        this.zone = zone;
+    public final void transition(Pattern pattern, ZoneCallback onComplete, ZoneCallback onAt, double onAtProgress) {
+//        this.zone = zone;
+        this.pattern = pattern;
         this.onComplete = onComplete;
         this.onAt = onAt;
         this.onAtProgress = onAtProgress;
@@ -73,7 +119,8 @@ public abstract class AbstractTransition {
         currentStep = 0;
     }
 
-    protected AbstractZone zone;
+//    protected AbstractZone zone;
+    protected Pattern pattern;
     private ZoneCallback onComplete;
     private ZoneCallback onAt;
     private boolean onAtFired = false;
@@ -115,8 +162,6 @@ public abstract class AbstractTransition {
      * @return The pattern as a map of letters
      */
     protected Map<Integer, Letter> splitPattern() {
-
-        Pattern pattern = zone.getPattern();
 
         Map<Integer, Letter> letters = new HashMap<>();
 

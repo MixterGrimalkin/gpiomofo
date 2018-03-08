@@ -1,2 +1,17 @@
 #!/usr/bin/env bash
-sudo nice -n -20 java -Djava.library.path=/home/pi/gpiomofo/c -jar gpiomofo.jar $*
+
+if [ ! -f "settings.yaml" ]
+then
+    cp default-settings.yaml settings.yaml
+fi
+
+if [ "$1" = "-simulation" ] || [ "$1" = "-sim" ]
+then
+    java -cp gpiomofo.jar net.amarantha.gpiomofo.Simulation $*
+else
+    sudo nice -n -20 java -Djava.library.path=/home/pi/gpiomofo/c -jar gpiomofo.jar $*
+    if [ $? -eq 7 ]
+    then
+        sudo reboot
+    fi
+fi

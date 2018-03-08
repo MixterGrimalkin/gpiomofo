@@ -1,3 +1,46 @@
+CrashingBlocks: 
+   MaxSpeed: 3.0
+   MinSpeed: 0.5
+   ExplosionColours: 
+   - 220,20,0
+   - 20,0,220
+   - 0,20,220
+   - 0,220,20
+   AudioPlayerIP: 192.168.1.101
+   Balls: 2
+   BallColour: 255,200,0
+   AudioPlayerPort: 53000
+   BackgroundSound: rise0
+AudioPlayer: 
+   Port: 53000
+   Files: 
+   - ambient-background,1
+   - flutter-1
+   - flutter-2
+   - flutter-3
+   - flutter-4
+   - flutter-5
+   - flutter-out
+   - rise0,1
+NeoPixelGUI: 
+   Spacer: 2
+   CustomLayout: scenarios/Starlight.layout
+   LedSize: 6
+NeoPixelBoard: 
+   RowsFirst: true
+   LoopBack: false
+Butterflies: 
+   FlutterInSound: flute-flutter-in
+   AudioPlayerIP: 192.168.1.101
+   AudioPlayerPort: 53000
+   BackgroundSound: ambient-background
+   FlutterOutSound: flute-flutter-out
+RainAnimation: 
+   MinSize: 1
+   MaxSpeed: 5
+   MinSpeed: 2
+   DropletCount: 200
+   MaxSize: 3
 LightBoardGUI: 
    OnlyOnOff: true
    LedSize: 2
@@ -7,7 +50,9 @@ LightBoardGUI:
 Services: 
    MidiDevice: USB Uno MIDI Interface
 PixelTape: 
-   TapeRefresh: 10
+   TapeRefresh: 1
+SerialDmx: 
+   Port: /dev/ttyUSB0
 General: 
    ScenariosDirectory: scenarios
    Refresh: 50
@@ -16,12 +61,12 @@ General:
    TargetPackage: net.amarantha.gpiomofo.target
    HttpAsyncTargets: true
    ScenarioPackage: net.amarantha.gpiomofo.scenario
-   Scenario: TransitionTest
+   Scenario: Starlight
 LightSurface: 
    LayerCount: 10
-   BoardClass: net.amarantha.gpiomofo.display.lightboard.LightBoardGUI
-   Height: 64
-   Width: 256
+   BoardClass: net.amarantha.gpiomofo.display.lightboard.NeoPixelBoard
+   Height: 30
+   Width: 90
 Gingerline: 
    LightingServerIP: 192.168.42.100
    C5-Amber: 255,80,0
@@ -41,16 +86,15 @@ Gingerline:
    MediaServerIP: 192.168.42.99
    C5-Purple: 210,50,200
 Gui: 
-   Window-Output-GPIO: 20.0,20.0
-   Window-Range-Sensor: 1555.0,469.0
-   Window-LightBoard: 136.0,590.0
-   Window-NeoPixel: 1751.0,354.0
+   Window-Output-GPIO: 191.0,139.0
+   Window-Range-Sensor: 139.0,289.0
+   Window-LightBoard: 314.0,189.0
+   Window-NeoPixel: 807.0,456.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
-   Window-Input-GPIO: 154.0,105.0
-   Window-GpioMofo: 747.0,347.0
-NeoPixelGUI: 
-   Spacer: 0
-   LedSize: 2
-NeoPixelBoard: 
-   RowsFirst: true
-   LoopBack: false
+   Window-Input-GPIO: 512.0,139.0
+   Window-GpioMofo: 1147.0,140.0
+Aws: 
+   ClientId: sdk-java
+   CertificateFile: /home/grimalkin/Downloads/aws/SnootBox.cert.pem
+   PrivateKeyFile: /home/grimalkin/Downloads/aws/SnootBox.private.key
+   ClientEndpoint: a2q2k2ttlfw6v7.iot.us-west-2.amazonaws.com

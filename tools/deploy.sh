@@ -16,7 +16,7 @@ ip=`./piaddress.sh $1`
 
 if [ "$2" = "-clean" ]
 then
-    read -p "Really remove existing installation, including properties? " -n 1 -r
+    read -p "Really remove existing installation, including scenarios and settings? " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]
     then
@@ -45,6 +45,8 @@ then
     sshpass -p ${password} ssh pi@${ip} "cd /home/pi; rm -r gpiomofo 2>/dev/null"
     echo "Uploading Application and Libraries..."
     sshpass -p ${password} scp -r ../target/gpiomofo pi@${ip}:
+#    echo "Uploading Default Settings..."
+#    sshpass -p ${password} scp ../default-settings.yaml pi@${ip}:gpiomofo/settings.yaml
 else
     echo "Uploading Application..."
     sshpass -p ${password} scp ../target/gpiomofo/*.jar pi@${ip}:gpiomofo
@@ -54,7 +56,6 @@ else
     echo "Uploading Utility Libraries..."
     sshpass -p ${password} scp ../target/gpiomofo/lib/amarantha*.jar pi@${ip}:gpiomofo/lib
     echo "Uploading Support Files..."
-    sshpass -p ${password} scp ../config/default.properties pi@${ip}:gpiomofo/config
     sshpass -p ${password} scp ../scenarios/README.yaml pi@${ip}:gpiomofo/scenarios
 fi
 

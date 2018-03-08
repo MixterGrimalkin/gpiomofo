@@ -1,7 +1,6 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix.sprites;
 
 import com.google.inject.Inject;
-import net.amarantha.gpiomofo.core.Constants;
 import net.amarantha.utils.colour.RGB;
 
 import java.util.*;
@@ -65,7 +64,7 @@ public class Explosion extends Sprite {
 
     @Override
     public void reset() {
-        super.reset();
+//        super.reset();
         for ( int i=0; i<sparkCount; i++ ) {
             Sprite spark = factory.make(Ball.class).setColour(randomFrom(colours)).setLayer(layer);
             int id = i + nextId++;

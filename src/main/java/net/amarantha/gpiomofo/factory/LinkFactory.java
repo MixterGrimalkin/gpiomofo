@@ -25,7 +25,7 @@ public class LinkFactory {
             linkContinuous((ContinuousTrigger)trigger, (OscValueTarget)targets[0]);
         } else {
             for (Target target : targets) {
-                trigger.onFire(target::processTrigger);
+                trigger.onFireLink(target::processTrigger);
                 List<Target> currentTargets = links.get(trigger);
                 if (currentTargets == null) {
                     links.put(trigger, currentTargets = new LinkedList<>());

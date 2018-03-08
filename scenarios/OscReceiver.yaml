@@ -1,0 +1,106 @@
+Triggers:
+  Chamber1Red:
+    type: Osc
+    port: 5300
+    address: chamber1-red
+    data: 255
+  Chamber1Green:
+    type: Osc
+    port: 5300
+    address: chamber1-green
+    data: 255
+  Chamber1Blue:
+    type: Osc
+    port: 5300
+    address: chamber1-blue
+    data: 255
+  Chamber2Red:
+    type: Osc
+    port: 5300
+    address: chamber2-red
+    data: 255
+  Chamber2Green:
+    type: Osc
+    port: 5300
+    address: chamber2-green
+    data: 255
+  Chamber2Blue:
+    type: Osc
+    port: 5300
+    address: chamber2-blue
+    data: 255
+  Chamber3Red:
+    type: Osc
+    port: 5300
+    address: chamber3-red
+    data: 255
+  Chamber3Green:
+    type: Osc
+    port: 5300
+    address: chamber3-green
+    data: 255
+  Chamber3Blue:
+    type: Osc
+    port: 5300
+    address: chamber3-blue
+    data: 255
+  Chamber4Red:
+    type: Osc
+    port: 5300
+    address: chamber4-red
+    data: 255
+  Chamber4Green:
+    type: Osc
+    port: 5300
+    address: chamber4-green
+    data: 255
+  Chamber4Blue:
+    type: Osc
+    port: 5300
+    address: chamber4-blue
+    data: 255
+  Chamber5Red:
+    type: Osc
+    port: 5300
+    address: chamber5-red
+    data: 255
+  Chamber5Green:
+    type: Osc
+    port: 5300
+    address: chamber5-green
+    data: 255
+  Chamber5Blue:
+    type: Osc
+    port: 5300
+    address: chamber5-blue
+    data: 255
+  Chamber7Red:
+    type: Osc
+    port: 5300
+    address: chamber7-red
+    data: 255
+  Chamber7Green:
+    type: Osc
+    port: 5300
+    address: chamber7-green
+    data: 255
+  Chamber7Blue:
+    type: Osc
+    port: 5300
+    address: chamber7-blue
+    data: 255
+  BriefingRed:
+    type: Osc
+    port: 5300
+    address: briefing-red
+    data: 255
+  BriefingGreen:
+    type: Osc
+    port: 5300
+    address: briefing-green
+    data: 255
+  BriefingBlue:
+    type: Osc
+    port: 5300
+    address: briefing-blue
+    data: 255

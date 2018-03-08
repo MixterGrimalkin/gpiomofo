@@ -23,8 +23,7 @@ public class Trigger implements HasName, HasEnable {
     @Parameter("holdTime") private Integer holdTime;
 
     @Override
-    public void enable() {
-    }
+    public void enable() {    }
 
     public void fire(boolean active) {
         lastState = active;
@@ -32,9 +31,11 @@ public class Trigger implements HasName, HasEnable {
             doFire(active);
         } else {
             if ( active ) {
+                tasks.removeTask("hold-cancel-"+getName());
                 tasks.addTask("hold-"+getName(), holdTime, () -> doFire(true));
             } else {
                 tasks.removeTask("hold-"+getName());
+                tasks.addTask("hold-cancel-"+getName(), holdTime, () -> doFire(false));
             }
         }
     }
@@ -67,7 +68,18 @@ public class Trigger implements HasName, HasEnable {
     private List<TriggerCallback> triggerCallbacks = new LinkedList<>();
     private List<TriggerCallback> compositeCallbacks = new LinkedList<>();
 
+    private int customHandlerCount = 0;
+
+    public int getCustomHandlerCount() {
+        return customHandlerCount;
+    }
+
+    public void onFireLink(TriggerCallback triggerCallback) {
+        triggerCallbacks.add(triggerCallback);
+    }
+
     public void onFire(TriggerCallback triggerCallback) {
+        customHandlerCount++;
         triggerCallbacks.add(triggerCallback);
     }
 

@@ -1,0 +1,89 @@
+# IP 192.168.42.102
+
+Triggers:
+  Red4Hold:
+    type: Gpio
+    pin: 2
+    resistance: PULL_UP
+    triggerState: false
+    holdTime: 1000
+  Red4:
+    type: Gpio
+    pin: 2
+    resistance: PULL_UP
+    triggerState: false
+  Green4:
+    type: Gpio
+    pin: 3
+    resistance: PULL_UP
+    triggerState: false
+  Blue4:
+    type: Gpio
+    pin: 4
+    resistance: PULL_UP
+    triggerState: false
+  Red5Hold:
+    type: Gpio
+    pin: 5
+    resistance: PULL_UP
+    triggerState: false
+    holdTime: 1000
+  Red5:
+    type: Gpio
+    pin: 5
+    resistance: PULL_UP
+    triggerState: false
+  Green5:
+    type: Gpio
+    pin: 6
+    resistance: PULL_UP
+    triggerState: false
+  Blue5:
+    type: Gpio
+    pin: 7
+    resistance: PULL_UP
+    triggerState: false
+
+Targets:
+  Panic4:
+    type: Http
+    onCommand: POST|192.168.42.105:8001/gpiomofo/trigger/panic-bikes/fire
+  Red4Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber4-red|255
+  Green4Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber4-green|255
+  Blue4Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber4-blue|255
+  Panic5:
+    type: Http
+    onCommand: POST|192.168.42.105:8001/gpiomofo/trigger/panic-kitchen/fire
+  Red5Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber5-red|255
+  Green5Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber5-green|255
+  Blue5Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber5-blue|255
+
+Links:
+  Red4Hold:
+    - Panic4
+  Red4:
+    - Red4Osc
+  Green4:
+    - Green4Osc
+  Blue4:
+    - Blue4Osc
+  Red5Hold:
+    - Panic5
+  Red5:
+    - Red5Osc
+  Green5:
+    - Green5Osc
+  Blue5:
+    - Blue5Osc

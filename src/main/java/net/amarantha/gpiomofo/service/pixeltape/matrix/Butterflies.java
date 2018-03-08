@@ -1,49 +1,97 @@
 package net.amarantha.gpiomofo.service.pixeltape.matrix;
 
 import com.google.inject.Inject;
+import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.Sprite;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.osc.OscService;
+import net.amarantha.utils.osc.entity.OscCommand;
+import net.amarantha.utils.properties.PropertiesService;
+import net.amarantha.utils.properties.entity.Property;
+import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.time.TimeGuard;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
 import static net.amarantha.utils.math.MathUtils.randomBetween;
 import static net.amarantha.utils.math.MathUtils.randomFlip;
 
+@PropertyGroup("Butterflies")
 public class Butterflies extends Animation {
 
+    @Inject private PropertiesService props;
+    @Inject private OscService osc;
     @Inject private TimeGuard guard;
+
+    private boolean useAudio = true;
+
+    public void setUseAudio(boolean useAudio) {
+        this.useAudio = useAudio;
+    }
+
+    @Property("AudioPlayerIP") private String playerIp;
+    @Property("AudioPlayerPort") private int playerPort;
+    @Property("FlutterInSound") private String flutterInSoundFilename;
+    @Property("FlutterOutSound") private String flutterOutSoundFilename;
+    @Property("BackgroundSound") private String backgroundSoundFilename;
+    private OscCommand backgroundSoundStart;
+    private OscCommand backgroundSoundStop;
 
     private Map<Integer, RGB> colours;
 
     private int[] targetJitter;
 
+    public void setTargetJitter(int[] targetJitter) {
+        this.targetJitter = targetJitter;
+    }
+
     public void init(int spriteCount, Map<Integer, RGB> colours, int tailLength) {
         this.colours = colours;
+        props.injectPropertiesOrExit(this);
         boolean wide = surface.width() >= surface.height();
         targetJitter = new int[]{surface.width() / (wide ? colours.size()*2 : 2), surface.height() / (wide ? 2 : colours.size()*2 )};
         sprites.setTailLength(tailLength);
         for (int i = 0; i < colours.size(); i++) {
             for (int j = 0; j < spriteCount / colours.size(); j++) {
-                sprites.create(i, colours.get(i));
+                sprites.create(i, colours.get(i)).init();
             }
         }
+        backgroundSoundStart = new OscCommand(playerIp, playerPort, backgroundSoundFilename+"/loop");
+        backgroundSoundStop = new OscCommand(playerIp, playerPort, backgroundSoundFilename+"/stop");
+        tentFlutter = new OscCommand(playerIp, playerPort, "windy-tent/play");
+        centreFlutter = new OscCommand(playerIp, playerPort, "centre-sound/play");
+        exitSound = new OscCommand(playerIp, playerPort, "exit-sound/play");
+        reset();
         randomize();
+    }
+
+    public void reset() {
+        sprites.forEach((s)->{
+            s.reset();
+        });
     }
 
     @Override
     public void start() {
-
+        audioActive = true;
+        osc.send(backgroundSoundStart);
     }
 
     @Override
     public void stop() {
-
+        audioActive = false;
+        if ( useAudio ) {
+            osc.send(backgroundSoundStop);
+        }
+        sprites.forEach(Sprite::reset);
     }
 
-    private int foreground = 1;
-    private int background = 0;
+    private int foreground = 2;
+    private int background = 1;
 
     @Override
     public void refresh() {
@@ -65,15 +113,27 @@ public class Butterflies extends Animation {
         });
     }
 
+    private OscCommand tentFlutter;
+    private OscCommand centreFlutter;
+    private OscCommand exitSound;
+
+    private boolean audioActive = false;
+
     @Override
     public void onFocusAdded(int focusId) {
         targetSprites();
+        if ( useAudio && audioActive ) {
+            if (focusId == 2) {
+                osc.send(centreFlutter);
+            } else {
+                osc.send(tentFlutter);
+            }
+        }
     }
 
     @Override
     public void onFocusRemoved(List<Integer> focusIds) {
         targetSprites();
-
     }
 
     public void targetOn(int x, int y) {
@@ -88,6 +148,9 @@ public class Butterflies extends Animation {
     private void targetSprites() {
         if (foci.isEmpty()) {
             randomize();
+            if ( useAudio && audioActive ) {
+                osc.send(exitSound);
+            }
         } else {
             sprites.forEach((oldSprite) -> {
                 Integer[] target = randomFocus(oldSprite);

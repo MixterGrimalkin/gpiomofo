@@ -1,7 +1,7 @@
 package net.amarantha.gpiomofo.scenario;
 
-import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.service.pixeltape.pattern.SolidColourWithWhite;
+import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.utils.colour.RGBW;
 
 public class Test extends Scenario {

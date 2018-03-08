@@ -3,11 +3,11 @@ package net.amarantha.gpiomofo.display.lightboard;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixelGUI;
-import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;
+import net.amarantha.utils.task.TaskService;
 
 import static net.amarantha.utils.shell.Utility.log;
 
@@ -45,7 +45,7 @@ public class NeoPixelBoard implements LightBoard {
     public void update(RGB[][] data) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                neoPixel.setPixelColourRGB(getPixelNumber(x, y), data[x][y]);
+                neoPixel.setPixel(getPixelNumber(x, y), data[x][y]);
             }
         }
         neoPixel.render();

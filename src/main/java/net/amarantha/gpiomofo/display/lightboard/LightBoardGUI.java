@@ -9,11 +9,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import net.amarantha.gpiomofo.service.gui.Gui;
-import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.properties.PropertiesService;
 import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;
+import net.amarantha.utils.task.TaskService;
 
 import static net.amarantha.utils.colour.RGB.*;
 import static net.amarantha.utils.shell.Utility.log;

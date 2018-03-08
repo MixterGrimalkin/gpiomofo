@@ -2,9 +2,9 @@ package net.amarantha.gpiomofo.target;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.annotation.Parameter;
+import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.gpiomofo.factory.entity.HasEnable;
 import net.amarantha.gpiomofo.factory.entity.HasName;
-import net.amarantha.gpiomofo.factory.TargetFactory;
 import net.amarantha.utils.service.Service;
 import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.time.Now;

@@ -1,0 +1,52 @@
+Triggers:
+  background-start:
+    type: Osc
+    port: 53000
+    address: background
+    data: 255
+  background-stop:
+    type: Osc
+    port: 53000
+    address: background
+    data: 0
+  flutter-in:
+    type: Osc
+    port: 53000
+    address: flutterin
+    data: 255
+    oneShot: true
+  flutter-out:
+    type: Osc
+    port: 53000
+    address: flutterout
+    data: 255
+
+Targets:
+  Background:
+    type: Audio
+    filename: audio/ambient-background.mp3
+    stopOnDeactivate: false
+    clearDelay: 250
+  StopBackground:
+    type: StopAudio
+    target: Background
+  FlutterIn:
+    type: Audio
+    filename: audio/flute-flutter-in.mp3
+    clearDelay: 250
+    stopOnDeactivate: false
+  FlutterOut:
+    type: Audio
+    filename: audio/flute-flutter-out.mp3
+    stopOnDeactivate: false
+    clearDelay: 250
+
+Links:
+  background-start:
+  - Background
+  background-stop:
+  - StopBackground
+  flutter-in:
+  - FlutterIn
+  flutter-out:
+  - FlutterOut

@@ -2,9 +2,7 @@ package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.service.gpio.ultrasonic.RangeSensorHCSR04;
-import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.osc.OscService;
-import net.amarantha.utils.osc.entity.OscCommand;
 import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.service.Service;

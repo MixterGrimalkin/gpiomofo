@@ -47,7 +47,7 @@ void pushTestPattern() {
 
 void sendSerialString(bool red1[], bool green1[], bool red2[], bool green2[]) {
     int col;
-    for (col = 0; col < cols ; col++) {
+    for (col = cols-1; col >= 0 ; col--) {
         delayMicroseconds(CLOCK_DELAY);
         digitalWrite(clockPin, LOW);
         digitalWrite(data1R, red1[col] );
@@ -70,7 +70,12 @@ void push() {
     if ( !paused ) {
         int row;
         for (row = 0; row < rows/2; row++) {
-            sendSerialString(currentFrame[0][row], currentFrame[1][row], currentFrame[0][row + rows / 2], currentFrame[1][row + rows / 2]);
+            sendSerialString(
+                currentFrame[0][15-row + (rows / 2)],
+                currentFrame[1][15-row + (rows / 2)],
+                currentFrame[0][15-row],
+                currentFrame[1][15-row]
+            );
             digitalWrite(output, HIGH);
             digitalWrite(store, LOW);
             decodeRowAddress(row);

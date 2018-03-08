@@ -2,12 +2,12 @@ package net.amarantha.gpiomofo.target;
 
 import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.service.audio.AudioFile;
-import net.amarantha.gpiomofo.target.Target;
 
 public class AudioTarget extends Target {
 
     @Parameter("filename") private String filename;
     @Parameter("loop") private boolean loop;
+    @Parameter("stopOnDeactivate") private boolean stopOnDeactivate;
 
     private AudioFile audioFile;
 
@@ -26,8 +26,13 @@ public class AudioTarget extends Target {
 
     @Override
     protected void onDeactivate() {
-        audioFile.onPlaybackFinished(null);
-        audioFile.stop();
+        if ( stopOnDeactivate ) {
+            audioFile.onPlaybackFinished(null);
+            audioFile.stop();
+        }
     }
 
+    public AudioFile getAudioFile() {
+        return audioFile;
+    }
 }

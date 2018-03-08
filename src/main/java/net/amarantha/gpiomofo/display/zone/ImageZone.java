@@ -2,7 +2,6 @@ package net.amarantha.gpiomofo.display.zone;
 
 import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.utils.colour.RGB;
-import net.amarantha.utils.math.MathUtils;
 import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;

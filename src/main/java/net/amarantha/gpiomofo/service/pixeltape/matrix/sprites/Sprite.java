@@ -55,7 +55,12 @@ public abstract class Sprite {
         setBounds(0, 0, surface.width()-1, surface.height()-1);
     }
 
-    public void reset() {}
+    public void reset() {
+        int centreX = (minBound[X] + (maxBound[X]-minBound[X]))/2;
+        int centreY = (minBound[Y] + (maxBound[Y]-minBound[Y]))/2;
+        exactPosition = new double[] { centreX, centreY };
+        position = new int[] { centreX, centreY };
+    }
 
     public void start() {}
 
@@ -190,5 +195,9 @@ public abstract class Sprite {
 
     public int position(int axis) {
         return position[axis];
+    }
+
+    public void setSurface(LightSurface surface) {
+        this.surface = surface;
     }
 }

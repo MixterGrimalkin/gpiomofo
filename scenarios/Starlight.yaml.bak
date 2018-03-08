@@ -1,0 +1,66 @@
+Parameters:
+  # Observatory
+  ConstellationId: cass
+  MonitorHost: starlight-monitor.herokuapp.com
+  MonitorPort: 80
+  PingInterval: 30000
+  # DMX
+  DmxStars: true
+  DmxRings: true
+  # Sensors
+  PinResistance: PULL_DOWN
+  TriggerState: true
+  StarTriggers: 1,2,3,4,5
+  # Layout
+  PixelCount: 26
+  RingPixels: 0,6,12,18,24
+  StarPixels: 1,7,13,19,25
+  # Clustering
+  Clusters: 0,1
+  # Single star activation
+  RingFlashColour: 255,200,200
+  RingPulseColour: 255,0,130
+  RingOnFadeUp: 100
+  RingOnFadeDown: 1000
+  RingOffFadeDown: 2000
+  # Leapfrog
+  LeapFrogStarCount: 2
+  LeapFrogTime: 1000
+  StarChaseDelay: 400
+  StarChaseColour: 255,255,180
+  ConnectorChaseDelay: 200
+  ConnectorChaseColour: 90,180,255
+  # Complete Win
+  FullWinStarCount: 4
+  RingWinColour: 100,100,255
+  StarWinColour: 255,255,200
+  TwinkleColour: 150,150,255
+  TwinklePulseMin: 200
+  TwinklePulseMax: 1000
+  TwinkleRange: 0.4
+  StarFadeDown: 2000
+  # Final win
+  StarFinalColour: 230,230,230
+  FinalColour1: 255,86,0
+  FinalColour2: 78,24,255
+  FinalColour3: 255,74,0
+  FinalColour4: 111,0,255
+  FinalAllColour: 255,255,255
+  FinalRingFadeOut: 400
+  FinalMaxInterval: 3000
+  FinalMinInterval: 250
+  FinalIntervalDelta: 250
+  FinalAnimationDuration: 30000
+  FinalPulseDuration: 15000
+  FinalPulseMaxDelay: 1500
+  FinalPulseMinDelay: 300
+  FinalPulseDeltaFactor: 0.85
+  # Lone Star
+  LoneStarTime: 10000
+
+Triggers:
+  Dummy:
+    type: Gpio
+    pin: 9
+    resistance: PULL_DOWN
+    triggerState: true

@@ -2,7 +2,6 @@ package net.amarantha.gpiomofo.target;
 
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.service.pixeltape.PixelTape;
-import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.service.Service;
 import net.amarantha.utils.time.TimeGuard;

@@ -1,8 +1,11 @@
 package net.amarantha.gpiomofo.display.entity;
 
-import net.amarantha.gpiomofo.core.Constants;
 import net.amarantha.utils.colour.RGB;
+import org.imgscalr.Scalr;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -12,6 +15,7 @@ import static net.amarantha.gpiomofo.core.Constants.Y;
 import static net.amarantha.utils.colour.RGB.BLACK;
 import static net.amarantha.utils.colour.RGB.WHITE;
 import static net.amarantha.utils.math.MathUtils.min;
+import static net.amarantha.utils.shell.Utility.log;
 
 /**
  * A pattern of dots
@@ -32,12 +36,31 @@ public class Pattern {
         }
     }
 
+    public static Pattern fromImage(String filename, int width, int height) {
+        Pattern result = new Pattern(width, height, true);
+        try {
+            BufferedImage image = Scalr.resize(ImageIO.read(new File(filename)), Scalr.Mode.FIT_TO_WIDTH, width, height);
+            for ( int y =0; y<image.getWidth(); y++ ) {
+                for (int x = 0; x < image.getWidth(); x++) {
+                    int[] pixel = (image.getRaster().getPixel(x,y,new int[3]));
+                    if ( pixel[0]>0 || pixel[1]>0 || pixel[2]>2 ) {
+                        result.draw(x, y, new RGB(pixel[0], pixel[1], pixel[2]));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log("Hurrah for festival coding!!!!");
+        }
+        return result;
+    }
+
     public Pattern(int width, int height) {
         this(width, height, false);
     }
 
     public Pattern(int width, int height, boolean transparent) {
         pixels = new RGB[this.width = max(1, width)][this.height = max(1, height)];
+        region = new Region(0,0,width,height);
         if (!(this.transparent = transparent)) {
             fill(BLACK);
         }
@@ -46,6 +69,7 @@ public class Pattern {
     public Pattern(int cols, String data) {
         int rows = data.length() / cols;
         pixels = new RGB[this.width = max(1, cols)][this.height = max(1, rows)];
+        region = new Region(0,0,width,height);
         transparent = true;
         int i = 0;
         for (int y = 0; y < height; y++) {
@@ -128,8 +152,32 @@ public class Pattern {
     }
 
     public Pattern draw(int x, int y, Pattern other) {
-        other.eachPixel((innerX, innerY, rgb) -> draw(x + innerX, y + innerY, rgb));
+        other.eachPixel((innerX, innerY, rgb) -> {
+            if ( rgb!=null ) {
+                draw(x + innerX, y + innerY, rgb);
+            }
+        });
         return this;
+    }
+
+    public Pattern drawWithOutline(int x, int y, Pattern other, RGB outline) {
+        Pattern shadow = other.getMask(outline);
+        draw(x - 1, y - 1, shadow);
+        draw(x + 1, y - 1, shadow);
+        draw(x - 1, y + 1, shadow);
+        draw(x + 1, y + 1, shadow);
+        draw(x, y, other);
+        return this;
+    }
+
+    public Pattern getMask(RGB colour) {
+        Pattern result = new Pattern(width, height, true);
+        eachPixel((x,y,rgb)->{
+            if ( rgb!=null ) {
+                result.draw(x,y,colour);
+            }
+        });
+        return result;
     }
 
     public Pattern fill(RGB colour) {
@@ -164,7 +212,11 @@ public class Pattern {
         return this;
     }
 
-    public void drawLine(int x1, int y1, int x2, int y2, RGB colour) {
+    public Pattern drawLine(int[] endA, int[] endB, RGB colour) {
+        return drawLine(endA[X], endA[Y], endB[X], endB[Y], colour);
+    }
+
+    public Pattern drawLine(int x1, int y1, int x2, int y2, RGB colour) {
         // Adapted from - https://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#Java
 
         // delta of exact value and rounded value of the dependant variable
@@ -204,6 +256,7 @@ public class Pattern {
                 }
             }
         }
+        return this;
     }
 
     public void fillCircle(int x, int y, int radius, RGB colour) {
@@ -241,14 +294,15 @@ public class Pattern {
 
     }
 
-    public void drawRect(int x1, int y1, int width, int height, RGB colour) {
+    public Pattern drawRect(int x1, int y1, int width, int height, RGB colour) {
         fillRegion(x1, y1, width, 1, colour);
         fillRegion(x1, y1, 1, height, colour);
         fillRegion(x1+width-1, y1, 1, height, colour);
         fillRegion(x1, y1+height-1, width, 1, colour);
+        return this;
     }
 
-    public void floodFill(int centreX, int centreY, RGB colour) {
+    public Pattern floodFill(int centreX, int centreY, RGB colour) {
         // from https://rosettacode.org/wiki/Bitmap/Flood_fill#Java
         RGB target = rgb(centreX, centreY);
         int[] node = new int[]{centreX,centreY};
@@ -280,11 +334,18 @@ public class Pattern {
                 }
             } while ((node = queue.pollFirst()) != null);
         }
+        return this;
     }
 
+    private Region region;
+
+    public Pattern clipTo(Region region) {
+        this.region = region;
+        return this;
+    }
 
     public boolean inBounds(int x, int y) {
-        return x >= 0 && x < width && y >= 0 && y < height;
+        return x >= region.left && x <= region.right && y >= region.top && y <= region.bottom;
     }
 
     public Pattern slice(int xStart, int yStart, int subWidth, int subHeight) {

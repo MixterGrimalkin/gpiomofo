@@ -15,28 +15,28 @@ public abstract class Interlace extends AbstractTransition {
 
     @Override
     public int getNumberOfSteps() {
-        return (int)(getDuration() / zone.getTick());
+        return (int)(getDuration() / 50);
 //        return (int)(getDuration() / maxShift);
     }
 
     @Override
     public void reset() {
-        maxShift = zone.getWidth();
+        maxShift = getWidth();
         goLeft = Math.random() > 0.5;
     }
 
     @Override
     public void animate(double progress) {
 //        System.out.println("shift=" + shift + ", prog=" +progress + ", steps=" + getNumberOfSteps());
-        zone.clear();
-        Pattern pattern = new Pattern(zone.getPattern().getHeight(), zone.getPattern().getWidth() + (Math.abs(shift) * 2));
-        for (int r = 0; r < zone.getPattern().getHeight(); r++) {
-            for (int c = 0; c < zone.getPattern().getWidth(); c++) {
-                pattern.draw(r, c + (goLeft ? 0 : Math.abs(shift) * 2), zone.getPattern().rgb(r, c));
+        clear();
+        Pattern pattern = new Pattern(getPattern().getHeight(), getPattern().getWidth() + (Math.abs(shift) * 2));
+        for (int r = 0; r < getPattern().getHeight(); r++) {
+            for (int c = 0; c < getPattern().getWidth(); c++) {
+                pattern.draw(r, c + (goLeft ? 0 : Math.abs(shift) * 2), getPattern().rgb(r, c));
             }
             goLeft = !goLeft;
         }
-        zone.drawPattern(zone.getRestX() - Math.abs(shift), zone.getRestY(), pattern);
+        draw(getRestX() - Math.abs(shift), getRestY(), pattern);
         shift += (int)shiftDelta;
         shiftDelta += acceleration;
     }

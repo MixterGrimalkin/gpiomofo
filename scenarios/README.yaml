@@ -36,6 +36,7 @@ Triggers:
     type: Osc
     port: 5300
     address: someAddress
+    data: aValue
 
 
 CompositeTriggers:
@@ -89,6 +90,7 @@ Targets:
     filename: SomeAudioFile.mp3
     # Optional:
     loop: true                                  # true = restart audio when finished (default=false)
+    stopOnDeactivate: false
 
   APythonTarget:
     type: Shell

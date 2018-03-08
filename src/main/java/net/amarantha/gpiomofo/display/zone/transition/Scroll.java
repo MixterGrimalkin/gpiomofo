@@ -7,15 +7,15 @@ public abstract class Scroll extends AbstractTransition {
 
     @Override
     public void animate(double progress) {
-        zone.clear();
-        zone.drawPattern((int)Math.round(x), (int)Math.round(y), zone.getPattern());
+        clear();
+        draw((int)Math.round(x), (int)Math.round(y), getPattern());
         x += deltaX;
         y += deltaY;
     }
 
     @Override
     public int getNumberOfSteps() {
-        return (int)(getDuration() / zone.getTick());
+        return (int)(getDuration() / 50L);
     }
 
     protected abstract boolean isComplete();

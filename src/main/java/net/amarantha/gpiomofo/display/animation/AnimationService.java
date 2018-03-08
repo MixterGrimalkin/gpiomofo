@@ -6,32 +6,54 @@ import net.amarantha.gpiomofo.service.pixeltape.matrix.Animation;
 import net.amarantha.utils.task.TaskService;
 import net.amarantha.utils.time.TimeGuard;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Singleton
 public class AnimationService {
 
     @Inject private TaskService tasks;
     @Inject private TimeGuard guard;
 
-    private Animation animation;
+    private Map<String, Animation> animations = new HashMap<>();
+    private Map<String, Boolean> animationActive = new HashMap<>();
+
+    public AnimationService add(String name, Animation animation) {
+        animations.put(name, animation);
+        animationActive.put(name, false);
+        animation.init();
+        return this;
+    }
 
     public void start() {
         tasks.addRepeatingTask("AnimationService", 10, this::refresh);
     }
 
     private void refresh() {
-        if ( animation!=null ) {
-            guard.every(animation.getRefreshInterval(), "UpdateAnimation", animation::refresh);
+        animations.forEach((name, animation) -> {
+            if ( animationActive.get(name) ) {
+                guard.every(animation.getRefreshInterval(), "UpdateAnimation" + name, animation::refresh);
+            }
+        });
+    }
+
+    public void play(String name) {
+        if ( !animationActive.get(name) ) {
+            animations.get(name).start();
+            animationActive.put(name, true);
         }
     }
 
-    public void play(Animation anim) {
-        if ( animation!=null ) {
-            animation.stop();
+    public void stop(String name) {
+        if ( animationActive.get(name) ) {
+            animations.get(name).stop();
+            animationActive.put(name, false);
         }
-        animation = anim;
-        animation.start();
     }
 
+    public void stopAll() {
+        animations.forEach((name,animation)-> stop(name));
+    }
 
 
 

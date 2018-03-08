@@ -16,22 +16,36 @@ public class AudioFile extends PlaybackListener implements Runnable {
 
     private boolean playing = false;
 
+    private int polyphony = 10;
+    private int voicesOn = 0;
+
+    public AudioFile setPolyphony(int polyphony) {
+        this.polyphony = polyphony;
+        return this;
+    }
+
+    public int getPolyphony() {
+        return polyphony;
+    }
+
     public AudioFile(String filename) {
         this.filename = filename;
     }
 
     public void play() {
-        try {
-            String urlAsString = "file:///" + new java.io.File(".").getCanonicalPath() + "/" + this.filename;
+        if ( voicesOn < polyphony ) {
+            try {
+                System.out.println("Playing " + filename);
+                String urlAsString = "file:///" + new java.io.File(".").getCanonicalPath() + "/" + this.filename;
 
-            player = new AdvancedPlayer(new URL(urlAsString).openStream(), FactoryRegistry.systemRegistry().createAudioDevice());
-            player.setPlayBackListener(this);
+                player = new AdvancedPlayer(new URL(urlAsString).openStream(), FactoryRegistry.systemRegistry().createAudioDevice());
+                player.setPlayBackListener(this);
 
-            playerThread = new Thread(this);
-            playerThread.start();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
+                playerThread = new Thread(this);
+                playerThread.start();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -58,7 +72,9 @@ public class AudioFile extends PlaybackListener implements Runnable {
 
     public void run() {
         try {
+            voicesOn++;
             this.player.play();
+            voicesOn--;
             if ( callback!=null ) {
                 callback.onPlaybackFinished();
             }

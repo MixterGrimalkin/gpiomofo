@@ -1,10 +1,9 @@
 package net.amarantha.gpiomofo.scenario;
 
 import net.amarantha.gpiomofo.core.Constants;
-import net.amarantha.gpiomofo.display.pixeltape.NeoPixelGUI;
+import net.amarantha.gpiomofo.service.pixeltape.pattern.*;
 import net.amarantha.gpiomofo.target.Target;
 import net.amarantha.gpiomofo.trigger.Trigger;
-import net.amarantha.gpiomofo.service.pixeltape.pattern.*;
 import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.http.entity.HttpCommand;
 import net.amarantha.utils.osc.entity.OscCommand;

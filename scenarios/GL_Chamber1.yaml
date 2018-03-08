@@ -1,0 +1,48 @@
+# IP 192.168.42.103
+
+Triggers:
+  Red1Hold:
+    type: Gpio
+    pin: 2
+    resistance: PULL_UP
+    triggerState: false
+    holdTime: 1000
+  Red1:
+    type: Gpio
+    pin: 2
+    resistance: PULL_UP
+    triggerState: false
+  Green1:
+    type: Gpio
+    pin: 3
+    resistance: PULL_UP
+    triggerState: false
+  Blue1:
+    type: Gpio
+    pin: 4
+    resistance: PULL_UP
+    triggerState: false
+
+Targets:
+  Panic1:
+    type: Http
+    onCommand: POST|192.168.42.105:8001/gpiomofo/trigger/panic-briefing/fire
+  Red1Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber1-red|255
+  Green1Osc:
+    type: Osc
+    onCommand: 192.168.42.99:5300/chamber1-green|255
+  Blue1Osc:
+    type: Osc
+    onCommand: 192.168.42.99:53400/chamber1-blue|255
+
+Links:
+  Red1Hold:
+    - Panic1
+  Red1:
+    - Red1Osc
+  Green1:
+    - Green1Osc
+  Blue1:
+    - Blue1Osc

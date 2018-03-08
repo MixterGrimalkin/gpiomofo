@@ -9,9 +9,7 @@ import java.util.*;
 
 import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
-import static net.amarantha.utils.math.MathUtils.randomBetween;
-import static net.amarantha.utils.math.MathUtils.randomFlip;
-import static net.amarantha.utils.math.MathUtils.round;
+import static net.amarantha.utils.math.MathUtils.*;
 
 @Singleton
 public class ButterPong extends Animation {
