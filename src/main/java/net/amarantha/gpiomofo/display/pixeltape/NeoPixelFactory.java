@@ -30,6 +30,13 @@ public class NeoPixelFactory {
         this.updateInterval = updateInterval;
     }
 
+    public void initialize(int pixelCount) {
+        for (int i = 0; i < pixelCount; i++) {
+            createPixel(i);
+        }
+        neoPixel.init(pixelCount);
+    }
+
     public Pixel createPixel(int number) {
         Pixel p = injector.getInstance(Pixel.class);
         p.setNumber(number);

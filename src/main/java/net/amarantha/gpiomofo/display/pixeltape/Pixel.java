@@ -92,6 +92,10 @@ public class Pixel {
         return this;
     }
 
+    public RGB rgb() {
+        return rgb;
+    }
+
     public Pixel delta(double delta) {
 //        if ( delta >= 0 ) {
             return delta(delta, -delta);
@@ -130,6 +134,10 @@ public class Pixel {
 
     public boolean goingUp() {
         return delta > 0;
+    }
+
+    public boolean goingDown() {
+        return delta < 0;
     }
 
     public Pixel fadeUp(int duration) {
