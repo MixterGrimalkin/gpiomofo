@@ -5,16 +5,15 @@ import net.amarantha.utils.colour.RGB;
 import net.amarantha.utils.task.TaskService;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static net.amarantha.utils.colour.RGB.BLACK;
 
-@Singleton
 public class NeoPixelFactory {
 
     @Inject private TaskService tasks;
@@ -31,10 +30,14 @@ public class NeoPixelFactory {
     }
 
     public void initialize(int pixelCount) {
+        createAllPixels(pixelCount);
+        neoPixel.init(pixelCount);
+    }
+
+    public void createAllPixels(int pixelCount) {
         for (int i = 0; i < pixelCount; i++) {
             createPixel(i);
         }
-        neoPixel.init(pixelCount);
     }
 
     public Pixel createPixel(int number) {
@@ -59,7 +62,9 @@ public class NeoPixelFactory {
         return pixels.size();
     }
 
-
+    public void eachPixel(BiConsumer<Integer, Pixel> consumer) {
+        pixels.forEach(consumer);
+    }
 
     public Pixel get(int number) {
         return pixels.get(number);
@@ -68,17 +73,26 @@ public class NeoPixelFactory {
     public void start() {
         neoPixel.allOff();
         tasks.addRepeatingTask(TASK_NAME, updateInterval, () -> {
-            RGB[] frame = new RGB[pixels.size()];
-            animations.forEach((animation)->{
-                if ( animation.update() ){
-                    for (int i = 0; i < frame.length; i++) {
-                        frame[i] = blend(frame[i], animation.getFrame()[i]);
-                    }
-                }
-            });
-            pixels.forEach((i, pixel) -> pixel.update(frame[i]));
-            neoPixel.render();
+            update();
+            render();
         });
+    }
+
+    public void update() {
+        RGB[] frame = new RGB[pixels.size()];
+        animations.forEach((animation)->{
+            if ( animation.update() ){
+                for (int i = 0; i < frame.length; i++) {
+                    frame[i] = blend(frame[i], animation.getFrame()[i]);
+                }
+            }
+        });
+        pixels.forEach((i, pixel) -> pixel.update(frame[i]));
+    }
+
+    public void render() {
+        pixels.forEach((i, pixel)->neoPixel.setPixel(i, pixel.currentState()));
+        neoPixel.render();
     }
 
     private RGB blend(RGB rgb1, RGB rgb2) {

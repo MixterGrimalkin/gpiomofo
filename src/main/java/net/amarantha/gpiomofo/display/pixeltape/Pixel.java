@@ -51,15 +51,20 @@ public class Pixel {
             case OFF:
                 return this;
             case PATTERN:
-                return applyDelta().draw();
+                return applyDelta();
             case ANIMATION:
                 return set(rgb);
         }
         return null;
     }
 
+    public RGB currentState() {
+        return rgb.withBrightness(current);
+    }
+
     private Pixel set(RGB rgb) {
-        neoPixel.setPixel(number, rgb);
+        this.rgb = rgb;
+        current = 1.0;
         return this;
     }
 
@@ -178,11 +183,6 @@ public class Pixel {
 
     public Pixel pause() {
         delta = 0;
-        return this;
-    }
-
-    public Pixel draw() {
-        neoPixel.setPixel(number, rgb.withBrightness(current));
         return this;
     }
 

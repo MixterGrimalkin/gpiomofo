@@ -120,7 +120,7 @@ public class TestCustomLayout extends Scenario {
 //                        starPulseDelta = -starPulseDelta;
 //                    }
 //                }
-//                pulsingStars.forEach((star)->{
+//                pulsingStars.eachPixel((star)->{
 //                    neoPixel.setPixel(stars[star], RGB.WHITE.withBrightness(starPulseBrightness));
 //                });
 //            });
