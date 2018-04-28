@@ -48,14 +48,18 @@ public class NeoPixelFactory {
         return p;
     }
 
-    public PixelAnimation createAnimation(int frameRate, Consumer<PixelAnimation> renderer) {
-        PixelAnimation animation = injector.getInstance(PixelAnimation.class);
-        animation.setFrameRate(frameRate);
-        animation.setRenderer(renderer);
+    public PixelAnimation addAnimation(PixelAnimation animation) {
         animation.setUpdateInterval(updateInterval);
         animation.init(pixels.size());
         animations.add(animation);
         return animation;
+    }
+
+    public PixelAnimation createAnimation(int frameRate, Consumer<PixelAnimation> renderer) {
+        PixelAnimation animation = injector.getInstance(PixelAnimation.class);
+        animation.setFrameRate(frameRate);
+        animation.setRenderer(renderer);
+        return addAnimation(animation);
     }
 
     public int getPixelCount() {

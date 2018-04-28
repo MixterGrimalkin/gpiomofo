@@ -52,9 +52,13 @@ public class PixelAnimation {
 
     public boolean update() {
         if ( running ) {
-            guard.every(frameRate, this, () -> renderer.accept(this));
+            guard.every(frameRate, this, this::render);
         }
         return running;
+    }
+
+    protected void render() {
+        renderer.accept(this);
     }
 
     public RGB[] getFrame() {
