@@ -1,17 +1,22 @@
 Parameters:
-  SpriteCount: 100
-  Colour1: 192,65,0
-  Colour2: 65,20,200
-  Colour3: 205,62,0
-  Colour4: 65,0,150
-  Colour5: 192,65,0
-  TailLength: 10
+
+  SpriteCount: 150
+  TailLength: 8
+  WinCount: 5
+
+#  ButterflyColours: 255,0,0 0,255,0 0,0,255
+  ButterflyColours: 192,65,0 65,20,200 205,62,0 65,0,150
+
+  # x,y Jitter on butterfly centre from FOCI
+  TargetJitter: 6,6
+
   PaddleAxis: Y
   PaddleColour: 255,0,0
   LingerTime: 50
   PayoffTime: 10
   OffsetMask: false
-  Foci: 1:7,7; 2:33,7; 3:33,33; 4:7,33; 5:20,20
+  Foci: 1:7,7 2:33,7 3:33,33 4:7,33 5:20,20
+#  Foci: 1:7,7; 2:33,7; 3:33,33; 4:7,33; 5:20,20
   PinResistance: PULL_DOWN
   PinTriggerState: true
 

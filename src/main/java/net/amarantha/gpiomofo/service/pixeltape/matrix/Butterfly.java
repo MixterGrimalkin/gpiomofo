@@ -31,14 +31,34 @@ public class Butterfly extends Sprite {
     private double[] offset = {0, 0};
     private double linearSpeed;
     private double theta;
+
     private double radius;
+    private double dRadius;
+    private double targetRadius;
+
     private double dTheta;
     int[] real = {0, 0};
     RGB colour;
     int preferredFocus = 0;
     private Integer group;
 
-    public Integer group() {
+    public double getdTheta() {
+        return dTheta;
+    }
+
+    public void setdTheta(double dTheta) {
+        this.dTheta = dTheta;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    public Integer getGroup() {
         return group;
     }
 
@@ -90,10 +110,23 @@ public class Butterfly extends Sprite {
         if (random() < probability) {
             target[X] = randomBetween(0, width - 1);
             target[Y] = randomBetween(0, height - 1);
-            linearSpeed = randomBetween(2.0, 25.0);
-            radius = randomBetween(0.0, 5.0);
-            dTheta = randomFlip(randomBetween(0.1, PI / 8));
+            linearSpeed = randomBetween(10.0, 25.0);
+            randomizeRadius();
+            randomizeAngularSpeed();
         }
+    }
+
+    void randomizeRadius() {
+        targetRadiusOn(randomBetween(0, 5));
+    }
+
+    void randomizeAngularSpeed() {
+        dTheta = randomFlip(randomBetween(0.1, PI / 8));
+    }
+
+    public void targetRadiusOn(double newRadius) {
+        targetRadius = newRadius;
+        dRadius = (targetRadius - radius) / linearSpeed;
     }
 
     void targetOn(int tx, int ty) {
@@ -129,6 +162,7 @@ public class Butterfly extends Sprite {
     int[] updatePosition(List<int[]> usedPositions) {
         updateAxis(X);
         updateAxis(Y);
+        updateRadius();
         int newX = round(current[X] + (Math.sin(theta) * radius));
         int newY = round(current[Y] + (Math.cos(theta) * radius));
         if ( positionUsed(new int[]{newX, newY}, usedPositions) ) {
@@ -144,6 +178,7 @@ public class Butterfly extends Sprite {
         storeTail();
         return real;
     }
+
 
     private boolean blockCollisions = false;
 
@@ -178,6 +213,13 @@ public class Butterfly extends Sprite {
         }
     }
 
+    public void updateRadius() {
+        radius += dRadius;
+        if ( ( dRadius > 0.0 && radius >= targetRadius ) || ( dRadius < 0.0 && radius <= targetRadius ) ) {
+            radius = targetRadius;
+            dRadius = 0.0;
+        }
+    }
 
 
 }

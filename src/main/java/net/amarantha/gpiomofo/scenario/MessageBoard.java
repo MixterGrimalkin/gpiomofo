@@ -92,7 +92,7 @@ public class MessageBoard extends Scenario {
         surface.layer(3).draw(0,0,leaves);
         surface.colouriseLayer(3, GREEN);
 
-        butterflies.setTargetJitter(new int[]{30, 60});
+        butterflies.setTargetJitter(30, 60);
 
         new Timer().schedule(new TimerTask() {
             @Override

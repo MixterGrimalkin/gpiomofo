@@ -40,21 +40,18 @@ public class GreenpeaceTunnel extends Scenario {
     @Parameter("LingerTime") private int lingerTime;
     @Parameter("PayoffTime") private int payoffTime;
 
-    @Parameter("Colour1") private RGB colour1;
-    @Parameter("Colour2") private RGB colour2;
-    @Parameter("Colour3") private RGB colour3;
-    @Parameter("Colour4") private RGB colour4;
-    @Parameter("Colour5") private RGB colour5;
+    @Parameter("ButterflyColours") private String colourStr;
     @Parameter("OffsetMask") private boolean offsetMask;
 
     @Parameter("PinResistance") private String resistanceStr;
     @Parameter("PinTriggerState") private boolean triggerState;
     @Parameter("Foci") private String fociStr;
 
-    private Map<Integer, RGB> colours = new HashMap<>();
+    @Parameter("TargetJitter") private String targetJitterStr;
 
-    private boolean wide;
-    private int step;
+    @Parameter("WinCount") private int winCount;
+
+    private Map<Integer, RGB> colours = new HashMap<>();
 
     @Inject private WebService http;
 
@@ -63,15 +60,14 @@ public class GreenpeaceTunnel extends Scenario {
     @Override
     public void setup() {
 
-        colours.put(0, colour1);
-        colours.put(1, colour2);
-        colours.put(2, colour3);
-        colours.put(3, colour4);
-        colours.put(4, colour5);
+        int i = 0;
+        for ( String s : colourStr.split(" ") ) {
+            colours.put(i++, RGB.parse(s));
+        }
 
         PinPullResistance resistance = PinPullResistance.valueOf(resistanceStr);
 
-        for ( String s : fociStr.split(";") ) {
+        for ( String s : fociStr.split(" ") ) {
             String[] parts = s.split(":");
             String[] coords = parts[1].split(",");
             int pin = parseInt(parts[0].trim());
@@ -88,21 +84,11 @@ public class GreenpeaceTunnel extends Scenario {
                     });
         }
 
+        String[] jitterCoords = targetJitterStr.split(",");
+        butterflies.setTargetJitter(parseInt(jitterCoords[0]), parseInt(jitterCoords[1]));
 
-
-
-//        pir1.onFire(callback(0, 0));
-//        pir2.onFire(callback(1, 7));
-//        pir3.onFire(callback(2, 20));
-//        pir4.onFire(callback(3, 32));
-//        pir5.onFire(callback(4, 44));
-//        pirAll.onFire((state)->{
-//            if ( state ) {
-//                startBlocks();
-//            } else {
-//                startButterflies();
-//            }
-//        });
+        butterflies.setLingerTime(lingerTime);
+        butterflies.setWinCount(winCount);
 
 
     }
@@ -126,32 +112,15 @@ public class GreenpeaceTunnel extends Scenario {
         }
     }
 
-    private Trigger.TriggerCallback callback(final int id, int position) {
-        return (state) -> {
-            if (state) {
-                int x = wide ? (step/2) + (id*step) : surface.width() / 2;
-                int y = position;//wide ? surface.height() / 2 : (step/2) + (id*step);
-                butterflies.addFocus(id, x, y);
-            } else {
-                butterflies.removeFocus(id);
-                startButterflies();
-            }
-        };
-    }
-
     @Override
     public void startup() {
 
-        wide = surface.width() >= surface.height();
-        step = wide ? surface.width() / colours.size() : surface.height() / colours.size();
-
-        butterflies.setLingerTime(lingerTime);
         butterflies.init(spriteCount, colours, tailLength);
+
         animationService.add("Butterflies", butterflies);
-
         animationService.add("CrashingBlocks", blocks);
-
         animationService.start();
+
         animationService.play("Butterflies");
 
         if ( offsetMask ) {

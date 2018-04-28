@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.Math.PI;
 import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
 import static net.amarantha.utils.math.MathUtils.randomBetween;
@@ -28,38 +29,38 @@ public class Butterflies extends Animation {
     @Inject private OscService osc;
     @Inject private TimeGuard guard;
 
-    private boolean useAudio = true;
-
-    public void setUseAudio(boolean useAudio) {
-        this.useAudio = useAudio;
-    }
-
     @Property("AudioPlayerIP") private String playerIp;
     @Property("AudioPlayerPort") private int playerPort;
     @Property("FlutterInSound") private String flutterInSoundFilename;
     @Property("FlutterOutSound") private String flutterOutSoundFilename;
     @Property("BackgroundSound") private String backgroundSoundFilename;
+
     private OscCommand backgroundSoundStart;
     private OscCommand backgroundSoundStop;
 
-    private Map<Integer, RGB> colours;
-
+    private boolean useAudio = true;
+    public void setUseAudio(boolean useAudio) {this.useAudio = useAudio;}
+    private int winCount;
+    public void setWinCount(int winCount) {this.winCount = winCount;}
     private int[] targetJitter;
+    public void setTargetJitter(int x, int y) {this.targetJitter = new int[]{ x, y };}
 
-    public void setTargetJitter(int[] targetJitter) {
-        this.targetJitter = targetJitter;
-    }
+    private Map<Integer, RGB> colours;
+    private Map<Integer, List<Butterfly>> colourGroups = new HashMap<>();
 
     public void init(int spriteCount, Map<Integer, RGB> colours, int tailLength) {
         this.colours = colours;
         props.injectPropertiesOrExit(this);
-        boolean wide = surface.width() >= surface.height();
-        targetJitter = new int[]{3, 3};
-//        targetJitter = new int[]{surface.width() / (wide ? colours.size()*2 : 2), surface.height() / (wide ? 2 : colours.size()*2 )};
         sprites.setTailLength(tailLength);
         for (int i = 0; i < colours.size(); i++) {
             for (int j = 0; j < spriteCount / colours.size(); j++) {
-                sprites.create(i, colours.get(i)).init();
+                Butterfly b = sprites.create(i, colours.get(i));
+                b.init();
+                List<Butterfly> group = colourGroups.get(i);
+                if ( group == null ) {
+                    colourGroups.put(i, group = new ArrayList<>());
+                }
+                group.add(b);
             }
         }
         backgroundSoundStart = new OscCommand(playerIp, playerPort, backgroundSoundFilename+"/loop");
@@ -98,24 +99,26 @@ public class Butterflies extends Animation {
     @Override
     public void refresh() {
         updateFoci();
-        if (foci.isEmpty()) {
-            guard.every(2000, "RandomizeUngroupedButterflies", () -> sprites.forEach((s) -> s.randomize(0.2)));
-        } else {
-            guard.every(2000, "RandomizeGroupedButterflies", () -> {
-                sprites.forEach((s) -> {
-                    if ( randomBetween(0.0, 1.0) <= 0.05 ) {
-                        s.randomize(1.0);
-                    } else {
-                        Integer[] target = foci.get(s.group());
-                        if ( target!=null ) {
-                            s.targetOn(
-                                    target[X] + randomFlip(randomBetween(0, targetJitter[X])),
-                                    target[Y] + randomFlip(randomBetween(0, targetJitter[Y]))
-                            );
+        if ( !payoff ) {
+            if (foci.isEmpty()) {
+                guard.every(2000, "RandomizeUngroupedButterflies", () -> sprites.forEach((s) -> s.randomize(0.2)));
+            } else {
+                guard.every(5000, "RandomizeGroupedButterflies", () ->
+                    sprites.forEach((s) -> {
+                        if (randomBetween(0.0, 1.0) <= 0.03) {
+                            s.randomize(1.0);
+                        } else {
+                            Integer[] target = foci.get(s.getGroup());
+                            if (target != null) {
+                                s.targetOn(
+                                        target[X] + randomFlip(randomBetween(0, targetJitter[X])),
+                                        target[Y] + randomFlip(randomBetween(0, targetJitter[Y]))
+                                );
+                            }
                         }
-                    }
-                });
-            });
+                    })
+                );
+            }
         }
         List<int[]> usedPositions = new ArrayList<>(sprites.get().size());
         sprites.forEach((s) -> usedPositions.add(s.updatePosition(usedPositions)));
@@ -136,29 +139,55 @@ public class Butterflies extends Animation {
     private OscCommand exitSound;
 
     private boolean audioActive = false;
+    private boolean payoff = false;
+
+    private int[] fieldCentre = { 20, 20 };
+    private int[] ringRadiusRange = { 9, 17 };
+    private int[] ringWidthRange = { 0, 3 };
 
     @Override
     public void onFocusAdded(int focusId) {
-        Map<Integer, List<Butterfly>> targetGroups = getTargetGroups();
-        targetGroups.get(null).forEach(butterfly-> butterfly.setGroup(focusId));
-        double prob = 1.0 / (foci.size()+1);
-        sprites.forEach((butterfly -> {
-            if ( randomBetween(0.0, 1.0) <= prob ) {
-                butterfly.setGroup(focusId);
-            }
-        }));
-        targetSprites();
-        if ( useAudio && audioActive ) {
-            if (focusId == 2) {
-                osc.send(centreFlutter);
-            } else {
-                osc.send(tentFlutter);
+        if ( foci.size() >= winCount ) {
+            payoff = true;
+            colourGroups.forEach((i, group) -> {
+                int ringRadius = randomBetween(ringRadiusRange[0], ringRadiusRange[1]);
+                final boolean clockwise = randomFlip(1) > 0;
+                group.forEach(butterfly->{
+                    butterfly.targetOn(fieldCentre[X], fieldCentre[Y]);
+                    butterfly.targetRadiusOn(ringRadius + randomFlip(randomBetween(ringWidthRange[0], ringWidthRange[1])));
+                    butterfly.setdTheta(clockwise ? -0.1 : 0.1);
+                });
+            });
+        } else {
+            payoff = false;
+            Map<Integer, List<Butterfly>> targetGroups = getTargetGroups();
+            targetGroups.get(null).forEach(butterfly -> butterfly.setGroup(focusId));
+            double prob = 1.0 / (foci.size());
+            sprites.forEach((butterfly -> {
+                if (randomBetween(0.0, 1.0) <= prob) {
+                    butterfly.setGroup(focusId);
+                }
+            }));
+            targetSprites();
+            if (useAudio && audioActive) {
+                if (focusId == 2) {
+                    osc.send(centreFlutter);
+                } else {
+                    osc.send(tentFlutter);
+                }
             }
         }
     }
 
     @Override
     public void onFocusRemoved(List<Integer> focusIds) {
+        if ( payoff && foci.size() < winCount) {
+            sprites.forEach(((butterfly) -> {
+                butterfly.randomizeRadius();
+                butterfly.randomizeAngularSpeed();
+            }));
+            payoff = false;
+        }
         Map<Integer, List<Butterfly>> targetGroups = getTargetGroups();
         targetGroups.forEach((id, sprites)->{
             if ( foci.get(id)==null ) {
@@ -174,44 +203,27 @@ public class Butterflies extends Animation {
         targetSprites();
     }
 
-    public void targetOn(int x, int y) {
-        sprites.forEach((s) -> {
-            s.targetOn(
-                    x + randomFlip(randomBetween(0, targetJitter[X])),
-                    y + randomFlip(randomBetween(0, targetJitter[Y]))
-            );
-        });
-    }
+//    public void targetOn(int x, int y) {
+//        sprites.forEach((s) -> {
+//            s.targetOn(
+//                    x + randomFlip(randomBetween(0, targetJitter[X])),
+//                    y + randomFlip(randomBetween(0, targetJitter[Y]))
+//            );
+//        });
+//    }
 
     private void targetSprites() {
-//        if (foci.isEmpty()) {
-//            randomize();
-//            if (useAudio && audioActive) {
-//                osc.send(exitSound);
-//            }
-//        } else if ( foci.size()==1 ) {
-//            sprites.forEach((butterfly -> {
-//
-//            }));
-//        } else {
-//            Map<Integer, List<Butterfly>> targetGroups = getTargetGroups();
-//            foci.forEach((id, coords) -> {
-//
-//            });
-//
-//
-            sprites.forEach((butterfly) -> {
-                    Integer[] target = foci.get(butterfly.group());
-                    if ( target!=null ) {
-                        butterfly.targetOn(
-                                target[X] + randomFlip(randomBetween(0, targetJitter[X])),
-                                target[Y] + randomFlip(randomBetween(0, targetJitter[Y]))
-                        );
-                    } else {
-                        butterfly.randomize(1.0);
-                    }
-            });
-//        }
+        sprites.forEach((butterfly) -> {
+            Integer[] target = foci.get(butterfly.getGroup());
+            if (target != null) {
+                butterfly.targetOn(
+                        target[X] + randomFlip(randomBetween(0, targetJitter[X])),
+                        target[Y] + randomFlip(randomBetween(0, targetJitter[Y]))
+                );
+            } else {
+                butterfly.randomize(1.0);
+            }
+        });
     }
 
     private Map<Integer, List<Butterfly>> getTargetGroups() {
@@ -219,7 +231,7 @@ public class Butterflies extends Animation {
         result.put(null, new ArrayList<>());
         foci.forEach((id, coords)-> result.put(id, new ArrayList<>()));
         sprites.forEach((butterfly) -> {
-            List<Butterfly> group = result.get(butterfly.group());
+            List<Butterfly> group = result.get(butterfly.getGroup());
             if (group==null ) {
                 butterfly.ungroup();
                 result.get(null).add(butterfly);

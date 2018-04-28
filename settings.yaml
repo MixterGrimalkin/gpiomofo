@@ -23,7 +23,7 @@ AudioPlayer:
    - flutter-out
    - rise0,1
 NeoPixelGUI: 
-   Spacer: 2
+   Spacer: 5
    CustomLayout: none
    LedSize: 5
 NeoPixelBoard: 
@@ -91,7 +91,7 @@ Gui:
    Window-LightBoard: 314.0,189.0
    Window-NeoPixel: 491.0,321.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
-   Window-Input-GPIO: 512.0,139.0
+   Window-Input-GPIO: 790.0,292.0
    Window-GpioMofo: 1147.0,140.0
 Aws: 
    ClientId: sdk-java
