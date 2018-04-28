@@ -19,6 +19,7 @@ import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
 import static net.amarantha.utils.math.MathUtils.randomBetween;
 import static net.amarantha.utils.math.MathUtils.randomFlip;
+import static net.amarantha.utils.math.MathUtils.randomFrom;
 
 @PropertyGroup("Butterflies")
 public class Butterflies extends Animation {
@@ -53,7 +54,8 @@ public class Butterflies extends Animation {
         this.colours = colours;
         props.injectPropertiesOrExit(this);
         boolean wide = surface.width() >= surface.height();
-        targetJitter = new int[]{surface.width() / (wide ? colours.size()*2 : 2), surface.height() / (wide ? 2 : colours.size()*2 )};
+        targetJitter = new int[]{3, 3};
+//        targetJitter = new int[]{surface.width() / (wide ? colours.size()*2 : 2), surface.height() / (wide ? 2 : colours.size()*2 )};
         sprites.setTailLength(tailLength);
         for (int i = 0; i < colours.size(); i++) {
             for (int j = 0; j < spriteCount / colours.size(); j++) {
@@ -97,7 +99,23 @@ public class Butterflies extends Animation {
     public void refresh() {
         updateFoci();
         if (foci.isEmpty()) {
-            guard.every(2000, "RandomizeButterflies", () -> sprites.forEach((s) -> s.randomize(0.2)));
+            guard.every(2000, "RandomizeUngroupedButterflies", () -> sprites.forEach((s) -> s.randomize(0.2)));
+        } else {
+            guard.every(2000, "RandomizeGroupedButterflies", () -> {
+                sprites.forEach((s) -> {
+                    if ( randomBetween(0.0, 1.0) <= 0.05 ) {
+                        s.randomize(1.0);
+                    } else {
+                        Integer[] target = foci.get(s.group());
+                        if ( target!=null ) {
+                            s.targetOn(
+                                    target[X] + randomFlip(randomBetween(0, targetJitter[X])),
+                                    target[Y] + randomFlip(randomBetween(0, targetJitter[Y]))
+                            );
+                        }
+                    }
+                });
+            });
         }
         List<int[]> usedPositions = new ArrayList<>(sprites.get().size());
         sprites.forEach((s) -> usedPositions.add(s.updatePosition(usedPositions)));
@@ -121,6 +139,14 @@ public class Butterflies extends Animation {
 
     @Override
     public void onFocusAdded(int focusId) {
+        Map<Integer, List<Butterfly>> targetGroups = getTargetGroups();
+        targetGroups.get(null).forEach(butterfly-> butterfly.setGroup(focusId));
+        double prob = 1.0 / (foci.size()+1);
+        sprites.forEach((butterfly -> {
+            if ( randomBetween(0.0, 1.0) <= prob ) {
+                butterfly.setGroup(focusId);
+            }
+        }));
         targetSprites();
         if ( useAudio && audioActive ) {
             if (focusId == 2) {
@@ -133,6 +159,18 @@ public class Butterflies extends Animation {
 
     @Override
     public void onFocusRemoved(List<Integer> focusIds) {
+        Map<Integer, List<Butterfly>> targetGroups = getTargetGroups();
+        targetGroups.forEach((id, sprites)->{
+            if ( foci.get(id)==null ) {
+                sprites.forEach(butterfly->{
+                    if ( foci.isEmpty() ) {
+                        butterfly.ungroup();
+                    } else {
+                        butterfly.setGroup(randomFrom(foci.keySet()));
+                    }
+                });
+            }
+        });
         targetSprites();
     }
 
@@ -146,20 +184,50 @@ public class Butterflies extends Animation {
     }
 
     private void targetSprites() {
-        if (foci.isEmpty()) {
-            randomize();
-            if ( useAudio && audioActive ) {
-                osc.send(exitSound);
-            }
-        } else {
-            sprites.forEach((oldSprite) -> {
-                Integer[] target = randomFocus(oldSprite);
-                oldSprite.targetOn(
-                        target[X] + randomFlip(randomBetween(0, targetJitter[X])),
-                        target[Y] + randomFlip(randomBetween(0, targetJitter[Y]))
-                );
+//        if (foci.isEmpty()) {
+//            randomize();
+//            if (useAudio && audioActive) {
+//                osc.send(exitSound);
+//            }
+//        } else if ( foci.size()==1 ) {
+//            sprites.forEach((butterfly -> {
+//
+//            }));
+//        } else {
+//            Map<Integer, List<Butterfly>> targetGroups = getTargetGroups();
+//            foci.forEach((id, coords) -> {
+//
+//            });
+//
+//
+            sprites.forEach((butterfly) -> {
+                    Integer[] target = foci.get(butterfly.group());
+                    if ( target!=null ) {
+                        butterfly.targetOn(
+                                target[X] + randomFlip(randomBetween(0, targetJitter[X])),
+                                target[Y] + randomFlip(randomBetween(0, targetJitter[Y]))
+                        );
+                    } else {
+                        butterfly.randomize(1.0);
+                    }
             });
-        }
+//        }
+    }
+
+    private Map<Integer, List<Butterfly>> getTargetGroups() {
+        Map<Integer, List<Butterfly>> result = new HashMap<>();
+        result.put(null, new ArrayList<>());
+        foci.forEach((id, coords)-> result.put(id, new ArrayList<>()));
+        sprites.forEach((butterfly) -> {
+            List<Butterfly> group = result.get(butterfly.group());
+            if (group==null ) {
+                butterfly.ungroup();
+                result.get(null).add(butterfly);
+            } else {
+                group.add(butterfly);
+            }
+        });
+        return result;
     }
 
     public Integer[] randomFocus(Butterfly oldSprite) {
@@ -173,7 +241,10 @@ public class Butterflies extends Animation {
     }
 
     public void randomize() {
-        sprites.forEach((s) -> s.randomize(1.0));
+        sprites.forEach((s) -> {
+            s.ungroup();
+            s.randomize(1.0);
+        });
     }
 
     //////////

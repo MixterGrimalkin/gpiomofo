@@ -1,6 +1,7 @@
 package net.amarantha.gpiomofo.scenario;
 
 import com.google.inject.Inject;
+import com.pi4j.io.gpio.PinPullResistance;
 import net.amarantha.gpiomofo.annotation.Named;
 import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.display.animation.AnimationService;
@@ -16,6 +17,7 @@ import net.amarantha.utils.service.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.Integer.parseInt;
 import static net.amarantha.utils.colour.RGB.BLACK;
 
 public class GreenpeaceTunnel extends Scenario {
@@ -26,12 +28,12 @@ public class GreenpeaceTunnel extends Scenario {
 
     @Service private LightSurface surface;
 
-    @Named("PIR1") private Trigger pir1;
-    @Named("PIR2") private Trigger pir2;
-    @Named("PIR3") private Trigger pir3;
-    @Named("PIR4") private Trigger pir4;
-    @Named("PIR5") private Trigger pir5;
-    @Named("PIRALL") private Trigger pirAll;
+//    @Named("PIR1") private Trigger pir1;
+//    @Named("PIR2") private Trigger pir2;
+//    @Named("PIR3") private Trigger pir3;
+//    @Named("PIR4") private Trigger pir4;
+//    @Named("PIR5") private Trigger pir5;
+//    @Named("PIRALL") private Trigger pirAll;
 
     @Parameter("SpriteCount") private int spriteCount;
     @Parameter("TailLength") private int tailLength;
@@ -44,6 +46,10 @@ public class GreenpeaceTunnel extends Scenario {
     @Parameter("Colour4") private RGB colour4;
     @Parameter("Colour5") private RGB colour5;
     @Parameter("OffsetMask") private boolean offsetMask;
+
+    @Parameter("PinResistance") private String resistanceStr;
+    @Parameter("PinTriggerState") private boolean triggerState;
+    @Parameter("Foci") private String fociStr;
 
     private Map<Integer, RGB> colours = new HashMap<>();
 
@@ -63,18 +69,40 @@ public class GreenpeaceTunnel extends Scenario {
         colours.put(3, colour4);
         colours.put(4, colour5);
 
-        pir1.onFire(callback(0, 0));
-        pir2.onFire(callback(1, 7));
-        pir3.onFire(callback(2, 20));
-        pir4.onFire(callback(3, 32));
-        pir5.onFire(callback(4, 44));
-        pirAll.onFire((state)->{
-            if ( state ) {
-                startBlocks();
-            } else {
-                startButterflies();
-            }
-        });
+        PinPullResistance resistance = PinPullResistance.valueOf(resistanceStr);
+
+        for ( String s : fociStr.split(";") ) {
+            String[] parts = s.split(":");
+            String[] coords = parts[1].split(",");
+            int pin = parseInt(parts[0].trim());
+            int x = parseInt(coords[0].trim());
+            int y = parseInt(coords[1].trim());
+            triggers
+                .gpio("Sensor-"+pin, pin, resistance, triggerState)
+                    .onFire((state)->{
+                        if ( state ) {
+                            butterflies.addFocus(pin, x, y);
+                        } else {
+                            butterflies.removeFocus(pin);
+                        }
+                    });
+        }
+
+
+
+
+//        pir1.onFire(callback(0, 0));
+//        pir2.onFire(callback(1, 7));
+//        pir3.onFire(callback(2, 20));
+//        pir4.onFire(callback(3, 32));
+//        pir5.onFire(callback(4, 44));
+//        pirAll.onFire((state)->{
+//            if ( state ) {
+//                startBlocks();
+//            } else {
+//                startButterflies();
+//            }
+//        });
 
 
     }
@@ -83,7 +111,7 @@ public class GreenpeaceTunnel extends Scenario {
         if ( startedPayoff!=null && System.currentTimeMillis()-startedPayoff > payoffTime*1000 ) {
             animationService.stop("CrashingBlocks");
             surface.clear();
-            offsetMask(BLACK);
+            if (offsetMask) offsetMask(BLACK);
             animationService.play("Butterflies");
             startedPayoff = null;
         }

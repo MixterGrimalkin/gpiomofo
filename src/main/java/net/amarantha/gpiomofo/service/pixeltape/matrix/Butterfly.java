@@ -36,6 +36,19 @@ public class Butterfly extends Sprite {
     int[] real = {0, 0};
     RGB colour;
     int preferredFocus = 0;
+    private Integer group;
+
+    public Integer group() {
+        return group;
+    }
+
+    public void ungroup() {
+        setGroup(null);
+    }
+
+    public void setGroup(Integer group) {
+        this.group = group;
+    }
 
     @Inject
     public Butterfly(LightSurface surface) {
@@ -164,5 +177,7 @@ public class Butterfly extends Sprite {
             theta = 0.0;
         }
     }
+
+
 
 }

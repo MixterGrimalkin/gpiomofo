@@ -1,5 +1,5 @@
 Parameters:
-  SpriteCount: 130
+  SpriteCount: 100
   Colour1: 192,65,0
   Colour2: 65,20,200
   Colour3: 205,62,0
@@ -11,42 +11,45 @@ Parameters:
   LingerTime: 50
   PayoffTime: 10
   OffsetMask: false
+  Foci: 1:7,7; 2:33,7; 3:33,33; 4:7,33; 5:20,20
+  PinResistance: PULL_DOWN
+  PinTriggerState: true
 
 Triggers:
-  PIR1:
+  Dummy:
     type: Gpio
-    pin: 0
+    pin: 9
     resistance: PULL_DOWN
     triggerState: true
-  PIR2:
-    type: Gpio
-    pin: 2
-    resistance: PULL_DOWN
-    triggerState: true
-  PIR3:
-    type: Gpio
-    pin: 3
-    resistance: PULL_DOWN
-    triggerState: true
-  PIR4:
-    type: Gpio
-    pin: 4
-    resistance: PULL_DOWN
-    triggerState: true
-  PIR5:
-    type: Gpio
-    pin: 5
-    resistance: PULL_DOWN
-    triggerState: true
+#  PIR2:
+#    type: Gpio
+#    pin: 2
+#    resistance: PULL_DOWN
+#    triggerState: true
+#  PIR3:
+#    type: Gpio
+#    pin: 3
+#    resistance: PULL_DOWN
+#    triggerState: true
+#  PIR4:
+#    type: Gpio
+#    pin: 4
+#    resistance: PULL_DOWN
+#    triggerState: true
+#  PIR5:
+#    type: Gpio
+#    pin: 5
+#    resistance: PULL_DOWN
+#    triggerState: true
 
-CompositeTriggers:
-  PIRALL:
-    triggers:
-    - PIR1
-    - PIR2
-    - PIR3
-    - PIR4
-    - PIR5
+#CompositeTriggers:
+#  PIRALL:
+#    triggers:
+#    - PIR1
+#    - PIR2
+#    - PIR3
+#    - PIR4
+#    - PIR5
 
 Targets:
   H1:
@@ -70,14 +73,14 @@ Targets:
     onCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR5/fire
     offCommand: post|192.168.0.69:8001/gpiomofo/trigger/PIR5/cancel
 
-Links:
-  PIR1:
-    - H1
-  PIR2:
-    - H2
-  PIR3:
-    - H3
-  PIR4:
-    - H4
-  PIR5:
-    - H5
+#Links:
+#  PIR1:
+#    - H1
+#  PIR2:
+#    - H2
+#  PIR3:
+#    - H3
+#  PIR4:
+#    - H4
+#  PIR5:
+#    - H5
