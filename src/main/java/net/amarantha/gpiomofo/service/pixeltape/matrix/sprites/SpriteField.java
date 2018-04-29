@@ -56,7 +56,7 @@ public class SpriteField {
             if ( running ) {
                 Set<Integer> layersToClear = new HashSet<Integer>();
                 sprites.forEach((sprite1) -> {
-                    sprite1.updatePosition();
+                    sprite1.update();
                     layersToClear.add(sprite1.getLayer());
                 });
                 collisionGroups.forEach((key,list)->{

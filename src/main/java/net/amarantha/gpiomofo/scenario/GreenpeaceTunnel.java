@@ -26,6 +26,8 @@ public class GreenpeaceTunnel extends Scenario {
     @Inject private Butterflies butterflies;
     @Inject private CrashingBlocks blocks;
 
+    @Named("Switch") private Trigger triggerSwitch;
+
     @Service private LightSurface surface;
 
 //    @Named("PIR1") private Trigger pir1;
@@ -83,6 +85,10 @@ public class GreenpeaceTunnel extends Scenario {
                         }
                     });
         }
+
+        triggerSwitch.onFire((state)->{
+            butterflies.linearMode(state);
+        });
 
         String[] jitterCoords = targetJitterStr.split(",");
         butterflies.setTargetJitter(parseInt(jitterCoords[0]), parseInt(jitterCoords[1]));

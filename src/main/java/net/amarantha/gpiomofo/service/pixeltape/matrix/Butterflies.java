@@ -3,6 +3,7 @@ package net.amarantha.gpiomofo.service.pixeltape.matrix;
 import com.google.inject.Inject;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.sprites.Sprite;
 import net.amarantha.utils.colour.RGB;
+import net.amarantha.utils.math.MathUtils;
 import net.amarantha.utils.osc.OscService;
 import net.amarantha.utils.osc.entity.OscCommand;
 import net.amarantha.utils.properties.PropertiesService;
@@ -10,17 +11,14 @@ import net.amarantha.utils.properties.entity.Property;
 import net.amarantha.utils.properties.entity.PropertyGroup;
 import net.amarantha.utils.time.TimeGuard;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Map.Entry;
 
-import static java.lang.Math.PI;
+import static java.lang.Math.pow;
+import static java.lang.Math.random;
 import static net.amarantha.gpiomofo.core.Constants.X;
 import static net.amarantha.gpiomofo.core.Constants.Y;
-import static net.amarantha.utils.math.MathUtils.randomBetween;
-import static net.amarantha.utils.math.MathUtils.randomFlip;
-import static net.amarantha.utils.math.MathUtils.randomFrom;
+import static net.amarantha.utils.math.MathUtils.*;
 
 @PropertyGroup("Butterflies")
 public class Butterflies extends Animation {
@@ -54,7 +52,7 @@ public class Butterflies extends Animation {
         sprites.setTailLength(tailLength);
         for (int i = 0; i < colours.size(); i++) {
             for (int j = 0; j < spriteCount / colours.size(); j++) {
-                Butterfly b = sprites.create(i, colours.get(i));
+                Butterfly b = sprites.create(colours.get(i));
                 b.init();
                 List<Butterfly> group = colourGroups.get(i);
                 if ( group == null ) {
@@ -73,9 +71,7 @@ public class Butterflies extends Animation {
     }
 
     public void reset() {
-        sprites.forEach((s)->{
-            s.reset();
-        });
+        sprites.forEach(Sprite::reset);
     }
 
     @Override
@@ -99,11 +95,11 @@ public class Butterflies extends Animation {
     @Override
     public void refresh() {
         updateFoci();
-        if ( !payoff ) {
+        if ( !payoff && !linearMode ) {
             if (foci.isEmpty()) {
                 guard.every(2000, "RandomizeUngroupedButterflies", () -> sprites.forEach((s) -> s.randomize(0.2)));
             } else {
-                guard.every(5000, "RandomizeGroupedButterflies", () ->
+                guard.every(10000, "RandomizeGroupedButterflies", () ->
                     sprites.forEach((s) -> {
                         if (randomBetween(0.0, 1.0) <= 0.03) {
                             s.randomize(1.0);
@@ -120,19 +116,47 @@ public class Butterflies extends Animation {
                 );
             }
         }
-        List<int[]> usedPositions = new ArrayList<>(sprites.get().size());
-        sprites.forEach((s) -> usedPositions.add(s.updatePosition(usedPositions)));
+        if ( linearMode ) {
+            guard.every(3000, "Linearize", ()-> linearize(0.2));
+        }
         surface.layer(background).clear();
         surface.layer(foreground).clear();
         sprites.forEach(s -> {
+            s.update();
             for (int i = 0; i < sprites.tailLength(); i++) {
                 surface.layer(background).draw(s.tailPos[i][X], s.tailPos[i][Y], s.tailColours[i]);
             }
-        });
-        sprites.forEach(s -> {
             surface.layer(foreground).draw(s.real[X], s.real[Y], s.colour);
         });
+        if ( winStarted!=null ) {
+            if (payoff) {
+                if (System.currentTimeMillis() - winStarted >= 30_000) {
+                    linearMode(true);
+                    winStarted = System.currentTimeMillis();
+                }
+            } else {
+                if (System.currentTimeMillis() - winStarted >= 60_000) {
+                    linearMode(false);
+                    winStarted = null;
+                }
+            }
+        }
     }
+
+    private void linearize(double prob) {
+        sprites.forEach(butterfly -> {
+            if (random() < prob) {
+                butterfly.setDecelerate(false);
+                if (random() < 0.5) {
+                    butterfly.setDelta(1.0, 0.0);
+                } else {
+                    butterfly.setDelta(0.0, 1.0);
+                }
+            }
+        });
+    }
+
+    private boolean linearMode = false;
 
     private OscCommand tentFlutter;
     private OscCommand centreFlutter;
@@ -145,38 +169,67 @@ public class Butterflies extends Animation {
     private int[] ringRadiusRange = { 9, 17 };
     private int[] ringWidthRange = { 0, 3 };
 
+    public void linearMode(boolean mode) {
+        linearMode = mode;
+        if ( mode ) {
+            sprites.forEach((butterfly -> {
+                butterfly.enableEntropy(false);
+                butterfly.targetRadiusOn(0);
+                butterfly.setGroup(null);
+            }));
+
+        } else {
+            sprites.forEach((butterfly -> {
+                butterfly.enableEntropy(true);
+                butterfly.setDecelerate(true);
+                butterfly.randomizeRadius();
+            }));
+        }
+    }
+
+    private Long winStarted;
+
     @Override
     public void onFocusAdded(int focusId) {
-        if ( foci.size() >= winCount ) {
-            payoff = true;
-            colourGroups.forEach((i, group) -> {
-                int ringRadius = randomBetween(ringRadiusRange[0], ringRadiusRange[1]);
-                final boolean clockwise = randomFlip(1) > 0;
-                group.forEach(butterfly->{
-                    butterfly.targetOn(fieldCentre[X], fieldCentre[Y]);
-                    butterfly.targetRadiusOn(ringRadius + randomFlip(randomBetween(ringWidthRange[0], ringWidthRange[1])));
-                    butterfly.setdTheta(clockwise ? -0.1 : 0.1);
-                });
-            });
-        } else {
-            payoff = false;
-            Map<Integer, List<Butterfly>> targetGroups = getTargetGroups();
-            targetGroups.get(null).forEach(butterfly -> butterfly.setGroup(focusId));
-            double prob = 1.0 / (foci.size());
-            sprites.forEach((butterfly -> {
-                if (randomBetween(0.0, 1.0) <= prob) {
-                    butterfly.setGroup(focusId);
+        if ( !linearMode ) {
+            if (foci.size() >= winCount) {
+                if ( !payoff ) {
+                    winStarted = System.currentTimeMillis();
                 }
-            }));
-            targetSprites();
-            if (useAudio && audioActive) {
-                if (focusId == 2) {
-                    osc.send(centreFlutter);
-                } else {
-                    osc.send(tentFlutter);
+                payoff = true;
+                colourGroups.forEach((i, group) -> {
+                    int ringRadius = randomBetween(ringRadiusRange[0], ringRadiusRange[1]);
+                    final boolean clockwise = randomFlip(1) > 0;
+                    group.forEach(butterfly -> {
+                        butterfly.targetOn(fieldCentre[X], fieldCentre[Y]);
+                        butterfly.targetRadiusOn(ringRadius + randomFlip(randomBetween(ringWidthRange[0], ringWidthRange[1])));
+                        butterfly.setAngularSpeed(clockwise ? -0.1 : 0.1);
+                    });
+                });
+            } else {
+                payoff = false;
+                Map<Integer, List<Butterfly>> targetGroups = getTargetGroups();
+                targetGroups.get(null).forEach(butterfly -> butterfly.setGroup(focusId));
+                double prob = 1.0 / (foci.size());
+                sprites.forEach((butterfly -> {
+                    if (randomBetween(0.0, 1.0) <= prob) {
+                        butterfly.setGroup(focusId);
+                    }
+                }));
+                targetSprites();
+                if (useAudio && audioActive) {
+                    if (focusId == 2) {
+                        osc.send(centreFlutter);
+                    } else {
+                        osc.send(tentFlutter);
+                    }
                 }
             }
         }
+    }
+
+    private double calculateDistance(int[] c1, Integer[] c2) {
+        return Math.sqrt(pow(c1[X] - c2[X], 2) + pow(c1[Y] - c2[Y], 2));
     }
 
     @Override
@@ -184,23 +237,40 @@ public class Butterflies extends Animation {
         if ( payoff && foci.size() < winCount) {
             sprites.forEach(((butterfly) -> {
                 butterfly.randomizeRadius();
-                butterfly.randomizeAngularSpeed();
+                Double lastDistance = null;
+                for (Entry<Integer, Integer[]> entry : foci.entrySet() ) {
+                    double distance = calculateDistance(butterfly.real, entry.getValue());
+                    if ( lastDistance==null || lastDistance > distance ) {
+                        lastDistance = distance;
+                        butterfly.setGroup(entry.getKey());
+                    }
+                }
             }));
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (!payoff) {
+                        sprites.forEach(Butterfly::randomizeAngularSpeed);
+                    }
+                }
+            }, 2000);
             payoff = false;
         }
-        Map<Integer, List<Butterfly>> targetGroups = getTargetGroups();
-        targetGroups.forEach((id, sprites)->{
-            if ( foci.get(id)==null ) {
-                sprites.forEach(butterfly->{
-                    if ( foci.isEmpty() ) {
-                        butterfly.ungroup();
-                    } else {
-                        butterfly.setGroup(randomFrom(foci.keySet()));
-                    }
-                });
-            }
-        });
-        targetSprites();
+        if ( !linearMode ) {
+            Map<Integer, List<Butterfly>> targetGroups = getTargetGroups();
+            targetGroups.forEach((id, sprites) -> {
+                if (foci.get(id) == null) {
+                    sprites.forEach(butterfly -> {
+                        if (foci.isEmpty()) {
+                            butterfly.setGroup(null);
+                        } else {
+                            butterfly.setGroup(randomFrom(foci.keySet()));
+                        }
+                    });
+                }
+            });
+            targetSprites();
+        }
     }
 
 //    public void targetOn(int x, int y) {
@@ -233,7 +303,7 @@ public class Butterflies extends Animation {
         sprites.forEach((butterfly) -> {
             List<Butterfly> group = result.get(butterfly.getGroup());
             if (group==null ) {
-                butterfly.ungroup();
+                butterfly.setGroup(null);
                 result.get(null).add(butterfly);
             } else {
                 group.add(butterfly);
@@ -242,19 +312,9 @@ public class Butterflies extends Animation {
         return result;
     }
 
-    public Integer[] randomFocus(Butterfly oldSprite) {
-        List<Integer[]> coords = new ArrayList<>(foci.values());
-        if (foci.keySet().contains(oldSprite.preferredFocus)) {
-            return foci.get(oldSprite.preferredFocus);
-        } else {
-            return coords.get(randomBetween(0, coords.size() - 1));
-
-        }
-    }
-
     public void randomize() {
         sprites.forEach((s) -> {
-            s.ungroup();
+            s.setGroup(null);
             s.randomize(1.0);
         });
     }

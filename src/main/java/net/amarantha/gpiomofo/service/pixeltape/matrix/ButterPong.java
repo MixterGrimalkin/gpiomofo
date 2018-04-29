@@ -171,7 +171,7 @@ public class ButterPong extends Animation {
     @Override
     public void refresh() {
 //        if ( ball!=null && leftPaddle!=null && rightPaddle!=null ) {
-//            ball.updatePosition();
+//            ball.update();
 //            ball.render();
 //            leftPaddle.render();
 //            rightPaddle.render();

@@ -78,8 +78,8 @@ public class Explosion extends Sprite {
     }
 
     @Override
-    public void updatePosition() {
-        super.updatePosition();
+    public void update() {
+        super.update();
         List<Integer> idsToRemove = new LinkedList<>();
         sparks.forEach((id, spark)-> {
             double dist = distances.get(id) + deltas.get(id);

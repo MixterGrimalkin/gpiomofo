@@ -30,8 +30,8 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(1, false))
 //            .add(targets.gpio(2, false))
 //            .add(targets.gpio(4, false))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("-;;-;;-")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/clear")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/add").withPayload("-;;-;;-")))
             .add(targets.http(lightboard.withPath("scene/splash/loadScenario")))
         .build().oneShot(true);
 
@@ -45,7 +45,7 @@ public class ZapperScenario extends Scenario {
 //        .build().repeat(true, targets.getScenario("Background")).oneShot(true);
 
         targets.chain("Finale-1")
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/clear")))
             .add(targets.http(lightboard.withPath("scene/zapper-finale/loadScenario")))
 //            .add(targets.getScenario("Light-Cycle"))
         .build().oneShot(true);
@@ -60,8 +60,8 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(1, true))
 //            .add(targets.gpio(2, false))
 //            .add(targets.gpio(4, false))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("A;;-;;-")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/clear")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/add").withPayload("A;;-;;-")))
             .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
@@ -70,8 +70,8 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(1, false))
 //            .add(targets.gpio(2, true))
 //            .add(targets.gpio(4, false))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("-;;B;;-")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/clear")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/add").withPayload("-;;B;;-")))
             .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
@@ -80,8 +80,8 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(1, false))
 //            .add(targets.gpio(2, false))
 //            .add(targets.gpio(4, true))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("-;;-;;C")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/clear")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/add").withPayload("-;;-;;C")))
             .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
@@ -90,8 +90,8 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(1, true))
 //            .add(targets.gpio(2, true))
 //            .add(targets.gpio(4, false))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("A;;B;;-")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/clear")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/add").withPayload("A;;B;;-")))
             .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
@@ -100,8 +100,8 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(1, true))
 //            .add(targets.gpio(2, false))
 //            .add(targets.gpio(4, true))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("A;;-;;C")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/clear")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/add").withPayload("A;;-;;C")))
             .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
@@ -110,8 +110,8 @@ public class ZapperScenario extends Scenario {
 //            .add(targets.gpio(1, false))
 //            .add(targets.gpio(2, true))
 //            .add(targets.gpio(4, true))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/clear")))
-            .add(targets.http(lightboard.withPath("scene/zapper/group/zaps/add").withPayload("-;;B;;C")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/clear")))
+            .add(targets.http(lightboard.withPath("scene/zapper/getGroup/zaps/add").withPayload("-;;B;;C")))
             .add(targets.http(lightboard.withPath("scene/zapper/loadScenario")))
         .build().oneShot(true);
 
