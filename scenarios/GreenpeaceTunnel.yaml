@@ -1,6 +1,6 @@
 Parameters:
 
-  SpriteCount: 160
+  SpriteCount: 100
   TailLength: 8
   WinCount: 5
 
@@ -21,9 +21,14 @@ Parameters:
   PinTriggerState: true
 
 Triggers:
-  Switch:
+  Switch1:
     type: Gpio
-    pin: 9
+    pin: 6
+    resistance: PULL_DOWN
+    triggerState: true
+  Switch2:
+    type: Gpio
+    pin: 7
     resistance: PULL_DOWN
     triggerState: true
 #  PIR2:

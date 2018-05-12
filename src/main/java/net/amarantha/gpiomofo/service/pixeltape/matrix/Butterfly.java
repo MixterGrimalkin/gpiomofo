@@ -86,6 +86,13 @@ public class Butterfly extends Sprite {
         this.dTheta = dTheta;
     }
 
+    void jumpTo(int jx, int jy) {
+        targetOn(jx, jy);
+        setLinearDelta(0, 0);
+        current[X] = jx;
+        current[Y] = jy;
+    }
+
     void targetOn(int tx, int ty) {
         target[X] = bound(0, fieldSize[X] - 1, tx);
         target[Y] = bound(0, fieldSize[Y] - 1, ty);
