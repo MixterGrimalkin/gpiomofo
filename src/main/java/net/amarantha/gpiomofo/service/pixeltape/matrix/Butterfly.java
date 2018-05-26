@@ -37,19 +37,28 @@ public class Butterfly extends Sprite {
 
     private Integer group;
 
+    private int[] topLeft = { 0, 0 };
+    private int[] bottomRight;
+
     @Inject
     public Butterfly(LightSurface surface) {
         this(RGB.GREEN, surface.width(), surface.height(), 5);
     }
 
     Butterfly(RGB colour, int width, int height, int tailLength) {
+        this(colour, width, height, new int[]{ 0, 1 }, new int[]{ width, height-3 }, tailLength);
+    }
+
+    Butterfly(RGB colour, int width, int height, int[] topLeft, int[] bottomRight, int tailLength) {
         this.colour = colour;
-        fieldSize = new int[]{ width, height };
+        fieldSize = new int[]{ bottomRight[X]-topLeft[X], bottomRight[Y]-topLeft[Y]};
         tailPos = new int[tailLength][2];
+        this.topLeft = topLeft;
+        this.bottomRight = bottomRight;
         this.tailLength = tailLength;
         tailColours = new RGB[tailLength];
-        current[X] = fieldSize[X] / 2;
-        current[Y] = fieldSize[Y] / 2;
+        current[X] = topLeft[X] + (fieldSize[X] / 2);
+        current[Y] = topLeft[Y] + (fieldSize[Y] / 2);
         theta = 0;
         randomize(1.0);
         calculateLinearDelta();
@@ -61,8 +70,8 @@ public class Butterfly extends Sprite {
 
     void randomize(double probability) {
         if (enableEntropy && random() < probability) {
-            target[X] = randomBetween(0, fieldSize[X] - 1);
-            target[Y] = randomBetween(0, fieldSize[Y] - 1);
+            target[X] = topLeft[X] + randomBetween(0, fieldSize[X] - 1);
+            target[Y] = topLeft[Y] + randomBetween(0, fieldSize[Y] - 1);
             linearSpeed = randomBetween(10.0, 25.0);
             randomizeRadius();
             randomizeAngularSpeed();
@@ -94,8 +103,8 @@ public class Butterfly extends Sprite {
     }
 
     void targetOn(int tx, int ty) {
-        target[X] = bound(0, fieldSize[X] - 1, tx);
-        target[Y] = bound(0, fieldSize[Y] - 1, ty);
+        target[X] = topLeft[X] + bound(0, fieldSize[X] - 1, tx);
+        target[Y] = topLeft[Y] + bound(0, fieldSize[Y] - 1, ty);
         calculateLinearDelta();
     }
 
@@ -131,11 +140,11 @@ public class Butterfly extends Sprite {
         if (!decelerate || target[axis] != current[axis]) {
             current[axis] += delta[axis];
         }
-        if (current[axis] < 0) {
-            current[axis] = 0;
+        if (current[axis] < topLeft[axis]) {
+            current[axis] = topLeft[axis];
             delta[axis] = -delta[axis];
-        } else if (current[axis] >= fieldSize[axis]) {
-            current[axis] = fieldSize[axis] - 1;
+        } else if (current[axis] >= bottomRight[axis]) {
+            current[axis] = bottomRight[axis] - 1;
             delta[axis] = -delta[axis];
         }
     }
@@ -149,11 +158,11 @@ public class Butterfly extends Sprite {
     }
 
     private void angularBounce(int axis) {
-        if ( real[axis] < 0 ) {
-            real[axis] = 0;
+        if ( real[axis] < topLeft[axis] ) {
+            real[axis] = topLeft[axis];
             dTheta = -dTheta;
-        } else if ( real[axis] >= fieldSize[axis] ) {
-            real[axis] = fieldSize[axis] - 1;
+        } else if ( real[axis] >= bottomRight[axis] ) {
+            real[axis] = bottomRight[axis] - 1;
             dTheta = -dTheta;
         }
     }

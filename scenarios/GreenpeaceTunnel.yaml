@@ -1,6 +1,6 @@
 Parameters:
 
-  SpriteCount: 100
+  SpriteCount: 50
   TailLength: 8
   WinCount: 5
 

@@ -89,9 +89,9 @@ Gui:
    Window-Output-GPIO: 191.0,139.0
    Window-Range-Sensor: 139.0,289.0
    Window-LightBoard: 314.0,189.0
-   Window-NeoPixel: 51.0,26.0
+   Window-NeoPixel: 104.0,339.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
-   Window-Input-GPIO: 2007.0,142.0
+   Window-Input-GPIO: 656.0,232.0
    Window-GpioMofo: 873.0,140.0
 Aws: 
    ClientId: sdk-java

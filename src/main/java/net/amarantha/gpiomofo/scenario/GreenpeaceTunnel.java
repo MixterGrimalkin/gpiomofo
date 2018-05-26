@@ -87,13 +87,9 @@ public class GreenpeaceTunnel extends Scenario {
                     });
         }
 
-        triggerSwitch1.onFire((state)->{
-            butterflies.linearMode(state);
-        });
+        triggerSwitch1.onFire((state)-> butterflies.linearMode(state));
 
-        triggerSwitch2.onFire((state)->{
-            butterflies.rest(true);
-        });
+        triggerSwitch2.onFire((state)-> butterflies.rest(true));
 
         String[] jitterCoords = targetJitterStr.split(",");
         butterflies.setTargetJitter(parseInt(jitterCoords[0]), parseInt(jitterCoords[1]));
