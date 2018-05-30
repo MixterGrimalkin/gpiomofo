@@ -41,15 +41,16 @@ public class Butterflies extends Animation {
     private OscCommand backgroundSoundStart;
     private OscCommand backgroundSoundStop;
 
-    private boolean useAudio = true;
-    public void setUseAudio(boolean useAudio) {this.useAudio = useAudio;}
-    private int winCount;
-    public void setWinCount(int winCount) {this.winCount = winCount;}
-    private int[] targetJitter;
-    public void setTargetJitter(int x, int y) {this.targetJitter = new int[]{ x, y };}
-
     private Map<Integer, RGB> colours;
     private Map<Integer, List<Butterfly>> colourGroups = new HashMap<>();
+
+    private boolean useAudio = true;
+    private int winCount;
+    private int[] targetJitter;
+
+    public void setUseAudio(boolean useAudio) {this.useAudio = useAudio;}
+    public void setWinCount(int winCount) {this.winCount = winCount;}
+    public void setTargetJitter(int x, int y) {this.targetJitter = new int[]{ x, y };}
 
     public void init(int spriteCount, Map<Integer, RGB> colours, int tailLength) {
         this.colours = colours;
@@ -76,40 +77,26 @@ public class Butterflies extends Animation {
     }
 
     public void reset() {
-        sprites.forEach(Sprite::reset);
+        sprites.forEach(Butterfly::reset);
     }
 
     @Override
     public void start() {
-        audioActive = true;
-        osc.send(backgroundSoundStart);
+//        audioActive = true;
+//        osc.send(backgroundSoundStart);
     }
 
     @Override
     public void stop() {
-        audioActive = false;
-        if ( useAudio ) {
-            osc.send(backgroundSoundStop);
-        }
-        sprites.forEach(Sprite::reset);
+//        audioActive = false;
+//        if ( useAudio ) {
+//            osc.send(backgroundSoundStop);
+//        }
+        sprites.forEach(Butterfly::reset);
     }
 
     private int foreground = 2;
     private int background = 1;
-
-    private void targetNear(Butterfly butterfly, int x, int y) {
-        butterfly.targetOn(
-                x + randomFlip(randomBetween(0, targetJitter[X])),
-                y + randomFlip(randomBetween(0, targetJitter[Y]))
-        );
-    }
-
-    private void jumpNear(Butterfly butterfly, int x, int y) {
-        butterfly.jumpTo(
-                x + randomFlip(randomBetween(0, targetJitter[X])),
-                y + randomFlip(randomBetween(0, targetJitter[Y]))
-        );
-    }
 
     private Butterfly wanderer;
 
@@ -139,7 +126,7 @@ public class Butterflies extends Animation {
                             } else {
                                 Integer[] target = foci.get(s.getGroup());
                                 if (target != null) {
-                                    targetNear(s, target[X], target[Y]);
+                                    s.targetNear(target[X], target[Y]);
                                 }
                             }
                         })
@@ -365,7 +352,7 @@ public class Butterflies extends Animation {
                     }
                 } else {
                     if (target != null) {
-                        targetNear(butterfly, target[X], target[Y]);
+                        butterfly.targetNear(target[X], target[Y]);
                     } else {
                         butterfly.randomize(1.0);
                     }

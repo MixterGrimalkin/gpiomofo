@@ -22,6 +22,7 @@ public class Butterfly extends Sprite {
     private double[] current = {0, 0};
     private double[] target = {0, 0};
     private double[] delta = {0, 0};
+    private int[] targetJitter = {0, 0};
     private double linearSpeed;
 
     int[][] tailPos;
@@ -46,7 +47,7 @@ public class Butterfly extends Sprite {
     }
 
     Butterfly(RGB colour, int width, int height, int tailLength) {
-        this(colour, width, height, new int[]{ 0, 1 }, new int[]{ width, height-3 }, tailLength);
+        this(colour, width, height, new int[]{ 0, 0 }, new int[]{ width, height }, tailLength);
     }
 
     Butterfly(RGB colour, int width, int height, int[] topLeft, int[] bottomRight, int tailLength) {
@@ -57,8 +58,7 @@ public class Butterfly extends Sprite {
         this.bottomRight = bottomRight;
         this.tailLength = tailLength;
         tailColours = new RGB[tailLength];
-        current[X] = topLeft[X] + (fieldSize[X] / 2);
-        current[Y] = topLeft[Y] + (fieldSize[Y] / 2);
+        current = centre();
         theta = 0;
         randomize(1.0);
         calculateLinearDelta();
@@ -66,6 +66,16 @@ public class Butterfly extends Sprite {
             tailColours[i] = RGB.BLACK;
             tailPos[i] = new int[]{-1, -1};
         }
+    }
+
+    private double[] centre() {
+        return new double[] {topLeft[X] + (fieldSize[X] / 2), topLeft[Y] + (fieldSize[Y] / 2) };
+    }
+
+    @Override
+    public void reset() {
+        current = centre();
+        radius = 0.0;
     }
 
     void randomize(double probability) {
@@ -102,10 +112,24 @@ public class Butterfly extends Sprite {
         current[Y] = jy;
     }
 
+    private void jumpNear(int tx, int ty) {
+        jumpTo(
+                tx + randomFlip(randomBetween(0, targetJitter[X])),
+                ty + randomFlip(randomBetween(0, targetJitter[Y]))
+        );
+    }
+
     void targetOn(int tx, int ty) {
         target[X] = topLeft[X] + bound(0, fieldSize[X] - 1, tx);
         target[Y] = topLeft[Y] + bound(0, fieldSize[Y] - 1, ty);
         calculateLinearDelta();
+    }
+
+    void targetNear(int tx, int ty) {
+        targetOn(
+            tx + randomFlip(randomBetween(0, targetJitter[X])),
+            ty + randomFlip(randomBetween(0, targetJitter[Y]))
+        );
     }
 
     private void calculateLinearDelta() {
@@ -114,10 +138,6 @@ public class Butterfly extends Sprite {
     }
 
     private boolean decelerate = true;
-
-    public void setDecelerate(boolean decelerate) {
-        this.decelerate = decelerate;
-    }
 
     @Override
     public void update() {
@@ -198,11 +218,16 @@ public class Butterfly extends Sprite {
         this.group = group;
     }
 
+    public void setDelta(double x, double y) {
+        delta = new double[]{ x, y };
+    }
+
     public void enableEntropy(boolean enableEntropy) {
         this.enableEntropy = enableEntropy;
     }
 
-    public void setDelta(double x, double y) {
-        delta = new double[]{ x, y };
+    public void setDecelerate(boolean decelerate) {
+        this.decelerate = decelerate;
     }
+
 }

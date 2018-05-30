@@ -35,6 +35,7 @@ public class GeneratePixelMapping {
         }
     }
 
+
     private static int[] calculateXY(int pixelNumber) {
 
         int p = pixelNumber % patternLength;

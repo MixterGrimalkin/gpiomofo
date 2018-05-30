@@ -7,6 +7,7 @@ import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.display.animation.AnimationService;
 import net.amarantha.gpiomofo.display.entity.Pattern;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
+import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.CrashingBlocks;
 import net.amarantha.gpiomofo.trigger.Trigger;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.Integer.parseInt;
+import static java.lang.System.currentTimeMillis;
 import static net.amarantha.utils.colour.RGB.BLACK;
 
 public class GreenpeaceTunnel extends Scenario {
@@ -25,6 +27,7 @@ public class GreenpeaceTunnel extends Scenario {
     @Inject private AnimationService animationService;
     @Inject private Butterflies butterflies;
     @Inject private CrashingBlocks blocks;
+    @Inject private NeoPixel neoPixel;
 
     @Named("Switch1") private Trigger triggerSwitch1;
     @Named("Switch2") private Trigger triggerSwitch2;
@@ -41,7 +44,8 @@ public class GreenpeaceTunnel extends Scenario {
     @Parameter("SpriteCount") private int spriteCount;
     @Parameter("TailLength") private int tailLength;
     @Parameter("LingerTime") private int lingerTime;
-    @Parameter("PayoffTime") private int payoffTime;
+    @Parameter("PayoffTime") private int payoffDuration;
+    @Parameter("PayoffRestTime") private int payoffRestTime;
 
     @Parameter("ButterflyColours") private String colourStr;
     @Parameter("OffsetMask") private boolean offsetMask;
@@ -58,10 +62,26 @@ public class GreenpeaceTunnel extends Scenario {
 
     @Inject private WebService http;
 
+    private int activeCount;
+
     private Long startedPayoff = null;
+    private Long finishedLastPayoff = null;
+
+    private void addDmxInterceptors(int startPixel, int pixelCount) {
+        for ( int i = 0; i < pixelCount; i++ ) {
+            neoPixel.intercept(startPixel + i, (rgb)->{});
+        }
+    }
 
     @Override
     public void setup() {
+
+        addDmxInterceptors(63, 23);
+        addDmxInterceptors(148, 23);
+        addDmxInterceptors(237, 20);
+        addDmxInterceptors(324, 18);
+        addDmxInterceptors(412, 15);
+        addDmxInterceptors(497, 15);
 
         int i = 0;
         for ( String s : colourStr.split(" ") ) {
@@ -81,13 +101,36 @@ public class GreenpeaceTunnel extends Scenario {
                     .onFire((state)->{
                         if ( state ) {
                             butterflies.addFocus(pin, x, y);
+                            activeCount++;
                         } else {
                             butterflies.removeFocus(pin);
+                            activeCount--;
+                        }
+                        if (activeCount >= winCount
+                                && startedPayoff==null
+                                && (finishedLastPayoff==null
+                                    || currentTimeMillis() - finishedLastPayoff >= payoffRestTime*1000)
+
+                                ) {
+                            startedPayoff = currentTimeMillis();
+                            finishedLastPayoff = null;
+                            startBlocks();
+                        } else if ( startedPayoff!=null && currentTimeMillis() - startedPayoff >= payoffDuration *1000) {
+                            startedPayoff = null;
+                            finishedLastPayoff = currentTimeMillis();
+                            startButterflies();
                         }
                     });
         }
 
-        triggerSwitch1.onFire((state)-> butterflies.linearMode(state));
+        triggerSwitch1.onFire((state) -> {
+            if (state) {
+                startBlocks();
+            } else {
+                startButterflies();
+            }
+
+        });
 
         triggerSwitch2.onFire((state)-> butterflies.rest(true));
 
@@ -101,39 +144,71 @@ public class GreenpeaceTunnel extends Scenario {
     }
 
     private void startButterflies() {
-        if ( startedPayoff!=null && System.currentTimeMillis()-startedPayoff > payoffTime*1000 ) {
-            animationService.stop("CrashingBlocks");
-            surface.clear();
-            if (offsetMask) offsetMask(BLACK);
-            animationService.play("Butterflies");
-            startedPayoff = null;
-        }
+        animationService.stop("CrashingBlocks");
+        surface.clear();
+        butterflies.reset();
+        if (offsetMask) offsetMask(BLACK);
+        animationService.play("Butterflies");
     }
 
     private void startBlocks() {
-        if ( startedPayoff==null ) {
-            animationService.stop("Butterflies");
-            surface.clear();
-            animationService.play("CrashingBlocks");
-            startedPayoff = System.currentTimeMillis();
-        }
+        animationService.stop("Butterflies");
+        blocks.reset();
+        surface.clear();
+        animationService.play("CrashingBlocks");
     }
 
     @Override
     public void startup() {
 
-        butterflies.init(spriteCount, colours, tailLength);
+//        new Thread(() -> {
+//            while (true) {
+//                xWipe(false);
+////                for (int i=0; i<5; i++)
+//                    yWipe(false);
+//            }
+//        }).start();
 
+        butterflies.init(spriteCount, colours, tailLength);
         animationService.add("Butterflies", butterflies);
         animationService.add("CrashingBlocks", blocks);
         animationService.start();
-
         animationService.play("Butterflies");
+//
+//        if ( offsetMask ) {
+//            offsetMask(BLACK);
+//        }
 
-        if ( offsetMask ) {
-            offsetMask(BLACK);
+    }
+
+    private void xWipe(boolean fill) {
+        surface.clear();
+        for ( int x=0; x<surface.width(); x++ ) {
+            if ( !fill ) surface.clear();
+            for ( int y=0; y<surface.height(); y++ ) {
+                surface.layer(0).draw(x, y, RGB.YELLOW);
+            }
+            sleep(200);
         }
+    }
 
+    private void yWipe(boolean fill) {
+        surface.clear();
+        for ( int y=0; y<surface.height(); y++ ) {
+            if (!fill) surface.clear();
+            for ( int x=0; x<surface.width(); x++ ) {
+                surface.layer(0).draw(x, y, RGB.YELLOW);
+            }
+            sleep(200);
+        }
+    }
+
+    private void sleep(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 

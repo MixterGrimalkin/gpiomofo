@@ -5,10 +5,10 @@ CrashingBlocks:
    - 220,20,0
    - 20,0,220
    - 0,20,220
-   - 0,220,20
+   - 220,22,202
    AudioPlayerIP: 192.168.1.101
    Balls: 2
-   BallColour: 255,200,0
+   BallColour: 255,160,0
    AudioPlayerPort: 53000
    BackgroundSound: rise0
 AudioPlayer: 
@@ -65,8 +65,8 @@ General:
 LightSurface: 
    LayerCount: 10
    BoardClass: net.amarantha.gpiomofo.display.lightboard.NeoPixelBoard
-   Height: 19
-   Width: 46
+   Height: 7
+   Width: 85
 Gingerline: 
    LightingServerIP: 192.168.42.100
    C5-Amber: 255,80,0
@@ -89,10 +89,10 @@ Gui:
    Window-Output-GPIO: 191.0,139.0
    Window-Range-Sensor: 139.0,289.0
    Window-LightBoard: 314.0,189.0
-   Window-NeoPixel: 104.0,339.0
+   Window-NeoPixel: 57.0,300.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
-   Window-Input-GPIO: 656.0,232.0
-   Window-GpioMofo: 873.0,140.0
+   Window-Input-GPIO: 130.0,166.0
+   Window-GpioMofo: 596.0,74.0
 Aws: 
    ClientId: sdk-java
    CertificateFile: /home/grimalkin/Downloads/aws/SnootBox.cert.pem
