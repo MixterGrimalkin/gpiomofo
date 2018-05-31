@@ -6,6 +6,7 @@ import net.amarantha.gpiomofo.annotation.Named;
 import net.amarantha.gpiomofo.annotation.Parameter;
 import net.amarantha.gpiomofo.display.animation.AnimationService;
 import net.amarantha.gpiomofo.display.entity.Pattern;
+import net.amarantha.gpiomofo.display.font.Font;
 import net.amarantha.gpiomofo.display.lightboard.LightSurface;
 import net.amarantha.gpiomofo.display.pixeltape.NeoPixel;
 import net.amarantha.gpiomofo.service.pixeltape.matrix.Butterflies;
@@ -21,6 +22,8 @@ import java.util.Map;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.currentTimeMillis;
 import static net.amarantha.utils.colour.RGB.BLACK;
+import static net.amarantha.utils.colour.RGB.RED;
+import static net.amarantha.utils.colour.RGB.WHITE;
 
 public class GreenpeaceTunnel extends Scenario {
 
@@ -76,12 +79,12 @@ public class GreenpeaceTunnel extends Scenario {
     @Override
     public void setup() {
 
-        addDmxInterceptors(63, 23);
-        addDmxInterceptors(148, 23);
-        addDmxInterceptors(237, 20);
-        addDmxInterceptors(324, 18);
-        addDmxInterceptors(412, 15);
-        addDmxInterceptors(497, 15);
+        addDmxInterceptors(62, 23);
+        addDmxInterceptors(85, 24);
+        addDmxInterceptors(236, 19);
+        addDmxInterceptors(255, 18);
+        addDmxInterceptors(409, 16);
+        addDmxInterceptors(425, 14);
 
         int i = 0;
         for ( String s : colourStr.split(" ") ) {
@@ -158,26 +161,29 @@ public class GreenpeaceTunnel extends Scenario {
         animationService.play("CrashingBlocks");
     }
 
+    private Font maskFont = Font.fromFile("ButterflyMask.fnt");
+
     @Override
     public void startup() {
 
 //        new Thread(() -> {
 //            while (true) {
 //                xWipe(false);
-////                for (int i=0; i<5; i++)
-//                    yWipe(false);
+//                yWipe(false);
 //            }
 //        }).start();
+
+//        surface.layer(maskLayer).fill(RED);
 
         butterflies.init(spriteCount, colours, tailLength);
         animationService.add("Butterflies", butterflies);
         animationService.add("CrashingBlocks", blocks);
         animationService.start();
         animationService.play("Butterflies");
-//
-//        if ( offsetMask ) {
-//            offsetMask(BLACK);
-//        }
+
+        if ( offsetMask ) {
+            offsetMask(BLACK);
+        }
 
     }
 
@@ -219,19 +225,20 @@ public class GreenpeaceTunnel extends Scenario {
     }
 
     private void offsetMask(RGB colour) {
-        Pattern mask = new Pattern(surface.width(), surface.height(), true);
-        mask.eachPixel((x,y,rgb)->{
-            if ( x%2==0 ) {
-                if ( y%2==0 ) {
-                    mask.draw(x, y, colour);
-                }
-            } else {
-                if ( y%2==1 ) {
-                    mask.draw(x, y, colour);
-                }
-            }
-        });
-        surface.layer(maskLayer).draw(0,0,mask);
+//        Pattern mask = new Pattern(surface.width(), surface.height(), true);
+//        mask.eachPixel((x,y,rgb)->{
+//            if ( x%2==0 ) {
+//                if ( y%2==0 ) {
+//                    mask.draw(x, y, colour);
+//                }
+//            } else {
+//                if ( y%2==1 ) {
+//                    mask.draw(x, y, colour);
+//                }
+//            }
+//        });
+        System.out.println("OUTPUT MASK!");
+        surface.layer(maskLayer).draw(0,0,maskFont.renderString("M").getMask(BLACK));
     }
 
 }
