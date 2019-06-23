@@ -50,21 +50,21 @@ then
 else
     echo "Uploading Application..."
     sshpass -p ${password} scp ../target/gpiomofo/*.jar pi@${ip}:gpiomofo
-#    echo "Uploading Scripts..."
-#    sshpass -p ${password} scp -r ../scripts pi@${ip}:gpiomofo
-#    sshpass -p ${password} scp ../src/main/*.sh pi@${ip}:gpiomofo
-#    echo "Uploading Utility Libraries..."
-#    sshpass -p ${password} scp ../target/gpiomofo/lib/amarantha*.jar pi@${ip}:gpiomofo/lib
-#    echo "Uploading Support Files..."
-#    sshpass -p ${password} scp ../scenarios/README.yaml pi@${ip}:gpiomofo/scenarios
+    echo "Uploading Scripts..."
+    sshpass -p ${password} scp -r ../scripts pi@${ip}:gpiomofo
+    sshpass -p ${password} scp ../src/main/*.sh pi@${ip}:gpiomofo
+    echo "Uploading Utility Libraries..."
+    sshpass -p ${password} scp ../target/gpiomofo/lib/amarantha*.jar pi@${ip}:gpiomofo/lib
+    echo "Uploading Support Files..."
+    sshpass -p ${password} scp ../scenarios/README.yaml pi@${ip}:gpiomofo/scenarios
 fi
 
-#echo "Enabling Scripts..."
-#sshpass -p ${password} ssh pi@${ip} "cd /home/pi/gpiomofo; sudo chmod +x *.sh; sudo chmod -x *.jar; sudo chmod +x scripts/*.sh"
+echo "Enabling Scripts..."
+sshpass -p ${password} ssh pi@${ip} "cd /home/pi/gpiomofo; sudo chmod +x *.sh; sudo chmod -x *.jar; sudo chmod +x scripts/*.sh"
 
-#echo "Uploading Native Libraries..."
-#sshpass -p ${password} scp -r ../src/main/c pi@${ip}:gpiomofo
-#sshpass -p ${password} ssh pi@${ip} "cd /home/pi/gpiomofo/c; chmod +x build.sh; ./build.sh; rm *.c"
+echo "Uploading Native Libraries..."
+sshpass -p ${password} scp -r ../src/main/c pi@${ip}:gpiomofo
+sshpass -p ${password} ssh pi@${ip} "cd /home/pi/gpiomofo/c; chmod +x build.sh; ./build.sh; rm *.c"
 
 echo
 echo "Done"

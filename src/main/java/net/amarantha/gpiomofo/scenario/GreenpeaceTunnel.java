@@ -37,13 +37,6 @@ public class GreenpeaceTunnel extends Scenario {
 
     @Service private LightSurface surface;
 
-//    @Named("PIR1") private Trigger pir1;
-//    @Named("PIR2") private Trigger pir2;
-//    @Named("PIR3") private Trigger pir3;
-//    @Named("PIR4") private Trigger pir4;
-//    @Named("PIR5") private Trigger pir5;
-//    @Named("PIRALL") private Trigger pirAll;
-
     @Parameter("SpriteCount") private int spriteCount;
     @Parameter("TailLength") private int tailLength;
     @Parameter("LingerTime") private int lingerTime;
@@ -79,12 +72,12 @@ public class GreenpeaceTunnel extends Scenario {
     @Override
     public void setup() {
 
-        addDmxInterceptors(62, 23);
-        addDmxInterceptors(85, 24);
-        addDmxInterceptors(236, 19);
-        addDmxInterceptors(255, 18);
-        addDmxInterceptors(409, 16);
-        addDmxInterceptors(425, 14);
+//        addDmxInterceptors(62, 23);
+//        addDmxInterceptors(85, 24);
+//        addDmxInterceptors(236, 19);
+//        addDmxInterceptors(255, 18);
+//        addDmxInterceptors(409, 16);
+//        addDmxInterceptors(425, 14);
 
         int i = 0;
         for ( String s : colourStr.split(" ") ) {
@@ -142,8 +135,6 @@ public class GreenpeaceTunnel extends Scenario {
 
         butterflies.setLingerTime(lingerTime);
         butterflies.setWinCount(winCount);
-
-
     }
 
     private void startButterflies() {
@@ -165,47 +156,13 @@ public class GreenpeaceTunnel extends Scenario {
 
     @Override
     public void startup() {
-
-//        new Thread(() -> {
-//            while (true) {
-//                xWipe(false);
-//                yWipe(false);
-//            }
-//        }).start();
-
-//        surface.layer(maskLayer).fill(RED);
-
         butterflies.init(spriteCount, colours, tailLength);
         animationService.add("Butterflies", butterflies);
         animationService.add("CrashingBlocks", blocks);
         animationService.start();
         animationService.play("Butterflies");
-
         if ( offsetMask ) {
             offsetMask(BLACK);
-        }
-
-    }
-
-    private void xWipe(boolean fill) {
-        surface.clear();
-        for ( int x=0; x<surface.width(); x++ ) {
-            if ( !fill ) surface.clear();
-            for ( int y=0; y<surface.height(); y++ ) {
-                surface.layer(0).draw(x, y, RGB.YELLOW);
-            }
-            sleep(200);
-        }
-    }
-
-    private void yWipe(boolean fill) {
-        surface.clear();
-        for ( int y=0; y<surface.height(); y++ ) {
-            if (!fill) surface.clear();
-            for ( int x=0; x<surface.width(); x++ ) {
-                surface.layer(0).draw(x, y, RGB.YELLOW);
-            }
-            sleep(200);
         }
     }
 
@@ -217,7 +174,6 @@ public class GreenpeaceTunnel extends Scenario {
         }
     }
 
-
     private int maskLayer = 8;
 
     private void clearMask() {
@@ -225,19 +181,6 @@ public class GreenpeaceTunnel extends Scenario {
     }
 
     private void offsetMask(RGB colour) {
-//        Pattern mask = new Pattern(surface.width(), surface.height(), true);
-//        mask.eachPixel((x,y,rgb)->{
-//            if ( x%2==0 ) {
-//                if ( y%2==0 ) {
-//                    mask.draw(x, y, colour);
-//                }
-//            } else {
-//                if ( y%2==1 ) {
-//                    mask.draw(x, y, colour);
-//                }
-//            }
-//        });
-        System.out.println("OUTPUT MASK!");
         surface.layer(maskLayer).draw(0,0,maskFont.renderString("M").getMask(BLACK));
     }
 
