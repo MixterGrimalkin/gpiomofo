@@ -105,6 +105,10 @@ public class CrashingBlocks extends Animation {
         field.stop();
     }
 
+    public void reset() {
+        balls.forEach(Sprite::reset);
+    }
+
     @Override
     public void refresh() {
 

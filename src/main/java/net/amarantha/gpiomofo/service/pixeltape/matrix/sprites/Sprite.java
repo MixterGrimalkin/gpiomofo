@@ -99,12 +99,12 @@ public abstract class Sprite {
         setLinearDeltaAxis(Y, Math.cos(angle) * delta);
     }
 
-    public void updatePosition() {
-        updateAxis(X);
-        updateAxis(Y);
+    public void update() {
+        updateLinearPosition(X);
+        updateLinearPosition(Y);
     }
 
-    public synchronized void updateAxis(int axis) {
+    public synchronized void updateLinearPosition(int axis) {
         double newPos = exactPosition[axis] + linearDelta[axis];
         Boolean bounceType = null;
         if ( newPos <= minBound[axis] ) {

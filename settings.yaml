@@ -5,10 +5,10 @@ CrashingBlocks:
    - 220,20,0
    - 20,0,220
    - 0,20,220
-   - 0,220,20
+   - 220,22,202
    AudioPlayerIP: 192.168.1.101
    Balls: 2
-   BallColour: 255,200,0
+   BallColour: 255,160,0
    AudioPlayerPort: 53000
    BackgroundSound: rise0
 AudioPlayer: 
@@ -23,9 +23,9 @@ AudioPlayer:
    - flutter-out
    - rise0,1
 NeoPixelGUI: 
-   Spacer: 2
-   CustomLayout: scenarios/Starlight.layout
-   LedSize: 6
+   Spacer: 5
+   CustomLayout: none
+   LedSize: 5
 NeoPixelBoard: 
    RowsFirst: true
    LoopBack: false
@@ -61,12 +61,12 @@ General:
    TargetPackage: net.amarantha.gpiomofo.target
    HttpAsyncTargets: true
    ScenarioPackage: net.amarantha.gpiomofo.scenario
-   Scenario: Starlight
+   Scenario: MessageBoard
 LightSurface: 
    LayerCount: 10
-   BoardClass: net.amarantha.gpiomofo.display.lightboard.NeoPixelBoard
-   Height: 30
-   Width: 90
+   BoardClass: net.amarantha.gpiomofo.display.lightboard.LightBoardGUI
+   Height: 64
+   Width: 256
 Gingerline: 
    LightingServerIP: 192.168.42.100
    C5-Amber: 255,80,0
@@ -88,11 +88,11 @@ Gingerline:
 Gui: 
    Window-Output-GPIO: 191.0,139.0
    Window-Range-Sensor: 139.0,289.0
-   Window-LightBoard: 314.0,189.0
-   Window-NeoPixel: 807.0,456.0
+   Window-LightBoard: 140.0,433.0
+   Window-NeoPixel: 146.0,351.0
    LogoFile: /home/grimalkin/code/gpiomofo/gpiomofo-logo.png
-   Window-Input-GPIO: 512.0,139.0
-   Window-GpioMofo: 1147.0,140.0
+   Window-Input-GPIO: 130.0,166.0
+   Window-GpioMofo: -3502.0,74.0
 Aws: 
    ClientId: sdk-java
    CertificateFile: /home/grimalkin/Downloads/aws/SnootBox.cert.pem
